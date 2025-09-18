@@ -1,5 +1,3 @@
-import os
-
 import regex
 from InquirerPy import inquirer
 from InquirerPy.validator import EmptyInputValidator, PasswordValidator
