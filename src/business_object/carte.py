@@ -5,7 +5,7 @@ class Carte:
     """Modélisation d'une carte dans un jeu de cartes"""
 
     """ Attributs de la classe """
-    __VALEURS = ("As", "2", "3", "4", "5", "6", "7", "8", "9", "10", "Valet", "Dame", "Roi")
+    __VALEURS = ("2", "3", "4", "5", "6", "7", "8", "9", "10", "Valet", "Dame", "Roi", "As")
     __COULEURS = ("Pique", "Carreau", "Coeur", "Trêfle")
 
     def __init__(self, valeur: str, couleur: str):
@@ -28,9 +28,9 @@ class Carte:
         """
 
         if valeur not in self.__VALEURS:
-            raise ValueError("Valeur de la carte incorrecte.")
+            raise ValueError(f"Valeur de la carte incorrecte : {valeur}")
         if couleur not in self.__COULEURS:
-            raise ValueError("Couleur de la carte incorrecte.")
+            raise ValueError(f"Couleur de la carte incorrecte : {couleur}")
 
         self.__valeur = valeur
         self.__couleur = couleur
@@ -64,7 +64,9 @@ class Carte:
         return f"Carte({self.__valeur}, {self.__couleur})"
 
     def __eq__(self, other) -> bool:
-        """Egalité entre deux Cartes
+        """
+
+        Egalité entre deux Cartes
 
         Paramètres
         ----------
@@ -74,7 +76,7 @@ class Carte:
         Renvois
         -------
         bool
-            Vrai si la valeur et la couleur deux cartes comparées sont identiques
+            Vrai si la valeur et la couleur des deux cartes comparées sont identiques
 
         """
 
@@ -83,6 +85,72 @@ class Carte:
 
         return self.__valeur == other.__valeur and self.__couleur == other.__couleur
 
+    def __lt__(self, other) -> bool:
+        """
+
+        Vérifie si la valeur de la carte est plus petite que celle de l'autre carte
+
+        Paramètres
+        ----------
+        other : Carte
+            carte comparée
+
+        Renvois
+        -------
+        bool
+            Vrai si la valeur de la carte est plus faible que la seconde
+
+        """
+
+        if not isinstance(other, Carte):
+            raise TypeError(f"L'objet comparé n'est pas de type Carte : {type(other)}")
+
+        return self.VALEURS().index(self.valeur) < self.VALEURS().index(other.valeur)
+
+    def __gt__(self, other) -> bool:
+        """
+
+        Vérifie si la valeur de la carte est plus grande que celle de l'autre carte
+
+        Paramètres
+        ----------
+        other : Carte
+            carte comparée
+
+        Renvois
+        -------
+        bool
+            Vrai si la valeur de la carte est plus forte que la seconde
+
+        """
+
+        if not isinstance(other, Carte):
+            raise TypeError(f"L'objet comparé n'est pas de type Carte : {type(other)}")
+
+        return self.VALEURS().index(self.valeur) > self.VALEURS().index(other.valeur)
+
     def __hash__(self):
         """Code de hachage déterminé selon la représentation officielle de la carte"""
         return hash(self.__repr__())
+
+    def valeur_egale(self, other) -> bool:
+        """
+
+        Egalité de valeur entre deux Cartes
+
+        Paramètres
+        ----------
+        other : Carte
+            carte comparée
+
+        Renvois
+        -------
+        bool
+            Vrai si la valeur des deux cartes comparées sont identiques
+
+        """
+
+        if not isinstance(other, Carte):
+            raise TypeError(f"L'objet comparé n'est pas de type Carte : {type(other)}")
+
+        return self.VALEURS().index(self.valeur) == self.VALEURS().index(other.valeur)

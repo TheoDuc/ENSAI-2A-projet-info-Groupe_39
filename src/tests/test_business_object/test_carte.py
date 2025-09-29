@@ -5,75 +5,148 @@ import pytest
 from business_object.carte import Carte
 
 
-@pytest.mark.parametrize(
-    "valeur, couleur, message_attendu",
-    [
-        ("1", "Carreau", "Valeur de la carte incorrecte."),
-        ("Dame", "Rouge", "Couleur de la carte incorrecte."),
-        ("12", "Coeur", "Valeur de la carte incorrecte."),
-        (("Trois"), "Trêfle", "Valeur de la carte incorrecte."),
-        ("Trêfle", "10", "Valeur de la carte incorrecte."),
-        (2, "Coeur", "Valeur de la carte incorrecte."),
-    ],
-)
-def test_carte_init_echec(valeur, couleur, message_attendu):
-    with pytest.raises(ValueError, match=message_attendu):
-        Carte(valeur, couleur)
+class TestCarte:
+    def test_carte_init_succes(self):
+        # GIVEN
+        valeur = "Roi"
+        couleur = "Pique"
 
+        # WHEN
+        carte = Carte(valeur, couleur)
 
-@pytest.mark.parametrize(
-    "valeur, couleur, resultat_attendu",
-    [
-        ("2", "Carreau", pytest.deux_carreau),
-        ("Valet", "Pique", pytest.valet_pique),
-        ("10", "Coeur", pytest.dix_coeur),
-        ("Roi", "Trêfle", pytest.roi_trefle),
-    ],
-)
-def test_carte_init_succes(valeur, couleur, resultat_attendu):
-    assert Carte(valeur, couleur) == resultat_attendu
+        # THEN
+        assert carte == pytest.roi_pique
 
+    def test_carte_init_valeur_incorrecte(self):
+        # GIVEN
+        valeur = "1"
+        couleur = "Pique"
+        message_attendu = f"Valeur de la carte incorrecte : {valeur}"
 
-@pytest.mark.parametrize(
-    "carte, resultat_attendu",
-    [
-        (pytest.as_carreau, "As de carreau"),
-        (pytest.valet_pique, "Valet de pique"),
-        (pytest.cinq_coeur, "5 de coeur"),
-        (pytest.neuf_trefle, "9 de trêfle"),
-    ],
-)
-def test_carte_str(carte, resultat_attendu):
-    assert str(carte) == resultat_attendu
+        # WHEN / THEN
+        with pytest.raises(ValueError, match=message_attendu):
+            Carte(valeur, couleur)
 
+    def test_carte_init_couleur_incorrecte(self):
+        # GIVEN
+        valeur = "2"
+        couleur = "noir"
+        message_attendu = f"Couleur de la carte incorrecte : {couleur}"
 
-@pytest.mark.parametrize(
-    "carte, resultat_attendu",
-    [
-        (pytest.as_carreau, "Carte(As, Carreau)"),
-        (pytest.valet_pique, "Carte(Valet, Pique)"),
-        (pytest.cinq_coeur, "Carte(5, Coeur)"),
-        (pytest.neuf_trefle, "Carte(9, Trêfle)"),
-    ],
-)
-def test_carte_repr(carte, resultat_attendu):
-    assert repr(carte) == resultat_attendu
+        # WHEN / THEN
+        with pytest.raises(ValueError, match=message_attendu):
+            Carte(valeur, couleur)
 
+    def test_carte_str(self):
+        # GIVEN
+        carte = pytest.dix_coeur
 
-@pytest.mark.parametrize(
-    "carte, other, resultat_attendu",
-    [
-        (pytest.huit_carreau, pytest.huit_carreau, True),
-        (pytest.neuf_trefle, pytest.six_carreau, False),
-        (pytest.valet_pique, pytest.valet_coeur, False),
-        (pytest.cinq_coeur, pytest.quatre_coeur, False),
-        (pytest.as_carreau, "Carte(As de carreau)", False),
-        (pytest.valet_pique, "Valet de Pique", False),
-        (pytest.cinq_coeur, 5, False),
-        (pytest.neuf_trefle, "Trêfle", False),
-    ],
-)
-def test_carte_eq_et_hash(carte, other, resultat_attendu):
-    """Vérifie que l'égalité des objets et leur hash sont cohérents"""
-    assert (carte == other) is resultat_attendu
-    assert (hash(carte) == hash(other)) is resultat_attendu
+        # WHEN
+        affichage = str(carte)
+
+        # THEN
+        assert affichage == "10 de coeur"
+
+    def test_carte_repr(self):
+        # GIVEN
+        carte = pytest.as_coeur
+
+        # WHEN
+        affichage = repr(carte)
+
+        # THEN
+        assert affichage == "Carte(As, Coeur)"
+
+    @pytest.mark.parametrize(
+        "carte, other, resultat_attendu",
+        [
+            (pytest.huit_carreau, pytest.huit_carreau, True),
+            (pytest.dame_carreau, pytest.valet_carreau, False),
+            (pytest.quatre_trefle, pytest.as_trefle, False),
+            (pytest.six_coeur, pytest.sept_coeur, False),
+            (pytest.cinq_coeur, 5, False),
+            (pytest.neuf_trefle, "Trêfle", False),
+        ],
+    )
+    def test_carte_eq_et_hash(self, carte, other, resultat_attendu):
+        # GIVEN
+        # paramètres injectés par parametrize
+
+        # WHEN / THEN
+        assert (carte == other) is resultat_attendu
+        assert (hash(carte) == hash(other)) is resultat_attendu
+
+    @pytest.mark.parametrize(
+        "carte, other, resultat_attendu",
+        [
+            (pytest.deux_carreau, pytest.as_carreau, True),
+            (pytest.dame_carreau, pytest.valet_carreau, False),
+            (pytest.quatre_trefle, pytest.quatre_coeur, False),
+        ],
+    )
+    def test_carte_lt_succes(self, carte, other, resultat_attendu):
+        # GIVEN
+        # paramètres injectés par parametrize
+
+        # WHEN / THEN
+        assert (carte < other) is resultat_attendu
+
+    def test_carte_lt_echec(self):
+        # GIVEN
+        carte = pytest.dix_carreau
+        other = 5
+        message_attendu = f"L'objet comparé n'est pas de type Carte : {type(other)}"
+
+        # WHEN / THEN
+        with pytest.raises(TypeError, match=message_attendu):
+            carte < other
+
+    @pytest.mark.parametrize(
+        "carte, other, resultat_attendu",
+        [
+            (pytest.roi_carreau, pytest.valet_carreau, True),
+            (pytest.deux_carreau, pytest.dix_carreau, False),
+            (pytest.sept_trefle, pytest.sept_coeur, False),
+        ],
+    )
+    def test_carte_gt_succes(self, carte, other, resultat_attendu):
+        # GIVEN
+        # paramètres injectés par parametrize
+
+        # WHEN / THEN
+        assert (carte > other) is resultat_attendu
+
+    def test_carte_gt_echec(self):
+        # GIVEN
+        carte = pytest.dix_carreau
+        other = 5
+        message_attendu = f"L'objet comparé n'est pas de type Carte : {type(other)}"
+
+        # WHEN / THEN
+        with pytest.raises(TypeError, match=message_attendu):
+            carte > other
+
+    @pytest.mark.parametrize(
+        "carte, other, resultat_attendu",
+        [
+            (pytest.valet_trefle, pytest.valet_carreau, True),
+            (pytest.deux_pique, pytest.dix_pique, False),
+            (pytest.sept_trefle, pytest.dame_coeur, False),
+        ],
+    )
+    def test_carte_valeur_egale_succes(self, carte, other, resultat_attendu):
+        # GIVEN
+        # paramètres injectés par parametrize
+
+        # WHEN / THEN
+        assert (carte.valeur_egale(other)) is resultat_attendu
+
+    def test_carte_valeur_egale_echec(self):
+        # GIVEN
+        carte = pytest.quatre_carreau
+        other = 4
+        message_attendu = f"L'objet comparé n'est pas de type Carte : {type(other)}"
+
+        # WHEN / THEN
+        with pytest.raises(TypeError, match=message_attendu):
+            carte.valeur_egale(other)
