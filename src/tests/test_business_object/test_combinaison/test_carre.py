@@ -1,1 +1,1 @@
-""" Implémentation des tests pour la classe Carre """
+"""Implémentation des tests pour la classe Carre"""

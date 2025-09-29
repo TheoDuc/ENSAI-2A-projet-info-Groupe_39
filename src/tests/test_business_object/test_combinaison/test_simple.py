@@ -1,1 +1,1 @@
-""" Implémentation des tests pour la classe Simple """
+"""Implémentation des tests pour la classe Simple"""

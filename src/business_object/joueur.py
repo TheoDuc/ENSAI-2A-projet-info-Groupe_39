@@ -1,4 +1,4 @@
-""" Implémentation de la classe Joueur """
+"""Implémentation de la classe Joueur"""
 
 
 class Joueur:

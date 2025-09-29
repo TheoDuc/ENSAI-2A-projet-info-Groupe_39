@@ -1,1 +1,1 @@
-""" Implémentation de la classe Admin """
+"""Implémentation de la classe Admin"""

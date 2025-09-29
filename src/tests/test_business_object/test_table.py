@@ -1,1 +1,1 @@
-""" Implémentation des tests pour la classe Table """
+"""Implémentation des tests pour la classe Table"""

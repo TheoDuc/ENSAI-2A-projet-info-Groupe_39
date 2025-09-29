@@ -1,1 +1,1 @@
-""" Implémentation de la classe Table """
+"""Implémentation de la classe Table"""

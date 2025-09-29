@@ -1,1 +1,1 @@
-""" Implémentation des tests pour la classe Brelan """
+"""Implémentation des tests pour la classe Brelan"""

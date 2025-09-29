@@ -1,1 +1,1 @@
-""" Implémentation de la classe Manche """
+"""Implémentation de la classe Manche"""

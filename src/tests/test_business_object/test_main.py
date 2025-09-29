@@ -1,1 +1,1 @@
-""" Implémentation des tests pour la classe Main """
+"""Implémentation des tests pour la classe Main"""

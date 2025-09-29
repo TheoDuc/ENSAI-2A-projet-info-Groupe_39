@@ -1,1 +1,1 @@
-""" Implémentation des tests pour la classe DoublePaire """
+"""Implémentation des tests pour la classe DoublePaire"""

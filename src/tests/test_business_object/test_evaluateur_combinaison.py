@@ -1,1 +1,1 @@
-""" Implémentation des tests pour la classe EvaluateurCombinaison """
+"""Implémentation des tests pour la classe EvaluateurCombinaison"""

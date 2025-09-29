@@ -1,1 +1,1 @@
-""" Implémentation des tests pour la classe Paire """
+"""Implémentation des tests pour la classe Paire"""

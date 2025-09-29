@@ -1,1 +1,1 @@
-""" Implémentation des tests pour la classe Board """
+"""Implémentation des tests pour la classe Board"""

@@ -1,1 +1,1 @@
-""" Implémentation des tests pour la classe InfoPartie """
+"""Implémentation des tests pour la classe InfoPartie"""

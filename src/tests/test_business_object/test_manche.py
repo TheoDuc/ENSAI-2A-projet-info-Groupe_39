@@ -1,1 +1,1 @@
-""" Implémentation des tests pour la classe Manche """
+"""Implémentation des tests pour la classe Manche"""

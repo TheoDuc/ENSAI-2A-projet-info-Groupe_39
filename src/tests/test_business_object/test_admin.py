@@ -1,1 +1,1 @@
-""" Implémentation des tests pour la classe Admin """
+"""Implémentation des tests pour la classe Admin"""

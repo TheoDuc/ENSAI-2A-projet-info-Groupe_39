@@ -1,1 +1,1 @@
-""" Implémentation de la classe Main """
+"""Implémentation de la classe Main"""

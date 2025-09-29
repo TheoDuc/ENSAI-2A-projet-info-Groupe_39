@@ -1,1 +1,1 @@
-""" Implémentation de la classe InfoPartie """
+"""Implémentation de la classe InfoPartie"""

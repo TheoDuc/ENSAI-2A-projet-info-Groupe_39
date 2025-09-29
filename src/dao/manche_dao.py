@@ -1,1 +1,1 @@
-""" Implémentation de la classe MancheDAO """
+"""Implémentation de la classe MancheDAO"""

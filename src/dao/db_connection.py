@@ -1,8 +1,11 @@
+"""Module de connection à la base de données"""
+
 import os
+
 import dotenv
 import psycopg2
-
 from psycopg2.extras import RealDictCursor
+
 from utils.singleton import Singleton
 
 

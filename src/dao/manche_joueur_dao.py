@@ -1,1 +1,1 @@
-""" Implémentation de la classe MancheJoueurDAO """
+"""Implémentation de la classe MancheJoueurDAO"""

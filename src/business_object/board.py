@@ -1,1 +1,1 @@
-""" Implémentation de la classe Board """
+"""Implémentation de la classe Board"""

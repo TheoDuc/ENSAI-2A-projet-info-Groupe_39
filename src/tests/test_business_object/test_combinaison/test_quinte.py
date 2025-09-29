@@ -1,1 +1,1 @@
-""" Implémentation des tests pour la classe Quinte """
+"""Implémentation des tests pour la classe Quinte"""

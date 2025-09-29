@@ -1,1 +1,1 @@
-""" Implémentation des tests pour la classe QuinteFlush """
+"""Implémentation des tests pour la classe QuinteFlush"""
