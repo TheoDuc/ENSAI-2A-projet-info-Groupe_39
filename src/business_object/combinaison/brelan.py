@@ -1,1 +1,1 @@
-"""Implémentation de la classe Brelan"""
+""" Implémentation de la classe Brelan """

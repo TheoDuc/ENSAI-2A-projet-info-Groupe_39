@@ -1,1 +1,1 @@
-"""Implémentation de la classe EvaluateurCombinaison"""
+""" Implémentation de la classe EvaluateurCombinaison """

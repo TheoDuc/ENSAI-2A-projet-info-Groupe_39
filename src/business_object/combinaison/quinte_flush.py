@@ -1,1 +1,1 @@
-"""Implémentation de la classe QuinteFlush"""
+""" Implémentation de la classe QuinteFlush """

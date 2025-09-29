@@ -1,1 +1,1 @@
-"""Implémentation de la classe Carre"""
+""" Implémentation de la classe Carre """

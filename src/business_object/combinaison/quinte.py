@@ -1,1 +1,1 @@
-"""Implémentation de la classe Quinte"""
+""" Implémentation de la classe Quinte """

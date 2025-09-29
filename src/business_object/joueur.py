@@ -1,3 +1,6 @@
+""" Implémentation de la classe Joueur """
+
+
 class Joueur:
     """
     Classe représentant un Joueur

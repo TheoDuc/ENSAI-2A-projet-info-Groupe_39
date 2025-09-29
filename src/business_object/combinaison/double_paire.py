@@ -1,1 +1,1 @@
-"""Implémentation de la classe DoublePaire"""
+""" Implémentation de la classe DoublePaire """

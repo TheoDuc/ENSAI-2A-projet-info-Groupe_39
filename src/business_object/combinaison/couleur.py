@@ -1,1 +1,1 @@
-"""Implémentation de la classe Couleur"""
+""" Implémentation de la classe Couleur """

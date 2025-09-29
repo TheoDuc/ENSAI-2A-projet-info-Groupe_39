@@ -1,3 +1,6 @@
+""" Implémentation de la classe JoueurDAO """
+
+
 import logging
 
 from utils.singleton import Singleton

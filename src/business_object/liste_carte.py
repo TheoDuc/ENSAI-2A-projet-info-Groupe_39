@@ -1,1 +1,1 @@
-"""Implémentation de la classe AbstractListeCartes"""
+""" Implémentation de la classe AbstractListeCartes """

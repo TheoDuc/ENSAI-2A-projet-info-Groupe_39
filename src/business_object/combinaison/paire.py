@@ -1,1 +1,1 @@
-"""Implémentation de la classe Paire"""
+""" Implémentation de la classe Paire """

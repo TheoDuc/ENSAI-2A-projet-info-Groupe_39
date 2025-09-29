@@ -1,1 +1,1 @@
-"""Implémentation de la classe Full"""
+""" Implémentation de la classe Full """

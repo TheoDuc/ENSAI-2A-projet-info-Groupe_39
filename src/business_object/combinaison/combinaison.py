@@ -1,1 +1,1 @@
-"""Implémentation de la classe AbstractCombinaison"""
+""" Implémentation de la classe AbstractCombinaison """

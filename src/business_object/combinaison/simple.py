@@ -1,1 +1,1 @@
-"""Implémentation de la classe Simple"""
+""" Implémentation de la classe Simple """
