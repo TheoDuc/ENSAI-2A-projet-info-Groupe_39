@@ -4,13 +4,12 @@
 class Carte:
     """Modélisation d'une carte dans un jeu de cartes"""
 
-    """ Attributs de la classe """
+    """Attributs de la classe"""
     __VALEURS = ("2", "3", "4", "5", "6", "7", "8", "9", "10", "Valet", "Dame", "Roi", "As")
     __COULEURS = ("Pique", "Carreau", "Coeur", "Trêfle")
 
     def __init__(self, valeur: str, couleur: str):
         """
-
         Instanciation d'une carte (Jeu de cartes)
 
         Paramètres
@@ -24,7 +23,6 @@ class Carte:
         -------
         Carte
             Instance de 'Carte'
-
         """
 
         if valeur not in self.__VALEURS:
@@ -65,7 +63,6 @@ class Carte:
 
     def __eq__(self, other) -> bool:
         """
-
         Egalité entre deux Cartes
 
         Paramètres
@@ -77,7 +74,6 @@ class Carte:
         -------
         bool
             Vrai si la valeur et la couleur des deux cartes comparées sont identiques
-
         """
 
         if not isinstance(other, Carte):
@@ -87,7 +83,6 @@ class Carte:
 
     def __lt__(self, other) -> bool:
         """
-
         Vérifie si la valeur de la carte est plus petite que celle de l'autre carte
 
         Paramètres
@@ -99,7 +94,6 @@ class Carte:
         -------
         bool
             Vrai si la valeur de la carte est plus faible que la seconde
-
         """
 
         if not isinstance(other, Carte):
@@ -109,7 +103,6 @@ class Carte:
 
     def __gt__(self, other) -> bool:
         """
-
         Vérifie si la valeur de la carte est plus grande que celle de l'autre carte
 
         Paramètres
@@ -121,7 +114,6 @@ class Carte:
         -------
         bool
             Vrai si la valeur de la carte est plus forte que la seconde
-
         """
 
         if not isinstance(other, Carte):
@@ -135,8 +127,7 @@ class Carte:
 
     def valeur_egale(self, other) -> bool:
         """
-
-        Egalité de valeur entre deux Cartes
+        Vérifie l'égalité de valeurs entre deux Cartes
 
         Paramètres
         ----------
