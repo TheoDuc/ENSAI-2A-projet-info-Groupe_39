@@ -1,4 +1,4 @@
-"""Implémentation des tests pour la classe AbstractListeCartes"""
+"""Implémentation des tests pour toutes les sous-classes de la classe AbstractListeCartes"""
 
 from abc import ABC
 
@@ -20,37 +20,75 @@ class AbstractListeCartesTest(ABC):
         """
         raise NotImplementedError
 
+    @pytest.fixture
+    def cls(self):
+        return NotImplementedError
+
+    def test_liste_cartes_init_succes(self, cls):
+        # GIVEN
+        # cls en fixture
+        cartes = [pytest.trois_carreau, pytest.quatre_carreau]
+
+        # WHEN
+        liste_cartes = cls(cartes)
+
+        # THEN
+        assert liste_cartes.cartes == cartes
+
+    def test_liste_cartes_init_tuple_echec(self, cls):
+        # GIVEN
+        # cls en fixture
+        cartes = (pytest.cinq_pique, pytest.valet_coeur)
+        message_attendu = f"cartes n'est pas list ou None : {type(cartes)}"
+
+        # WHEN / THEN
+        with pytest.raises(TypeError, match=message_attendu):
+            cls(cartes)
+
+    def test_liste_cartes_init_pas_carte_echec(self, cls):
+        # GIVEN
+        # cls en fixture
+        nombre = 5
+        cartes = (pytest.cinq_pique, nombre)
+        message_attendu = f"cartes ne doit contenir que des objet de type Carte : {type(nombre)}"
+
+        # WHEN / THEN
+        with pytest.raises(TypeError, match=message_attendu):
+            cls(cartes)
+
     def test_liste_cartes_str(self, liste_cartes):
         # GIVEN
         # liste_carte en fixture
+        resultat = "[As de pique, 10 de coeur]"
 
         # WHEN
         affichage = str(liste_cartes)
 
         # THEN
-        assert affichage == "[As de pique, 10 de coeur]"
+        assert affichage == resultat
 
     def test_liste_cartes_len(self, liste_cartes):
         # GIVEN
         # liste_carte en fixture
+        resultat = 2
 
         # WHEN
         longueur = len(liste_cartes)
 
         # THEN
-        assert longueur == 2
+        assert longueur == resultat
 
     def test_liste_cartes_ajouter_carte_succes(self, liste_cartes):
         # GIVEN
         # liste_carte en fixture
         carte = pytest.cinq_trefle
+        resultat = [pytest.as_pique, pytest.dix_coeur, pytest.cinq_trefle]
 
         # WHEN
         liste_cartes.ajouter_carte(carte)
 
         # THEN
-        assert liste_cartes.cartes[-1] == carte
-        assert len(liste_cartes) == 3
+        assert liste_cartes.cartes == resultat
 
     def test_liste_cartes_ajouter_carte_echec(self, liste_cartes):
         # GIVEN
@@ -65,13 +103,14 @@ class AbstractListeCartesTest(ABC):
     def test_liste_cartes_retirer_carte_succes(self, liste_cartes):
         # GIVEN
         # liste_cartes en fixture
+        resultat = [pytest.dix_coeur]
 
         # WHEN
         carte_retiree = liste_cartes.retirer_carte()
 
         # THEN
         assert carte_retiree == pytest.as_pique
-        assert len(liste_cartes) == 1
+        assert liste_cartes.cartes == resultat
 
     def test_liste_cartes_retirer_carte_indice_non_int(self, liste_cartes):
         # GIVEN
@@ -96,20 +135,34 @@ class AbstractListeCartesTest(ABC):
     def test_liste_cartes_trie_valeur_croissant(self, liste_cartes):
         # GIVEN
         # liste_cartes en fixture
+        resultat = [pytest.dix_coeur, pytest.as_pique]
 
         # WHEN
         liste_cartes.trie_valeur()
 
         # THEN
-        assert liste_cartes.cartes[0] == pytest.dix_coeur
+        assert liste_cartes.cartes == resultat
 
     def test_liste_cartes_trie_valeur_croissante(self, liste_cartes):
         # GIVEN
         # liste_cartes en fixture
         croissant = False
+        resultat = [pytest.as_pique, pytest.dix_coeur]
 
         # WHEN
         liste_cartes.trie_valeur(croissant)
 
         # THEN
-        assert liste_cartes.cartes[0] == pytest.as_pique
+        assert liste_cartes.cartes == resultat
+
+    def test_liste_cartes_melanger(self, cls):
+        # GIVEN
+        # cls en fixture
+        liste_carte = cls(None)
+        liste_carte_temoin = cls(None)
+
+        # WHEN
+        liste_carte.melanger()
+
+        # THEN
+        assert liste_carte.cartes != liste_carte_temoin.cartes

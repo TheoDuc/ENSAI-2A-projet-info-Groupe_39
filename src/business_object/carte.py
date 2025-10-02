@@ -121,7 +121,7 @@ class Carte:
 
         return self.VALEURS().index(self.valeur) > self.VALEURS().index(other.valeur)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """Code de hachage déterminé selon la représentation officielle de la carte"""
         return hash(self.__repr__())
 

@@ -40,22 +40,24 @@ class TestCarte:
     def test_carte_str(self):
         # GIVEN
         carte = pytest.dix_coeur
+        resultat = "10 de coeur"
 
         # WHEN
         affichage = str(carte)
 
         # THEN
-        assert affichage == "10 de coeur"
+        assert affichage == resultat
 
     def test_carte_repr(self):
         # GIVEN
         carte = pytest.as_coeur
+        resultat = "Carte(As, Coeur)"
 
         # WHEN
         affichage = repr(carte)
 
         # THEN
-        assert affichage == "Carte(As, Coeur)"
+        assert affichage == resultat
 
     @pytest.mark.parametrize(
         "carte, other, resultat_attendu",

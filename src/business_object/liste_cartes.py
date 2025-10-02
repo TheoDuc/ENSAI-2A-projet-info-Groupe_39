@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from copy import deepcopy
 from random import shuffle
 
-from carte import Carte
+from business_object.carte import Carte
 
 
 class AbstractListeCartes(ABC):
@@ -25,19 +25,21 @@ class AbstractListeCartes(ABC):
             Instance de '_ListeCartes'
         """
         if not isinstance(cartes, list) and cartes is not None:
-            raise ValueError("L'argument 'cartes' doit être None ou une liste de cartes.")
+            raise TypeError(f"cartes n'est pas list ou None : {type(cartes)}")
 
         if cartes is not None:
             for carte in cartes:
                 if not isinstance(carte, Carte):
-                    raise ValueError("L'argument 'cartes' doit être None ou une liste de cartes.")
+                    raise TypeError(
+                        f"cartes ne doit contenir que des objet de type Carte : {type(carte)}"
+                    )
 
         if cartes is not None:
             self.__cartes = cartes
         else:
             self.__cartes = [
                 Carte(valeur, couleur) for valeur in Carte.VALEURS() for couleur in Carte.COULEURS()
-            ] * 2
+            ]
 
     @property
     def cartes(self) -> list:
@@ -76,9 +78,20 @@ class AbstractListeCartes(ABC):
             Vrai si l'ordre des cartes et les cartes sont identiques.
             Le type des deux objets doit aussi être identique.
         """
-        pass
 
-    def ajouter_carte(self, carte: Carte):
+        if type(self) is not type(other):
+            return False
+
+        if len(self) != len(other):
+            return False
+
+        for carte1, carte2 in self.cartes, other.cartes:
+            if carte1 != carte2:
+                return False
+
+        return True
+
+    def ajouter_carte(self, carte: Carte) -> None:
         """
         Ajoute une carte dans la liste de cartes
 
