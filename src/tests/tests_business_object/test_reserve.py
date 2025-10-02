@@ -1,12 +1,12 @@
 """Implémentation des tests pour la classe Reserve"""
 
 import pytest
-from test.test_liste_cartes import AbstractListeCartesTest
 
 from business_object.board import Board
 from business_object.carte import Carte
 from business_object.main import Main
 from business_object.reserve import Reserve
+from tests.tests_business_object.test_liste_cartes import AbstractListeCartesTest
 
 
 class TestReserve(AbstractListeCartesTest):

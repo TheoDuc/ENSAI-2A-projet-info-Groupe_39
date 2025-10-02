@@ -1,9 +1,9 @@
 """Implémentation des tests pour la classe Board"""
 
 import pytest
-from tests.test_liste_cartes import AbstractListeCartesTest
 
 from business_object.board import Board
+from tests.tests_business_object.test_liste_cartes import AbstractListeCartesTest
 
 
 class TestBoard(AbstractListeCartesTest):

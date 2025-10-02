@@ -3,7 +3,7 @@
 import pytest
 
 from business_object.main import Main
-from tests.test_business_object.test_liste_cartes import AbstractListeCartesTest
+from tests.tests_business_object.test_liste_cartes import AbstractListeCartesTest
 
 
 class TestMain(AbstractListeCartesTest):
