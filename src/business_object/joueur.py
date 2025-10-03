@@ -21,10 +21,13 @@ class Joueur:
         indique si le joueur est un fan de Pokemon
     """
 
-    def __init__(self, pseudo, age, mail, mdp=None, fan_pokemon=False, id_joueur=None):
+    def __init__(self, pseudo, credit, actif, pays, age, mail, mdp=None, fan_pokemon=False, id_joueur=None):
         """Constructeur"""
         self.id_joueur = id_joueur
         self.pseudo = pseudo
+        self.credit = credit
+        self.actif = actif
+        self.pays = pays
         self.mdp = mdp
         self.age = age
         self.mail = mail
