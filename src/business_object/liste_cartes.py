@@ -132,13 +132,6 @@ class AbstractListeCartes(ABC):
 
         return self.__cartes.pop(indice)
 
-    def trie_valeur(self, croissant=True) -> None:
-        """
-
-        Blabla
-        """
-        pass
-
     def melanger(self):
         """Mélange l'ordre des cartes"""
         shuffle(self.__cartes)
