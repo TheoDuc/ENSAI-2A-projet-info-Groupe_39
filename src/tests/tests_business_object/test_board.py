@@ -15,12 +15,13 @@ class TestBoard(AbstractListeCartesTest):
     def cls(self):
         return Board
 
-    def test_board_init_defaut(self):
+    def test_board_init_succes(self):
         # GIVEN
-        resultat = []
+        resultat = [pytest.quatre_carreau]
 
         # WHEN
-        board = Board()
+        board = Board(resultat)
 
         # THEN
         assert board.cartes == resultat
+

@@ -102,7 +102,7 @@ class AbstractListeCartes(ABC):
         """
 
         if not isinstance(carte, Carte):
-            raise TypeError("L'argument 'carte' doit être une instance de Carte.")
+            raise TypeError(f"l'objet à ajouter n'est pas de type Carte : {type(carte)}")
 
         self.__cartes.append(carte)
 

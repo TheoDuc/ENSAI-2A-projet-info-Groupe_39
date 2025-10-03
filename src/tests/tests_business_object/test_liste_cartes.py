@@ -49,7 +49,7 @@ class AbstractListeCartesTest(ABC):
         # GIVEN
         # cls en fixture
         nombre = 5
-        cartes = (pytest.cinq_pique, nombre)
+        cartes = [pytest.cinq_pique, nombre]
         message_attendu = f"cartes ne doit contenir que des objet de type Carte : {type(nombre)}"
 
         # WHEN / THEN
@@ -106,7 +106,7 @@ class AbstractListeCartesTest(ABC):
         resultat = [pytest.dix_coeur]
 
         # WHEN
-        carte_retiree = liste_cartes.retirer_carte()
+        carte_retiree = liste_cartes.retirer_carte(0)
 
         # THEN
         assert carte_retiree == pytest.as_pique
