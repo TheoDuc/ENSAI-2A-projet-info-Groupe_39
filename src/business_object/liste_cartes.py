@@ -134,8 +134,7 @@ class AbstractListeCartes(ABC):
 
     def trie_valeur(self, croissant=True) -> None:
         """
-
-        Blabla
+        blabla
         """
         pass
 
