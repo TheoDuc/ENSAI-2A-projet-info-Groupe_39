@@ -5,44 +5,54 @@ import pytest
 from business_object.combinaison.carre import Carre
 
 
-# ---------- Fixtures ----------
-@pytest.fixture
-def carre():
-    """Fixture qui fournit un carré de test"""
-    return Carre("Dame", ("10", "8", "7"))
+# ---------- Classe de tests ----------
+class Test_Carre:
+    def test_creation_carre(self):
+        # GIVEN
+        hauteur = "Dame"
+        kicker = ("10", "8", "7")
 
+        # WHEN
+        c = Carre(hauteur, kicker)
 
-@pytest.fixture
-def autre_carre():
-    """Fixture pour comparaison"""
-    return Carre("Valet", ("Roi", "9", "6"))
+        # THEN
+        assert c.hauteur == "Dame"
+        assert c.kicker == ("10", "8", "7")
+        assert Carre.FORCE() == 7
 
+    def test_comparaison_carre(self):
+        # GIVEN
+        c_dame = Carre("Dame", ("10", "8", "7"))
+        c_valet = Carre("Valet", ("Roi", "9", "6"))
 
-# ---------- Tests ----------
-def test_creation_carre(carre):
-    assert carre.hauteur == "Dame"
-    assert carre.kicker == ("10", "8", "7")
-    assert Carre.FORCE() == 7  # appel correct de la méthode
+        # WHEN / THEN
+        assert c_dame > c_valet
+        assert c_valet < c_dame
+        assert c_dame == Carre("Dame", ("10", "8", "7"))
 
+    def test_egalite_et_non_egalite(self):
+        # GIVEN
+        c_dame = Carre("Dame", ("10", "8", "7"))
+        c_valet = Carre("Valet", ("Roi", "9", "6"))
 
-def test_comparaison_carre(carre, autre_carre):
-    assert carre > autre_carre
-    assert not (autre_carre > carre)
-    assert carre == Carre("Dame", ("10", "8", "7"))
+        # WHEN / THEN
+        assert c_dame == Carre("Dame", ("10", "8", "7"))
+        assert c_dame != c_valet
 
+    def test_creation_carre_invalide(self):
+        # GIVEN / WHEN / THEN
+        with pytest.raises(ValueError):
+            Carre(12, ("10", "8", "7"))
 
-def test_egalite_et_non_egalite(carre, autre_carre):
-    assert carre == Carre("Dame", ("10", "8", "7"))
-    assert carre != autre_carre
+    def test_str_repr_carre(self):
+        # GIVEN
+        c = Carre("Dame", ("10", "8", "7"))
 
+        # WHEN
+        texte_str = str(c)
+        texte_repr = repr(c)
 
-def test_creation_carre_invalide():
-    # hauteur non valide
-    with pytest.raises(ValueError):
-        Carre(12, ("10", "8", "7"))
-
-
-def test_str_carre(carre):
-    texte = str(carre)
-    assert "Carre" in texte
-    assert "Dame" in texte
+        # THEN
+        assert "Carre" in texte_str
+        assert "Dame" in texte_str
+        assert texte_repr == texte_str

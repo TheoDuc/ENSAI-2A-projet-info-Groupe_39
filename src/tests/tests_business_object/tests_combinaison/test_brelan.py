@@ -1,46 +1,58 @@
+"""Implémentation des tests pour la classe Brelan"""
+
 import pytest
 
 from business_object.combinaison.brelan import Brelan
 
 
-@pytest.fixture
-def brelan():
-    """Fixture qui crée un brelan de Dames"""
-    return Brelan("Dame", ("10", "8"))
+# ---------- Classe de tests ----------
+class Test_Brelan:
+    def test_creation_brelan(self):
+        # GIVEN
+        hauteur = "Dame"
+        kicker = ("10", "8")
 
+        # WHEN
+        b = Brelan(hauteur, kicker)
 
-@pytest.fixture
-def autre_brelan():
-    """Fixture pour comparaison : brelan de Valets"""
-    return Brelan("Valet", ("Roi", "9"))
+        # THEN
+        assert b.hauteur == "Dame"
+        assert b.kicker == ("10", "8")
+        assert Brelan.FORCE() == 3
 
+    def test_comparaison_brelan(self):
+        # GIVEN
+        b_dame = Brelan("Dame", ("10", "8"))
+        b_valet = Brelan("Valet", ("Roi", "9"))
 
-def test_creation_brelan(brelan):
-    # THEN
-    assert brelan.hauteur == "Dame"
-    assert brelan.kicker == ("10", "8")
-    # Vérifie que la constante FORCE vaut bien 3
-    assert getattr(Brelan, "FORCE", None) == 3 or callable(Brelan.FORCE)
+        # WHEN / THEN
+        assert b_dame > b_valet
+        assert b_valet < b_dame
+        assert b_dame == Brelan("Dame", ("10", "8"))
 
+    def test_egalite_et_non_egalite(self):
+        # GIVEN
+        b_dame = Brelan("Dame", ("10", "8"))
+        b_valet = Brelan("Valet", ("Roi", "9"))
 
-def test_comparaison_brelan(brelan, autre_brelan):
-    # WHEN / THEN
-    assert brelan > autre_brelan
-    assert not (autre_brelan > brelan)
-    assert brelan == Brelan("Dame", ("10", "8"))
+        # WHEN / THEN
+        assert b_dame == Brelan("Dame", ("10", "8"))
+        assert b_dame != b_valet
 
+    def test_creation_brelan_invalide(self):
+        # GIVEN / WHEN / THEN
+        with pytest.raises(ValueError):
+            Brelan(12, ("10", "8"))
 
-def test_egalite_et_non_egalite(brelan, autre_brelan):
-    assert brelan == Brelan("Dame", ("10", "8"))
-    assert brelan != autre_brelan
+    def test_str_repr_brelan(self):
+        # GIVEN
+        b = Brelan("Dame", ("10", "8"))
 
+        # WHEN
+        texte_str = str(b)
+        texte_repr = repr(b)
 
-def test_creation_brelan_invalide():
-    with pytest.raises(ValueError):
-        Brelan(12, ("10", "8"))  # hauteur non valide
-
-
-def test_str_brelan(brelan):
-    texte = str(brelan)
-    assert "Brelan" in texte
-    assert "Dame" in texte
+        # THEN
+        assert "Brelan" in texte_str
+        assert "Dame" in texte_str
+        assert texte_repr == texte_str

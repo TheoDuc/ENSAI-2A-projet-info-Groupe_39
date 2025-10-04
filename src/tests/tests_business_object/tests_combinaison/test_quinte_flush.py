@@ -8,8 +8,7 @@ from business_object.combinaison.quinte_flush import QuinteFlush
 # ---------- Fixtures ----------
 @pytest.fixture
 def quinte_flush():
-    """Fixture qui fournit une quinte flush de test"""
-    # kicker = None car QuinteFlush n'a pas de kicker
+    """Fixture qui fournit une QuinteFlush avec hauteur 'As'"""
     return QuinteFlush("As")
 
 
@@ -19,31 +18,71 @@ def autre_quinte_flush():
     return QuinteFlush("Roi")
 
 
-# ---------- Tests ----------
-def test_creation_quinte_flush(quinte_flush):
-    assert quinte_flush.hauteur == "As"
-    assert quinte_flush.kicker == ()
-    assert QuinteFlush.FORCE() == 8
+# ---------- Classe de tests ----------
+class Test_Quinte_Flush:
+    """Tests unitaires pour la classe QuinteFlush"""
 
+    def test_creation_quinte_flush(self, quinte_flush):
+        # GIVEN
+        hauteur = "As"
 
-def test_comparaison_quinte_flush(quinte_flush, autre_quinte_flush):
-    assert quinte_flush > autre_quinte_flush
-    assert not (autre_quinte_flush > quinte_flush)
-    assert quinte_flush == QuinteFlush("As")
+        # WHEN
+        quinte = quinte_flush
 
+        # THEN
+        assert quinte.hauteur == "As"
+        assert quinte.kicker == ()
+        assert QuinteFlush.FORCE() == 8
 
-def test_egalite_et_non_egalite(quinte_flush, autre_quinte_flush):
-    assert quinte_flush == QuinteFlush("As")
-    assert quinte_flush != autre_quinte_flush
+    def test_comparaison_quinte_flush(self, quinte_flush, autre_quinte_flush):
+        # GIVEN
+        q_as = quinte_flush
+        q_roi = autre_quinte_flush
 
+        # WHEN
+        resultat_sup = q_as > q_roi
+        resultat_inf = q_roi > q_as
+        resultat_egal = q_as == QuinteFlush("As")
 
-def test_creation_quinte_flush_invalide():
-    # Hauteur non valide
-    with pytest.raises(ValueError):
-        QuinteFlush(12)
+        # THEN
+        assert resultat_sup
+        assert not resultat_inf
+        assert resultat_egal
 
+    def test_comparaison_inverse(self, quinte_flush, autre_quinte_flush):
+        # GIVEN
+        q_as = quinte_flush
+        q_roi = autre_quinte_flush
 
-def test_str_quinte_flush(quinte_flush):
-    texte = str(quinte_flush)
-    assert "QuinteFlush" in texte
-    assert "As" in texte
+        # THEN
+        assert q_roi < q_as
+
+    def test_egalite_et_non_egalite(self, quinte_flush, autre_quinte_flush):
+        # GIVEN
+        q_as = quinte_flush
+        q_roi = autre_quinte_flush
+
+        # WHEN / THEN
+        assert q_as == QuinteFlush("As")
+        assert q_as != q_roi
+
+    def test_creation_quinte_flush_invalide(self):
+        # GIVEN
+        hauteur_invalide = 12
+
+        # WHEN / THEN
+        with pytest.raises(ValueError):
+            QuinteFlush(hauteur_invalide)
+
+    def test_str_repr_quinte_flush(self, quinte_flush):
+        # GIVEN
+        q = quinte_flush
+
+        # WHEN
+        texte_str = str(q)
+        texte_repr = repr(q)
+
+        # THEN
+        assert "QuinteFlush" in texte_str
+        assert "As" in texte_str
+        assert texte_repr == texte_str
