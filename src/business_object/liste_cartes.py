@@ -1,6 +1,6 @@
 """Implémentation de la classe AbstractListeCartes"""
 
-from abc import ABC, abstractmethod
+from abc import ABC
 from copy import deepcopy
 from random import shuffle
 
@@ -62,7 +62,6 @@ class AbstractListeCartes(ABC):
         """Renvoie le nombre de cartes dans l'attribut 'cartes'"""
         return len(self.__cartes)
 
-    @abstractmethod
     def __eq__(self, other) -> bool:
         """
         Compare l'égalité entre deux listes de cartes

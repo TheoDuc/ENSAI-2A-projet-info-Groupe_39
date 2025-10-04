@@ -25,7 +25,7 @@ class TestReserve(AbstractListeCartesTest):
         ]
 
         # WHEN
-        reserve = Reserve()
+        reserve = Reserve(None)
 
         # THEN
         assert reserve.cartes == resultat
@@ -36,7 +36,7 @@ class TestReserve(AbstractListeCartesTest):
         resultat = [pytest.huit_coeur, pytest.valet_trefle, pytest.deux_coeur]
 
         # WHEN
-        reserve.bruler()
+        reserve = reserve.bruler()
 
         # THEN
         assert reserve.cartes == resultat
@@ -44,12 +44,12 @@ class TestReserve(AbstractListeCartesTest):
     def test_reserve_reveler_succes(self):
         # GIVEN
         reserve = Reserve([pytest.as_pique, pytest.as_trefle, pytest.as_coeur])
-        board = Board()
+        board = Board([pytest.roi_pique])
         resultat_reserve = [pytest.as_trefle, pytest.as_coeur]
-        resultat_board = [pytest.as_pique]
+        resultat_board = [pytest.roi_pique, pytest.as_pique]
 
         # WHEN
-        reserve.reveler(board)
+        reserve, board = reserve.reveler(board)
 
         # THEN
         assert reserve.cartes == resultat_reserve
@@ -58,11 +58,11 @@ class TestReserve(AbstractListeCartesTest):
     def test_reserve_reveler_echec(self):
         # GIVEN
         reserve = Reserve([pytest.as_pique, pytest.as_trefle, pytest.as_coeur])
-        main = Main()
-        message_attendu = f"reserve pas de type Reserve : {type(main)}"
+        main = Main(None)
+        message_attendu = f"board pas de type Board : {type(main)}"
 
         # WHEN / THEN
-        with pytest.raises(TypeError, match=message_attendu):
+        with pytest.raises(ValueError, match=message_attendu):
             reserve.reveler(main)
 
     def test_reserve_distribuer_succes():
@@ -73,13 +73,13 @@ class TestReserve(AbstractListeCartesTest):
         n_joueurs = 2
         resultat = [
             Main(pytest.as_pique, pytest.valet_carreau),
-            Main(pytest.quatre_trefle, pytest.valet_coeur),
+            Main(pytest.quatre_trefle, pytest.valet_coeur)
         ]
         resultat_reserve = []
 
         # WHEN
-        mains = reserve.distribuer(n_joueurs)
+        reserve_f, mains = reserve.distribuer(n_joueurs)
 
         # THEN
         assert mains == resultat
-        assert reserve.cartes == resultat_reserve
+        assert reserve_f.cartes == resultat_reserve

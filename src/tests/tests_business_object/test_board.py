@@ -17,11 +17,26 @@ class TestBoard(AbstractListeCartesTest):
 
     def test_board_init_succes(self):
         # GIVEN
-        resultat = [pytest.quatre_carreau]
+        resultat = []
 
         # WHEN
-        board = Board(resultat)
+        board = Board(None)
 
         # THEN
         assert board.cartes == resultat
 
+    def test_board_init_trop_grand(self, liste_cartes):
+        # GIVEN
+        cartes = [
+            pytest.as_pique,
+            pytest.dix_coeur,
+            pytest.as_pique,
+            pytest.dix_coeur,
+            pytest.as_pique,
+            pytest.dix_coeur,
+        ]
+        message_attendu = f"Le nombre de carte dans le board est trop grand : {len(cartes)}"
+
+        # WHEN / THEN
+        with pytest.raises(ValueError, match=message_attendu):
+            Board(cartes)
