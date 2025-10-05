@@ -1,9 +1,6 @@
 """Implémentation des tests pour la classe Joueur"""
 
 import unittest
-
-# On importe la classe Joueur depuis ton module
-# (si le fichier s'appelle joueur.py, on fera : from joueur import Joueur)
 from src.business_object.joueur import Joueur
 
 
