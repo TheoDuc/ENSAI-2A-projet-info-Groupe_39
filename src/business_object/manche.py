@@ -10,7 +10,7 @@ class Manche:
 
     __TOURS = ("preflop", "flop", "turn", "river")
 
-    def __init__(self, info: InfoManche, reserve: Reserve, board: Board, grosse_blind: int):
+    def __init__(self, info: InfoManche, grosse_blind: int):
         """
         Instanciation d'une manche
 
@@ -51,8 +51,8 @@ class Manche:
         self.__tour = 0
         self.__pot = 0
         self.__info = info
-        self.__reserve = reserve
-        self.__board = board
+        self.__reserve = Reserve()
+        self.__board = Board()
         self._indice_joueur_actuel = 0
         self.__grosse_blind = grosse_blind
 
@@ -85,3 +85,9 @@ class Manche:
     def TOURS(cls) -> tuple:
         """Retourne la liste des valeurs possibles d'un tour"""
         return cls.__TOURS
+
+    def __str__(self):
+        return (f"Manche(tour={self.__tour}, "
+                f"pot={self.__pot}, "
+                f"grosse_blind={self.__grosse_blind}, "
+                f"board={self.__board})")
