@@ -45,3 +45,14 @@ class TestManche:
 
         # THEN
         assert tours == ("preflop", "flop", "turn", "river")
+
+    def test_manche_str(self):
+        # GIVEN
+        info = InfoManche()
+        grosse_blind = 100
+
+        # WHEN
+        manche = Manche(info, grosse_blind)
+
+        # THEN
+        assert str(manche) == "Manche(tour=0, pot=0, grosse_blind=100, board=[])"
