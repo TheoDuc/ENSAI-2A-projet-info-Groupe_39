@@ -1,6 +1,6 @@
 """Implémentation de la classe AbstractListeCartes"""
 
-from abc import ABC, abstractmethod
+from abc import ABC
 from copy import deepcopy
 from random import shuffle
 
@@ -62,7 +62,6 @@ class AbstractListeCartes(ABC):
         """Renvoie le nombre de cartes dans l'attribut 'cartes'"""
         return len(self.__cartes)
 
-    @abstractmethod
     def __eq__(self, other) -> bool:
         """
         Compare l'égalité entre deux listes de cartes
@@ -102,7 +101,7 @@ class AbstractListeCartes(ABC):
         """
 
         if not isinstance(carte, Carte):
-            raise TypeError("L'argument 'carte' doit être une instance de Carte.")
+            raise TypeError(f"l'objet à ajouter n'est pas de type Carte : {type(carte)}")
 
         self.__cartes.append(carte)
 
@@ -131,13 +130,6 @@ class AbstractListeCartes(ABC):
             raise ValueError(f"L'indice renseigné est trop grand : {indice}")
 
         return self.__cartes.pop(indice)
-
-    def trie_valeur(self, croissant=True) -> None:
-        """
-
-        Blabla
-        """
-        pass
 
     def melanger(self):
         """Mélange l'ordre des cartes"""

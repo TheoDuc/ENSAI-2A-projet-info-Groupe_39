@@ -1,7 +1,95 @@
 """Implémentation de la classe Reserve"""
 
+from business_object.board import Board
+from business_object.carte import Carte
 from business_object.liste_cartes import AbstractListeCartes
+from business_object.main import Main
 
 
 class Reserve(AbstractListeCartes):
-    pass
+    """Modélisation de la reserve"""
+
+    def __init__(self, cartes: list[Carte]):
+        """
+        Instanciation de la reserve de carte
+
+        Paramètres
+        ----------
+        cartes : list[Carte]
+            Liste de cartes
+
+        Renvois
+        -------
+        Reserve
+            Instance de 'Reserve'
+        """
+        AbstractListeCartes.__init__(self, cartes)
+
+    def bruler(self):
+        """
+        Positionne la premiere carte du paquet en dernier
+
+        Renvois
+        -------
+        Reserve
+            Instance de 'Reserve'
+        """
+        new_reserve = []
+        for i in range(len(self.cartes) - 1):
+            new_reserve.append(self.cartes[i + 1])
+        new_reserve.append(self.cartes[0])
+        return Reserve(new_reserve)
+
+    def reveler(self, board):
+        """
+        Prend une carte de le reserve et la met dans le board
+
+        Paramètres
+        ----------
+        board : Board
+            le board associé à la reserve
+
+        Renvois
+        -------
+        Reserve
+            Instance de 'Reserve'
+        Board
+            Instance de 'Board'
+        """
+        if not isinstance(board, Board):
+            raise ValueError(f"board pas de type Board : {type(board)}")
+        list_carte_board = board.cartes
+        list_carte_reserve = self.cartes
+        carte_reveler = list_carte_reserve.pop(0)
+        list_carte_board.append(carte_reveler)
+        return Reserve(list_carte_reserve), Board(list_carte_board)
+
+    def distribuer(self, n_joueurs):
+        """
+        Distribue 2 carte de la reserve dans la Main de chaque joueur
+
+        Paramètres
+        ----------
+        n_joueur : int
+            le nombre de Main à créer
+
+        Renvois
+        -------
+        Reserve
+            Instance de 'Reserve'
+        mains
+            une liste de Main
+        """
+        list_carte_reserve = self.cartes
+        distribution = [[] for i in range(n_joueurs)]
+        if len(list_carte_reserve) < n_joueurs * 2:
+            raise ValueError(
+                f"le nombre de carte dans la reserve est trop petit: {len(list_carte_reserve)}"
+            )
+        for k in range(0, 2):
+            for i in range(0, n_joueurs):
+                new = list_carte_reserve.pop(0)
+                distribution[i].append(new)
+        for i in range(len(distribution)):
+            distribution[i] = Main(distribution[i])
+        return Reserve(list_carte_reserve), distribution

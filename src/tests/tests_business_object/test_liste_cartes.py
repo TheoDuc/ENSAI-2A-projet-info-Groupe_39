@@ -49,7 +49,7 @@ class AbstractListeCartesTest(ABC):
         # GIVEN
         # cls en fixture
         nombre = 5
-        cartes = (pytest.cinq_pique, nombre)
+        cartes = [pytest.cinq_pique, nombre]
         message_attendu = f"cartes ne doit contenir que des objet de type Carte : {type(nombre)}"
 
         # WHEN / THEN
@@ -106,7 +106,7 @@ class AbstractListeCartesTest(ABC):
         resultat = [pytest.dix_coeur]
 
         # WHEN
-        carte_retiree = liste_cartes.retirer_carte()
+        carte_retiree = liste_cartes.retirer_carte(0)
 
         # THEN
         assert carte_retiree == pytest.as_pique
@@ -131,29 +131,6 @@ class AbstractListeCartesTest(ABC):
         # WHEN / THEN
         with pytest.raises(ValueError, match=message_attendu):
             liste_cartes.retirer_carte(indice)
-
-    def test_liste_cartes_trie_valeur_croissant(self, liste_cartes):
-        # GIVEN
-        # liste_cartes en fixture
-        resultat = [pytest.dix_coeur, pytest.as_pique]
-
-        # WHEN
-        liste_cartes.trie_valeur()
-
-        # THEN
-        assert liste_cartes.cartes == resultat
-
-    def test_liste_cartes_trie_valeur_croissante(self, liste_cartes):
-        # GIVEN
-        # liste_cartes en fixture
-        croissant = False
-        resultat = [pytest.as_pique, pytest.dix_coeur]
-
-        # WHEN
-        liste_cartes.trie_valeur(croissant)
-
-        # THEN
-        assert liste_cartes.cartes == resultat
 
     def test_liste_cartes_melanger(self, cls):
         # GIVEN
