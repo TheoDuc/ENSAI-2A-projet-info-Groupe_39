@@ -87,3 +87,12 @@ class Manche:
                 f"pot={self.__pot}, "
                 f"grosse_blind={self.__grosse_blind}, "
                 f"board={self.__board})")
+
+    def preflop(self):
+        melanger(self.reserve)
+        assignation_mains(self.info, distribuer(self.reserve, len(self.info.joueurs)))
+
+    def flop(self):
+        for i in range(3):
+            reveler(self.reserve, self.board)
+    
