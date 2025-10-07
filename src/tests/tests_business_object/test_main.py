@@ -25,6 +25,15 @@ class TestMain(AbstractListeCartesTest):
         # THEN
         assert main.cartes == resultat
 
+    def test_main_init_trop_grand(self, liste_cartes):
+        # GIVEN
+        cartes = [pytest.as_pique, pytest.dix_coeur, pytest.as_pique]
+        message_attendu = f"Le nombre de carte dans la main est trop grand : {len(cartes)}"
+
+        # WHEN / THEN
+        with pytest.raises(ValueError, match=message_attendu):
+            Main(cartes)
+
     def test_main_intervertir_cartes_(self):
         # GIVEN
         main = Main([pytest.roi_carreau, pytest.roi_coeur])
@@ -35,14 +44,3 @@ class TestMain(AbstractListeCartesTest):
 
         # THEN
         assert main.cartes == resultat
-    
-
-    def test_main_init_trop_grand(self, liste_cartes):
-        # GIVEN
-        cartes = [pytest.as_pique, pytest.dix_coeur, pytest.as_pique]
-        message_attendu = f"Le nombre de carte dans la main est trop grand : {len(cartes)}"
-
-        # WHEN / THEN
-        with pytest.raises(ValueError, match=message_attendu):
-            Main(cartes)
-

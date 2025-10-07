@@ -84,13 +84,9 @@ class AbstractListeCartes(ABC):
         if len(self) != len(other):
             return False
 
-        for i in range(len(self)):
-            if self.cartes[i] != other.cartes[i]:
+        for carte in range(len(self)):
+            if self.cartes[carte] != other.cartes[carte]:
                 return False
-
-        """for carte1, carte2 in self.cartes, other.cartes:
-            if carte1 != carte2:
-                return False"""
 
         return True
 

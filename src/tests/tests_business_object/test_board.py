@@ -18,7 +18,6 @@ class TestBoard(AbstractListeCartesTest):
     def test_board_init_defaut(self):
         # GIVEN
         resultat = []
-        resultat = []
 
         # WHEN
         board = Board()

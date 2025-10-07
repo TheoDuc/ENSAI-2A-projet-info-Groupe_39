@@ -26,17 +26,20 @@ class Main(AbstractListeCartes):
             raise ValueError(f"Le nombre de carte dans la main est trop grand : {len(cartes)}")
 
         else:
-            AbstractListeCartes.__init__(self, cartes)
+            super().__init__(cartes)
 
     def intervertir_cartes(self):
         """
-        Renvoie une main avec un ordre opposé que le premier
+        Inverse l'ordre des cartes dans la main
+
+        Paramètres
+        ----------
+        None
 
         Renvois
         -------
-        Main
-            Instance de 'Main'
+        None
 
         """
-        carte1 = self.retirer_carte()
-        self.ajouter_carte(carte1)
+
+        self.ajouter_carte(self.retirer_carte())

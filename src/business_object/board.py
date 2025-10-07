@@ -26,4 +26,4 @@ class Board(AbstractListeCartes):
             raise ValueError(f"Le nombre de carte dans le board est trop grand : {len(cartes)}")
 
         else:
-            AbstractListeCartes.__init__(self, cartes)
+            super().__init__(cartes)

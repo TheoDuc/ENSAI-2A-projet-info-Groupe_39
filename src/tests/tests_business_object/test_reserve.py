@@ -73,7 +73,7 @@ class TestReserve(AbstractListeCartesTest):
         n_joueurs = 2
         resultat = [
             Main([pytest.as_pique, pytest.valet_carreau]),
-            Main([pytest.quatre_trefle, pytest.valet_coeur])
+            Main([pytest.quatre_trefle, pytest.valet_coeur]),
         ]
         resultat_reserve = []
 
@@ -90,8 +90,9 @@ class TestReserve(AbstractListeCartesTest):
             [pytest.as_pique, pytest.quatre_trefle, pytest.valet_carreau, pytest.valet_coeur]
         )
         n_joueurs = 3
-        message_attendu = f"le nombre de carte dans la reserve est trop petit: {len(reserve.cartes)}"
-
+        message_attendu = (
+            f"le nombre de carte dans la reserve est trop petit : {len(reserve.cartes)}"
+        )
 
         # WHEN / THEN
         with pytest.raises(ValueError, match=message_attendu):
