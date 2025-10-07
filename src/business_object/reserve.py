@@ -48,7 +48,7 @@ class Reserve(AbstractListeCartes):
         Paramètres
         ----------
         board : Board
-            le board associé à la reserve
+            Le board associé à la reserve
 
         Renvois
         -------
@@ -67,12 +67,12 @@ class Reserve(AbstractListeCartes):
         Paramètres
         ----------
         n_joueur : int
-            le nombre de Main à créer
+            Le nombre de mains à créer
 
         Renvois
         -------
-        mains
-            une liste de Main
+        list[Main]
+            Une liste de mains
         """
 
         # Vérification qu'il y a assez de cartes à distribuer
