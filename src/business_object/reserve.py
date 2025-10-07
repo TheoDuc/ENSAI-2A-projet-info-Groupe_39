@@ -9,7 +9,7 @@ from business_object.main import Main
 class Reserve(AbstractListeCartes):
     """Modélisation de la reserve"""
 
-    def __init__(self, cartes: list[Carte]):
+    def __init__(self, cartes: list[Carte] = None):
         """
         Instanciation de la reserve de carte
 
@@ -34,11 +34,8 @@ class Reserve(AbstractListeCartes):
         Reserve
             Instance de 'Reserve'
         """
-        new_reserve = []
-        for i in range(len(self.cartes) - 1):
-            new_reserve.append(self.cartes[i + 1])
-        new_reserve.append(self.cartes[0])
-        return Reserve(new_reserve)
+        carte_bruler = self.retirer_carte()
+        self.ajouter_carte(carte_bruler)
 
     def reveler(self, board):
         """
@@ -58,12 +55,9 @@ class Reserve(AbstractListeCartes):
         """
         if not isinstance(board, Board):
             raise ValueError(f"board pas de type Board : {type(board)}")
-        list_carte_board = board.cartes
-        list_carte_reserve = self.cartes
-        carte_reveler = list_carte_reserve.pop(0)
-        list_carte_board.append(carte_reveler)
-        return Reserve(list_carte_reserve), Board(list_carte_board)
-
+        carte_reveler = self.retirer_carte()
+        board.ajouter_carte(carte_reveler)
+        
     def distribuer(self, n_joueurs):
         """
         Distribue 2 carte de la reserve dans la Main de chaque joueur
@@ -80,16 +74,15 @@ class Reserve(AbstractListeCartes):
         mains
             une liste de Main
         """
-        list_carte_reserve = self.cartes
         distribution = [[] for i in range(n_joueurs)]
-        if len(list_carte_reserve) < n_joueurs * 2:
+        if len(self.cartes) < n_joueurs * 2:
             raise ValueError(
-                f"le nombre de carte dans la reserve est trop petit: {len(list_carte_reserve)}"
+                f"le nombre de carte dans la reserve est trop petit: {len(self.cartes)}"
             )
         for k in range(0, 2):
             for i in range(0, n_joueurs):
-                new = list_carte_reserve.pop(0)
+                new = self.retirer_carte()
                 distribution[i].append(new)
         for i in range(len(distribution)):
             distribution[i] = Main(distribution[i])
-        return Reserve(list_carte_reserve), distribution
+        return distribution

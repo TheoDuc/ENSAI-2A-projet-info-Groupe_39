@@ -7,7 +7,7 @@ from business_object.liste_cartes import AbstractListeCartes
 class Main(AbstractListeCartes):
     """Modélisation de la main d'un joueur"""
 
-    def __init__(self, cartes: list[Carte]):
+    def __init__(self, cartes: list[Carte] = []):
         """
         Instanciation d'une main
 
@@ -25,9 +25,6 @@ class Main(AbstractListeCartes):
         if cartes is not None and len(cartes) > 2:
             raise ValueError(f"Le nombre de carte dans la main est trop grand : {len(cartes)}")
 
-        # elif cartes is None:
-        # AbstractListeCartes.cartes = []
-
         else:
             AbstractListeCartes.__init__(self, cartes)
 
@@ -41,6 +38,5 @@ class Main(AbstractListeCartes):
             Instance de 'Main'
 
         """
-        carte1 = self.cartes[0]
-        carte2 = self.cartes[1]
-        return Main([carte2, carte1])
+        carte1 = self.retirer_carte()
+        self.ajouter_carte(carte1)

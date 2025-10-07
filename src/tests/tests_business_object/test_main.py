@@ -20,7 +20,7 @@ class TestMain(AbstractListeCartesTest):
         resultat = []
 
         # WHEN
-        main = Main(None)
+        main = Main()
 
         # THEN
         assert main.cartes == resultat
@@ -31,10 +31,10 @@ class TestMain(AbstractListeCartesTest):
         resultat = [pytest.roi_coeur, pytest.roi_carreau]
 
         # WHEN
-        essaye = main.intervertir_cartes()
+        main.intervertir_cartes()
 
         # THEN
-        assert essaye.cartes == resultat
+        assert main.cartes == resultat
     
 
     def test_main_init_trop_grand(self, liste_cartes):

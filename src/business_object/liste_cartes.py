@@ -109,7 +109,7 @@ class AbstractListeCartes(ABC):
 
         self.__cartes.append(carte)
 
-    def retirer_carte(self, indice: int) -> Carte:
+    def retirer_carte(self, indice: int = 0) -> Carte:
         """
         Retire une carte de la liste selon son indice
 

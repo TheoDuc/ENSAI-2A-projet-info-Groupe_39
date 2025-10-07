@@ -21,7 +21,7 @@ class TestBoard(AbstractListeCartesTest):
         resultat = []
 
         # WHEN
-        board = Board(None)
+        board = Board()
 
         # THEN
         assert board.cartes == resultat
