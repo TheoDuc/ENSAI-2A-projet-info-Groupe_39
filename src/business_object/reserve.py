@@ -71,8 +71,6 @@ class Reserve(AbstractListeCartes):
 
         Renvois
         -------
-        Reserve
-            Instance de 'Reserve'
         mains
             une liste de Main
         """
