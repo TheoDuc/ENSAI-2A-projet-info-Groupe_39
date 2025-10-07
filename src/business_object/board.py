@@ -23,7 +23,7 @@ class Board(AbstractListeCartes):
         """
 
         if cartes is not None and len(cartes) > 5:
-            raise ValueError(f"Le nombre de carte dans le board est trop grand : {len(cartes)}")
+            raise ValueError(f"Le nombre de cartes dans le board est trop grand : {len(cartes)}")
 
         else:
             super().__init__(cartes)

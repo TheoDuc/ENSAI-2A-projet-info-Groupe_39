@@ -35,7 +35,7 @@ class TestBoard(AbstractListeCartesTest):
             pytest.as_pique,
             pytest.dix_coeur,
         ]
-        message_attendu = f"Le nombre de carte dans le board est trop grand : {len(cartes)}"
+        message_attendu = f"Le nombre de cartes dans le board est trop grand : {len(cartes)}"
 
         # WHEN / THEN
         with pytest.raises(ValueError, match=message_attendu):

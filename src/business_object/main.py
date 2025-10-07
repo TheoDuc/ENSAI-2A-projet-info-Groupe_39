@@ -23,7 +23,7 @@ class Main(AbstractListeCartes):
         """
 
         if cartes is not None and len(cartes) > 2:
-            raise ValueError(f"Le nombre de carte dans la main est trop grand : {len(cartes)}")
+            raise ValueError(f"Le nombre de cartes dans la main est trop grand : {len(cartes)}")
 
         else:
             super().__init__(cartes)
