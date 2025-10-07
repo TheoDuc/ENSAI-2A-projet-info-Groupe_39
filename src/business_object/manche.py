@@ -49,7 +49,7 @@ class Manche:
         self.__info = info
         self.__reserve = Reserve(None)
         self.__board = Board([])
-        self._indice_joueur_actuel = 0
+        self.__indice_joueur_actuel = 0
         self.__grosse_blind = grosse_blind
 
 
@@ -83,16 +83,35 @@ class Manche:
         return cls.__TOURS
 
     def __str__(self):
-        return (f"Manche(tour={self.__tour}, "
-                f"pot={self.__pot}, "
-                f"grosse_blind={self.__grosse_blind}, "
-                f"board={self.__board})")
+        return (f"Manche(tour={self.tour}, "
+                f"pot={self.pot}, "
+                f"grosse_blind={self.grosse_blind}, "
+                f"board={self.board})")
 
     def preflop(self):
-        melanger(self.reserve)
-        assignation_mains(self.info, distribuer(self.reserve, len(self.info.joueurs)))
+        melanger(self.__reserve)
+        assignation_mains(self.__info, distribuer(self.__reserve, len(self.__info.joueurs)))
+        miser(self.__info, 0, self.__grosse_blind/2)
+        miser(self.__info, 1, self.__grosse_blind)
 
     def flop(self):
         for i in range(3):
-            reveler(self.reserve, self.board)
-    
+            reveler(self.__reserve, self.__board)
+        self.__tour += 1
+        self.__indice_joueur_actuel = 2
+
+    def turn(self):
+        reveler(self.__reserve, self.__board)
+        self.__tour += 1
+        self.__indice_joueur_actuel = 2
+
+    def river(self):
+        reveler(self.__reserve, self.__board)
+        self.__tour += 1
+        self.__indice_joueur_actuel = 2
+
+    def ajouter_au_pot(self, credit):
+        self.__pot += credit
+
+    def distribuer_pot(self):
+        pass
