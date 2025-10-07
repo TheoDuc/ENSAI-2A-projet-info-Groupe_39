@@ -3,6 +3,8 @@
 from business_object.info_manche import InfoManche
 from business_object.reserve import Reserve
 from business_object.board import Board
+from business_object.evaluateur_combinaison import EvaluateurCombinaison
+from business_object.combinaison.combinaison import AbstractCombinaison
 
 class Manche:
     """ Modélisation d'une manche de poker, c'est-à-dire une séquence complète de jeu 
@@ -89,24 +91,24 @@ class Manche:
                 f"board={self.board})")
 
     def preflop(self):
-        melanger(self.__reserve)
-        assignation_mains(self.__info, distribuer(self.__reserve, len(self.__info.joueurs)))
-        miser(self.__info, 0, self.__grosse_blind/2)
-        miser(self.__info, 1, self.__grosse_blind)
+        Reserve.melanger(self.__reserve)
+        InfoManche.assignation_mains(self.__info, distribuer(self.__reserve, len(self.__info.joueurs)))
+        InfoManche.miser(self.__info, 0, self.__grosse_blind/2)
+        InfoManche.miser(self.__info, 1, self.__grosse_blind)
 
     def flop(self):
         for i in range(3):
-            reveler(self.__reserve, self.__board)
+            Board.reveler(self.__reserve, self.__board)
         self.__tour += 1
         self.__indice_joueur_actuel = 2
 
     def turn(self):
-        reveler(self.__reserve, self.__board)
+        Board.reveler(self.__reserve, self.__board)
         self.__tour += 1
         self.__indice_joueur_actuel = 2
 
     def river(self):
-        reveler(self.__reserve, self.__board)
+        Board.reveler(self.__reserve, self.__board)
         self.__tour += 1
         self.__indice_joueur_actuel = 2
 
@@ -114,4 +116,28 @@ class Manche:
         self.__pot += credit
 
     def distribuer_pot(self):
-        pass
+        joueurs_en_lice = {}
+        board = self.board.cartes
+        for i in range(len(self.info.joueurs)):
+            if self.info.tour_couche[i] == None:
+                main = self.info.mains[i]
+                joueurs_en_lice[i] = EvaluateurCombinaison.eval(main.cartes+board)
+
+        """tri par insertion, la comparaison étant celle des forces des combinaisons des joueurs"""
+        classement = [i for i in joueurs_en_lice]
+        for i in range(1, len(classement)):
+            j = i - 1
+            while j >= 0 and AbstractCombinaison.gt(joueurs_en_lice[classement[j]], joueurs_en_lice[classement[i]]):
+                classement[j + 1] = classement[j]
+                j -= 1
+            classement[j + 1] = classement[i]
+        """on distribue en partant de la meilleure main puis si besoin pots secondaires à répartir"""
+        mises = self.info.mises.copy()
+        gains = [0] * len(mises)
+        for i in classement:
+            for j in range(len(mises)):
+                gains[i] += max(mises[i], mises[j])
+                mises[j] = max(0, mises[j]-mises[i])
+        mises = self.info.mises.copy()
+        ### reste à ajouter les crédits aux joueurs
+        return gains-mises
