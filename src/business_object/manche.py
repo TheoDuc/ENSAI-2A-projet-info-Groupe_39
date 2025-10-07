@@ -5,6 +5,7 @@ from business_object.reserve import Reserve
 from business_object.board import Board
 from business_object.evaluateur_combinaison import EvaluateurCombinaison
 from business_object.combinaison.combinaison import AbstractCombinaison
+from business_object.joueur import Joueur
 
 class Manche:
     """ Modélisation d'une manche de poker, c'est-à-dire une séquence complète de jeu 
@@ -139,5 +140,24 @@ class Manche:
                 gains[i] += max(mises[i], mises[j])
                 mises[j] = max(0, mises[j]-mises[i])
         mises = self.info.mises.copy()
-        ### reste à ajouter les crédits aux joueurs
-        return gains-mises
+        """ajouter ou retirer les crédits des joueurs"""
+        for i in range(len(gains)):
+            joueur = self.__info.__joueurs[i]
+            Joueur.ajouter_credits(joueur, gains[i])
+            Joueur.retirer_credits(joueur, mises[i])
+        return gains
+
+    def joueur_suivant(self):
+        indice = self.__indice_joueur_actuel + 1
+        tour_couche = self.info.tour_couche
+        if None not in tour_couche:
+            raise ValueError("Tous les joueurs ne peuvent être couchés.")
+        else:
+            while tour_couche[indice] != None:
+                if indice == len(tour_couche) - 1:
+                    indice = 0
+                else:
+                    indice += 1
+            return indice
+
+# pas de modif d'attribut privé il faut une méthode dans la classe d'origine ça me paraît plus cohérent
