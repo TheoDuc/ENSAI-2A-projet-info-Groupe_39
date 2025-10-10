@@ -77,19 +77,31 @@ class Test:
 
     def test_table_mettre_grosse_blind_succes(self):
         # GIVEN
+        joueur1 = Joueur(1, "alice", 1000, True, "France", 20)
+        joueur2 = Joueur(2, "bernard", 500, True, "France", 25)
+        table = Table(10,10,1,[joueur1, joueur2])
+        credit = joueur2.credit
+        credit_attendu = credit - 10
         
         # WHEN
+        table.mettre_grosse_blind(credit)
 
         # THEN
         assert True == True
+        assert joueur2.credit == credit_attendu
 
     def test_table_rotation_dealer_succes(self):
         # GIVEN
-        
+        joueur1 = Joueur(1, "alice", 1000, True, "France", 20)
+        joueur2 = Joueur(2, "bernard", 500, True, "France", 25)
+        table = Table(10,10,1,[joueur1, joueur2])
+        table_attendue = Table(10,10,1,[joueur2, joueur1])
+
         # WHEN
+        table.rotation_dealer()
 
         # THEN
-        assert True == True
+        assert table.joueurs == table_attendue.joueurs
 
     def test_table_lancer_manche_succes(self):
         # GIVEN

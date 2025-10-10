@@ -59,9 +59,9 @@ class Table:
             raise ValueError("Nombre maximum de joueurs atteint")
 
     def retirer_joueur(self, indice: int) -> None:
-        """Retire un joueur de la table"""
+        """Retire un joueur de la table et le renvoie"""
         if 0 <= indice < len(self.__joueurs):
-            self.__joueurs.pop(indice)
+            return self.__joueurs.pop(indice)
         else:
             raise IndexError("Indice de joueur incorrect")
 
@@ -82,10 +82,12 @@ class Table:
             raise ValueError("Crédit insuffisant pour mettre la grosse blind")
         # A implementer
         else:
+            self.joueurs[1].credit -= self.__grosse_blind
             self.__grosse_blind += credit
 
     def rotation_dealer(self) -> None:
-        pass
+        dealer = self.retirer_joueur(0)
+        self.ajouter_joueur(dealer)
 
     def lancer_manche(self) -> None:
         """Lance une manche"""
