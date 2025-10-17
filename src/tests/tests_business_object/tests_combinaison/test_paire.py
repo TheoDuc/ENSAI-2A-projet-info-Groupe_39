@@ -2,89 +2,68 @@
 
 import pytest
 
+from business_object.carte import Carte
 from business_object.combinaison.paire import Paire
 
-"""Tests unitaires pour la combinaison Paire"""
 
-
-# ---------- Fixtures ----------
-@pytest.fixture
-def paire():
-    """Fixture qui fournit une Paire de test"""
-    return Paire("Dame", ("Roi", "10", "8"))
-
-
-@pytest.fixture
-def autre_paire():
-    """Fixture pour comparaison"""
-    return Paire("Valet", ("As", "9", "7"))
-
-
-# ---------- Classe de tests ----------
 class Test_Paire:
-    def test_creation_paire(self, paire):
-        # GIVEN
-        hauteur = "Dame"
-        kicker = ("Roi", "10", "8")
+    """Tests unitaires pour la combinaison Paire avec GIVEN / WHEN / THEN"""
 
-        # WHEN
-        p = paire
+    def test_paire_init_succes(self):
+        # GIVEN : cartes formant une Paire
+        cartes = [
+            pytest.dame_coeur,
+            pytest.dame_pique,
+            pytest.roi_coeur,
+            pytest.valet_coeur,
+            pytest.dix_coeur,
+        ]
 
-        # THEN
-        assert p.hauteur == "Dame"
-        assert p.kicker == ("Roi", "10", "8")
-        assert Paire.FORCE() == 1
+        # WHEN : création de la Paire
+        paire = Paire.from_cartes(cartes)
 
-    def test_comparaison_paire(self, paire, autre_paire):
-        # GIVEN
-        p_dame = paire
-        p_valet = autre_paire
+        # THEN : vérifications
+        assert paire.hauteur == "Dame"
+        assert paire.kicker[0] == "Roi"
+        assert all(k in Carte.VALEURS() for k in paire.kicker)
 
-        # WHEN
-        resultat_sup = p_dame > p_valet
-        resultat_inf = p_valet > p_dame
-        resultat_egal = p_dame == Paire("Dame", ("Roi", "10", "8"))
+    def test_paire_init_invalide(self):
+        # GIVEN : cartes sans Paire
+        cartes = [pytest.dame_coeur, pytest.roi_coeur, pytest.valet_coeur]
 
-        # THEN
-        assert resultat_sup
-        assert not resultat_inf
-        assert resultat_egal
-
-    def test_comparaison_inverse(self, paire, autre_paire):
-        # GIVEN
-        p_dame = paire
-        p_valet = autre_paire
-
-        # THEN
-        assert p_valet < p_dame
-
-    def test_egalite_et_non_egalite(self, paire, autre_paire):
-        # GIVEN
-        p_dame = paire
-        p_valet = autre_paire
-
-        # WHEN / THEN
-        assert p_dame == Paire("Dame", ("Roi", "10", "8"))
-        assert p_dame != p_valet
-
-    def test_creation_paire_invalide(self):
-        # GIVEN
-        hauteur_invalide = 12
-        kicker = ("Roi", "10", "8")
-
-        # WHEN / THEN
+        # WHEN / THEN : création échoue
         with pytest.raises(ValueError):
-            Paire(hauteur_invalide, kicker)
+            Paire.from_cartes(cartes)
 
-    def test_str_repr_paire(self, paire):
-        # GIVEN
-        p = paire
+    def test_paire_est_present(self):
+        # GIVEN : cartes contenant une Paire
+        cartes = [
+            pytest.dame_coeur,
+            pytest.dame_pique,
+            pytest.roi_coeur,
+            pytest.valet_coeur,
+            pytest.dix_coeur,
+        ]
+
+        # WHEN / THEN : méthode est_present retourne True
+        assert Paire.est_present(cartes)
+
+    def test_paire_est_present_faux(self):
+        # GIVEN : cartes sans Paire
+        cartes = [pytest.dame_coeur, pytest.roi_coeur, pytest.valet_coeur]
+
+        # WHEN / THEN : méthode est_present retourne False
+        assert not Paire.est_present(cartes)
+
+    def test_paire_str_repr(self):
+        # GIVEN : Paire avec kicker
+        paire = Paire("Dame", ("Roi", "Valet", "10"))
 
         # WHEN
-        texte_str = str(p)
-        texte_repr = repr(p)
+        texte_str = str(paire)
+        texte_repr = repr(paire)
 
-        # THEN
+        # THEN : vérifications
         assert "Paire" in texte_str
         assert "Dame" in texte_str
         assert texte_repr == texte_str
