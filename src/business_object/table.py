@@ -1,19 +1,31 @@
 """Implémentation de la classe Table"""
 
+from business_object.joueur import Joueur
 
 class Table:
-    """Modélisation d'une table de jeu
-
-    On definit une table par :
-    - le nombre maximum de joueurs
-    - la grosse blind
-    - le mode de jeu (0 = texas holdem, 1 = omaha)
-    - la liste des joueurs
-    - les cartes sur la table
-
-    """
+    """Modélisation d'une tablede jeu"""
 
     def __init__(self, joueur_max=int, grosse_blind=int, mode_jeu=int, joueurs=list):
+        """
+        Instanciation de la table de jeu
+
+        Paramètres
+        ----------
+        joueur_max : int
+            nombre de joueur maximum sur une table
+        grosse_blind : int
+            valeur de la grosse blind
+        mode_jeu : int
+            ????????
+        joueurs : list[Joueur]
+            liste des joueurs present sur la table
+
+        Renvois
+        -------
+        Table
+            Instance de 'Table'
+
+        """
         self.__joueur_max = joueur_max
         self.__grosse_blind = grosse_blind
         self.__mode_jeu = mode_jeu
@@ -23,69 +35,88 @@ class Table:
     # creer une classe property pour joueur_max, grosse_blind, mode_jeu et joueurs
     @property
     def joueur_max(self):
+        """Retourne l'attribut 'joueur_max'"""
         return self.__joueur_max
 
     @property
     def grosse_blind(self):
+        """Retourne l'attribut 'grosse_blind'"""
         return self.__grosse_blind
 
     @property
     def mode_jeu(self):
+        """Retourne l'attribut 'mode_jeu'"""
         return self.__mode_jeu
 
     @property
     def joueurs(self):
+        """Retourne l'attribut 'joueurs'"""
         return self.__joueurs
-
-    """
-    __len__():int
-    methodes: ajouter_joueur(joueur: Joueur) 
-    retirer_joueur(indice:int) 
-    mettre_gross_blind(credit:int)
-    rotation_dealer()
-    lancer_manche()
-    que nous allons coder
-    """
 
     def __len__(self) -> int:
         """Retourne le nombre de joueurs à la table"""
         return len(self.__joueurs)
 
     def ajouter_joueur(self, joueur) -> None:
-        """Ajoute un joueur à la table"""
-        if len(self.__joueurs) < self.__joueur_max:
-            self.__joueurs.append(joueur)
-        else:
-            raise ValueError("Nombre maximum de joueurs atteint")
+        """
+        Ajoute un joueur à la table
 
-    def retirer_joueur(self, indice: int) -> None:
-        """Retire un joueur de la table"""
-        if 0 <= indice < len(self.__joueurs):
-            self.__joueurs.pop(indice)
+        Paramètres
+        ----------
+        joueur : Joueur
+            joueur à ajouter à la table
+        """
+        if len(self.__joueurs) >= self.__joueur_max:
+            raise ValueError("Nombre maximum de joueurs atteint")
+        elif not isinstance(joueur,Joueur):
+            raise TypeError("Le joueur n'est pas une instance de joueur")
         else:
-            raise IndexError("Indice de joueur incorrect")
+            self.__joueurs.append(joueur)
+
+    def retirer_joueur(self, indice: int) -> Joueur:
+        """
+        Retire un joueur de la liste des joueurs selon son indice
+
+        Paramètres
+        ----------
+        indice : int
+            Indice du joueur à retirer dans la liste des joueurs
+
+        Renvois
+        -------
+        Joueur
+            Retourne le joueru retirée de la liste des joueurs
+        """
+        if not isinstance(indice,int):
+            raise TypeError("L'indice doit être un entier")
+        if indice >= len(self.__joueurs):
+            raise IndexError(
+                f"Indice plus grand que le nombre de joueurs : {len(self.__joueurs)}")
+        if 0 > indice :
+            raise IndexError("Indice négatif impossible")
+        else:
+            return self.__joueurs.pop(indice)
+           
 
     def mettre_grosse_blind(self, credit: int) -> None:
         """
-        Déduit la valeur de la grosse blind du crédit du joueur et l'ajoute au pot.
+        Change la valeur de la grosse blind
 
-        Args:
-            credit (int): le montant qui permettrait de mettre à joueur la grosse blind
-            si le crédit est insuffisant, le joueur est éliminé de la partie
-            sinon le montant de la grosse blind est déduit du crédit du joueur
-        Raises:
-            ValueError: si le crédit est insuffisant pour mettre la grosse blind
-            la valeur credit sert a incrementer augmenter la mise du pot
-            la valeur de la grosse blind devient l'ancienne grosse blind + le credit
+        Paramètres
+        ----------
+        credit : int
+            nouvelle valeur de la grosse blind
+
         """
-        if credit < self.__grosse_blind:
-            raise ValueError("Crédit insuffisant pour mettre la grosse blind")
-        # A implementer
-        else:
-            self.__grosse_blind += credit
+        if not isinstance(credit,int):
+            raise TypeError("Le crédit doit être un entier")
+        else :
+            self.__grosse_blind = credit
 
     def rotation_dealer(self) -> None:
-        pass
+        """Change l'ordre dans la liste de joueur"""
+        dealer = self.retirer_joueur(0)
+        self.ajouter_joueur(dealer)
 
     def lancer_manche(self) -> None:
         """Lance une manche"""

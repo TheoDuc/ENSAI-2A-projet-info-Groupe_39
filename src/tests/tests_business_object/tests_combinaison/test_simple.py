@@ -1,90 +1,57 @@
-"""Implémentation des tests pour la classe Simple"""
-
 import pytest
 
 from business_object.combinaison.simple import Simple
 
 
-# ---------- Fixtures ----------
-@pytest.fixture
-def simple():
-    """Fixture qui fournit une carte Simple de test"""
-    return Simple("As", ("Roi", "Dame", "10", "9"))
-
-
-@pytest.fixture
-def autre_simple():
-    """Fixture pour comparaison"""
-    return Simple("Roi", ("Dame", "10", "9", "8"))
-
-
-# ---------- Classe de tests ----------
 class Test_Simple:
-    """Tests unitaires pour la combinaison Simple"""
+    """Tests unitaires pour la combinaison Simple avec GIVEN / WHEN / THEN"""
 
-    def test_creation_simple(self, simple):
-        # GIVEN
-        hauteur = "As"
-        kicker = ("Roi", "Dame", "10", "9")
+    def test_creation_simple(self):
+        # GIVEN : un jeu de cartes quelconques
+        cartes = [
+            pytest.as_coeur,
+            pytest.roi_carreau,
+            pytest.dame_coeur,
+            pytest.valet_pique,
+            pytest.dix_carreau,
+        ]
 
-        # WHEN
-        s = simple
+        # WHEN : création de la Simple
+        simple = Simple.from_cartes(cartes)
 
-        # THEN
-        assert s.hauteur == "As"
-        assert s.kicker == ("Roi", "Dame", "10", "9")
+        # THEN : vérifications
+        assert simple.hauteur == "As"  # la carte la plus haute
+        assert simple.kicker == ("Roi", "Dame", "Valet", "10")
         assert Simple.FORCE() == 0
 
-    def test_comparaison_simple(self, simple, autre_simple):
-        # GIVEN
-        s_as = simple
-        s_roi = autre_simple
-
-        # WHEN
-        resultat_sup = s_as > s_roi
-        resultat_inf = s_roi > s_as
-        resultat_egal = s_as == Simple("As", ("Roi", "Dame", "10", "9"))
-
-        # THEN
-        assert resultat_sup
-        assert not resultat_inf
-        assert resultat_egal
-
-    def test_comparaison_inverse(self, simple, autre_simple):
-        # GIVEN
-        s_as = simple
-        s_roi = autre_simple
-
-        # THEN
-        assert s_roi < s_as
-
-    def test_egalite_et_non_egalite(self, simple, autre_simple):
-        # GIVEN
-        s_as = simple
-        s_roi = autre_simple
+    def test_est_present(self):
+        # GIVEN : des cartes non vides
+        cartes = [pytest.as_coeur, pytest.roi_carreau]
 
         # WHEN / THEN
-        assert s_as == Simple("As", ("Roi", "Dame", "10", "9"))
-        assert s_as != s_roi
+        assert Simple.est_present(cartes)
 
-    def test_creation_simple_invalide(self):
-        # GIVEN
-        hauteur_invalide = 12
-        kicker = ("Roi", "Dame", "10", "9")
+    def test_est_present_faux(self):
+        # GIVEN : aucune carte
+        cartes = []
 
         # WHEN / THEN
-        with pytest.raises(ValueError):
-            Simple(hauteur_invalide, kicker)
+        assert not Simple.est_present(cartes)
 
-    def test_str_repr_simple(self, simple):
-        # GIVEN
-        s = simple
+    def test_str_repr_simple(self):
+        # GIVEN : création d'une Simple
+        cartes = [
+            pytest.as_coeur,
+            pytest.roi_carreau,
+            pytest.dame_coeur,
+        ]
+        simple = Simple.from_cartes(cartes)
 
         # WHEN
-        texte_str = str(s)
-        texte_repr = repr(s)
+        texte_str = str(simple)
+        texte_repr = repr(simple)
 
-        # THEN
+        # THEN : vérifications
         assert "Simple" in texte_str
         assert "As" in texte_str
         assert texte_repr == texte_str

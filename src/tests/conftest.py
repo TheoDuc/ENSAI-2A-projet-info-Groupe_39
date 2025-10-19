@@ -1,6 +1,5 @@
 """Fichier de configuration pour les tests"""
 
-
 import pytest
 
 from business_object.carte import Carte

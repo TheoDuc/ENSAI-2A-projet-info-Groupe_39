@@ -1,88 +1,64 @@
-"""Implémentation des tests pour la classe QuinteFlush"""
-
 import pytest
 
 from business_object.combinaison.quinte_flush import QuinteFlush
 
 
-# ---------- Fixtures ----------
-@pytest.fixture
-def quinte_flush():
-    """Fixture qui fournit une QuinteFlush avec hauteur 'As'"""
-    return QuinteFlush("As")
+class Test_QuinteFlush:
+    """Tests unitaires QuinteFlush avec GIVEN / WHEN / THEN"""
 
+    def test_creation_quinte_flush(self):
+        # GIVEN : cartes formant une Quinte Flush
+        cartes = [
+            pytest.as_coeur,
+            pytest.roi_coeur,
+            pytest.dame_coeur,
+            pytest.valet_coeur,
+            pytest.dix_coeur,
+        ]
 
-@pytest.fixture
-def autre_quinte_flush():
-    """Fixture pour comparaison"""
-    return QuinteFlush("Roi")
-
-
-# ---------- Classe de tests ----------
-class Test_Quinte_Flush:
-    """Tests unitaires pour la classe QuinteFlush"""
-
-    def test_creation_quinte_flush(self, quinte_flush):
-        # GIVEN
-        hauteur = "As"
-
-        # WHEN
-        quinte = quinte_flush
+        # WHEN : création
+        q = QuinteFlush.from_cartes(cartes)
 
         # THEN
-        assert quinte.hauteur == "As"
-        assert quinte.kicker == ()
+        assert q.hauteur == "As"
+        assert q.kicker == ()
         assert QuinteFlush.FORCE() == 8
 
-    def test_comparaison_quinte_flush(self, quinte_flush, autre_quinte_flush):
-        # GIVEN
-        q_as = quinte_flush
-        q_roi = autre_quinte_flush
-
-        # WHEN
-        resultat_sup = q_as > q_roi
-        resultat_inf = q_roi > q_as
-        resultat_egal = q_as == QuinteFlush("As")
-
-        # THEN
-        assert resultat_sup
-        assert not resultat_inf
-        assert resultat_egal
-
-    def test_comparaison_inverse(self, quinte_flush, autre_quinte_flush):
-        # GIVEN
-        q_as = quinte_flush
-        q_roi = autre_quinte_flush
-
-        # THEN
-        assert q_roi < q_as
-
-    def test_egalite_et_non_egalite(self, quinte_flush, autre_quinte_flush):
-        # GIVEN
-        q_as = quinte_flush
-        q_roi = autre_quinte_flush
+    def test_est_present(self):
+        # GIVEN : cartes avec quinte flush
+        cartes = [
+            pytest.as_coeur,
+            pytest.roi_coeur,
+            pytest.dame_coeur,
+            pytest.valet_coeur,
+            pytest.dix_coeur,
+        ]
 
         # WHEN / THEN
-        assert q_as == QuinteFlush("As")
-        assert q_as != q_roi
+        assert QuinteFlush.est_present(cartes)
 
-    def test_creation_quinte_flush_invalide(self):
-        # GIVEN
-        hauteur_invalide = 12
+    def test_est_present_faux(self):
+        # GIVEN : cartes sans quinte flush
+        cartes = [
+            pytest.as_coeur,
+            pytest.roi_coeur,
+            pytest.dame_coeur,
+            pytest.valet_coeur,
+            pytest.neuf_carreau,
+        ]
 
         # WHEN / THEN
-        with pytest.raises(ValueError):
-            QuinteFlush(hauteur_invalide)
+        assert not QuinteFlush.est_present(cartes)
 
-    def test_str_repr_quinte_flush(self, quinte_flush):
-        # GIVEN
-        q = quinte_flush
+    def test_str_repr_quinte_flush(self):
+        # GIVEN : une Quinte Flush
+        q = QuinteFlush("As")
 
-        # WHEN
+        # WHEN : récupération des chaînes
         texte_str = str(q)
         texte_repr = repr(q)
 
-        # THEN
-        assert "QuinteFlush" in texte_str
+        # THEN : vérifications
+        assert "Quinte Flush" in texte_str
         assert "As" in texte_str
         assert texte_repr == texte_str

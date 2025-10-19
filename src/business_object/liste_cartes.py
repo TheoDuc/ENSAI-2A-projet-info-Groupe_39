@@ -84,8 +84,8 @@ class AbstractListeCartes(ABC):
         if len(self) != len(other):
             return False
 
-        for carte1, carte2 in self.cartes, other.cartes:
-            if carte1 != carte2:
+        for carte in range(len(self)):
+            if self.cartes[carte] != other.cartes[carte]:
                 return False
 
         return True
@@ -105,7 +105,7 @@ class AbstractListeCartes(ABC):
 
         self.__cartes.append(carte)
 
-    def retirer_carte(self, indice: int) -> Carte:
+    def retirer_carte(self, indice: int = 0) -> Carte:
         """
         Retire une carte de la liste selon son indice
 

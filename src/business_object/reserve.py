@@ -9,7 +9,7 @@ from business_object.main import Main
 class Reserve(AbstractListeCartes):
     """Modélisation de la reserve"""
 
-    def __init__(self, cartes: list[Carte]):
+    def __init__(self, cartes: list[Carte] = None):
         """
         Instanciation de la reserve de carte
 
@@ -23,22 +23,23 @@ class Reserve(AbstractListeCartes):
         Reserve
             Instance de 'Reserve'
         """
-        AbstractListeCartes.__init__(self, cartes)
+
+        super().__init__(cartes)
 
     def bruler(self):
         """
         Positionne la premiere carte du paquet en dernier
 
+        Paramètres
+        ----------
+        None
+
         Renvois
         -------
-        Reserve
-            Instance de 'Reserve'
+        None
         """
-        new_reserve = []
-        for i in range(len(self.cartes) - 1):
-            new_reserve.append(self.cartes[i + 1])
-        new_reserve.append(self.cartes[0])
-        return Reserve(new_reserve)
+
+        self.ajouter_carte(self.retirer_carte())
 
     def reveler(self, board):
         """
@@ -47,49 +48,49 @@ class Reserve(AbstractListeCartes):
         Paramètres
         ----------
         board : Board
-            le board associé à la reserve
+            Le board associé à la reserve
 
         Renvois
         -------
-        Reserve
-            Instance de 'Reserve'
-        Board
-            Instance de 'Board'
+        None
         """
+
         if not isinstance(board, Board):
             raise ValueError(f"board pas de type Board : {type(board)}")
-        list_carte_board = board.cartes
-        list_carte_reserve = self.cartes
-        carte_reveler = list_carte_reserve.pop(0)
-        list_carte_board.append(carte_reveler)
-        return Reserve(list_carte_reserve), Board(list_carte_board)
+
+        board.ajouter_carte(self.retirer_carte())
 
     def distribuer(self, n_joueurs):
         """
-        Distribue 2 carte de la reserve dans la Main de chaque joueur
+        Distribue 2 cartes de la reserve dans la Main de chaque joueur
 
         Paramètres
         ----------
         n_joueur : int
-            le nombre de Main à créer
+            Le nombre de mains à créer
 
         Renvois
         -------
-        Reserve
-            Instance de 'Reserve'
-        mains
-            une liste de Main
+        list[Main]
+            Une liste de mains
         """
-        list_carte_reserve = self.cartes
-        distribution = [[] for i in range(n_joueurs)]
-        if len(list_carte_reserve) < n_joueurs * 2:
+
+        # Vérification qu'il y a assez de cartes à distribuer
+        if len(self.cartes) < n_joueurs * 2:
             raise ValueError(
-                f"le nombre de carte dans la reserve est trop petit: {len(list_carte_reserve)}"
+                f"le nombre de carte dans la reserve est trop petit : {len(self.cartes)}"
             )
-        for k in range(0, 2):
-            for i in range(0, n_joueurs):
-                new = list_carte_reserve.pop(0)
-                distribution[i].append(new)
-        for i in range(len(distribution)):
-            distribution[i] = Main(distribution[i])
-        return Reserve(list_carte_reserve), distribution
+
+        distribution = [[] for i in range(n_joueurs)]
+
+        # Distribution des cartes dans des listes
+        for _ in range(0, 2):
+            for joueur in range(0, n_joueurs):
+                carte = self.retirer_carte()
+                distribution[joueur].append(carte)
+
+        # Converson des listes de cartes en mains
+        for main in range(len(distribution)):
+            distribution[main] = Main(distribution[main])
+
+        return distribution

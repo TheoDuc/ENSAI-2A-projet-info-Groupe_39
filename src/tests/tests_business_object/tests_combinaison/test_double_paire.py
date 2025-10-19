@@ -1,76 +1,74 @@
-"""Tests unitaires pour la classe DoublePaire"""
-
 import pytest
 
+from business_object.carte import Carte
 from business_object.combinaison.double_paire import DoublePaire
 
 
-class Test_Double_Paire:
-    """Tests unitaires pour la combinaison Double Paire"""
+class Test_DoublePaire:
+    """Tests unitaires pour la combinaison DoublePaire avec structure GIVEN / WHEN / THEN"""
 
-    def test_creation_doublepaire(self):
-        # GIVEN
-        hauteur = "Dame"
-        kicker = ("Roi", "10")
+    def test_double_paire_init_succes(self):
+        # GIVEN : cartes formant une Double Paire
+        cartes = [
+            pytest.dame_coeur,
+            pytest.dame_pique,
+            pytest.roi_coeur,
+            pytest.roi_carreau,
+            pytest.valet_coeur,
+        ]
 
-        # WHEN
-        dp = DoublePaire(hauteur, kicker)
+        # WHEN : création de la Double Paire
+        double_paire = DoublePaire.from_cartes(cartes)
 
-        # THEN
-        assert dp.hauteur == "Dame"
-        assert dp.kicker == ("Roi", "10")
-        assert DoublePaire.FORCE() == 2
+        # THEN : vérifications
+        assert double_paire.hauteur == "Roi"  # la paire la plus haute
+        assert double_paire.kicker[0] == "Dame"  # la deuxième paire
+        assert all(k in Carte.VALEURS() for k in double_paire.kicker)
 
-    def test_comparaison_doublepaire(self):
-        # GIVEN
-        dp_dame = DoublePaire("Dame", ("Roi", "10"))
-        dp_valet = DoublePaire("Valet", ("As", "9"))
+    def test_double_paire_init_invalide(self):
+        # GIVEN : cartes sans Double Paire
+        cartes = [pytest.dame_coeur, pytest.dame_pique, pytest.valet_coeur]
 
-        # WHEN
-        resultat_sup = dp_dame > dp_valet
-        resultat_inf = dp_valet > dp_dame
-        resultat_egal = dp_dame == DoublePaire("Dame", ("Roi", "10"))
-
-        # THEN
-        assert resultat_sup
-        assert not resultat_inf
-        assert resultat_egal
-
-    def test_comparaison_inverse(self):
-        # GIVEN
-        dp_dame = DoublePaire("Dame", ("Roi", "10"))
-        dp_valet = DoublePaire("Valet", ("As", "9"))
-
-        # THEN
-        assert dp_valet < dp_dame
-
-    def test_egalite_et_non_egalite(self):
-        # GIVEN
-        dp_dame = DoublePaire("Dame", ("Roi", "10"))
-        dp_valet = DoublePaire("Valet", ("As", "9"))
-
-        # WHEN / THEN
-        assert dp_dame == DoublePaire("Dame", ("Roi", "10"))
-        assert dp_dame != dp_valet
-
-    def test_creation_doublepaire_invalide(self):
-        # GIVEN
-        hauteur_invalide = 12
-        kicker = ("Roi", "10")
-
-        # WHEN / THEN
+        # WHEN / THEN : création échoue
         with pytest.raises(ValueError):
-            DoublePaire(hauteur_invalide, kicker)
+            DoublePaire.from_cartes(cartes)
 
-    def test_str_repr_doublepaire(self):
-        # GIVEN
-        dp = DoublePaire("Dame", ("Roi", "10"))
+    def test_double_paire_est_present(self):
+        # GIVEN : cartes contenant une Double Paire
+        cartes = [
+            pytest.dame_coeur,
+            pytest.dame_pique,
+            pytest.roi_coeur,
+            pytest.roi_carreau,
+            pytest.valet_coeur,
+        ]
 
-        # WHEN
-        texte_str = str(dp)
-        texte_repr = repr(dp)
+        # WHEN / THEN : méthode est_present retourne True
+        assert DoublePaire.est_present(cartes)
 
-        # THEN
-        assert "DoublePaire" in texte_str
-        assert "Dame" in texte_str
-        assert texte_repr == texte_str
+    def test_double_paire_est_present_faux(self):
+        # GIVEN : cartes sans Double Paire
+        cartes = [pytest.dame_coeur, pytest.dame_pique, pytest.valet_coeur]
+
+        # WHEN / THEN : méthode est_present retourne False
+        assert not DoublePaire.est_present(cartes)
+
+    def test_double_paire_str_repr(self):
+        # GIVEN : cartes formant une Double Paire
+        cartes = [
+            pytest.dame_coeur,
+            pytest.dame_pique,
+            pytest.roi_coeur,
+            pytest.roi_carreau,
+            pytest.valet_coeur,
+        ]
+
+        # WHEN : création de la Double Paire
+        double_paire = DoublePaire.from_cartes(cartes)
+
+        # THEN : vérification des représentations
+        assert str(double_paire) == "Double Paire Roi et Dame"
+        assert (
+            repr(double_paire)
+            == f"DoublePaire(hauteur=Roi, kicker=({double_paire.kicker[0]}, {double_paire.kicker[1]}))"
+        )

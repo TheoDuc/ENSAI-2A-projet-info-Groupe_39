@@ -64,8 +64,8 @@ class TestCarte:
         [
             (pytest.huit_carreau, pytest.huit_carreau, True),
             (pytest.dame_carreau, pytest.valet_carreau, False),
-            (pytest.quatre_trefle, pytest.as_trefle, False),
-            (pytest.six_coeur, pytest.sept_coeur, False),
+            (pytest.quatre_pique, pytest.as_trefle, False),
+            (pytest.six_pique, pytest.six_coeur, False),
             (pytest.cinq_coeur, 5, False),
             (pytest.neuf_trefle, "Trêfle", False),
         ],

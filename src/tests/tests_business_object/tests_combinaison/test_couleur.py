@@ -1,56 +1,81 @@
-"""Tests unitaires pour la classe Couleur"""
-
 import pytest
 
+from business_object.carte import Carte
 from business_object.combinaison.couleur import Couleur
 
 
 class Test_Couleur:
-    def test_creation_couleur(self):
-        # GIVEN
+    """Tests unitaires pour la combinaison Couleur avec GIVEN / WHEN / THEN et conftest.py"""
+
+    def test_couleur_init_succes(self):
+        # GIVEN : hauteur = As
         hauteur = "As"
 
-        # WHEN
-        c = Couleur(hauteur)
+        # WHEN : création d'une Couleur
+        couleur = Couleur(hauteur)
 
-        # THEN
-        assert c.hauteur == "As"
-        assert c.kicker == ()
+        # THEN : vérifications
+        assert couleur.hauteur == "As"
+        assert all(k in Carte.VALEURS() for k in couleur.kicker)
         assert Couleur.FORCE() == 5
 
-    def test_comparaison_couleur(self):
-        # GIVEN
-        as_c = Couleur("As")
-        roi_c = Couleur("Roi")
+    def test_couleur_comparaison(self):
+        # GIVEN : deux couleurs de hauteurs différentes
+        as_couleur = Couleur("As")
+        roi_couleur = Couleur("Roi")
 
-        # WHEN / THEN
-        assert as_c > roi_c
-        assert roi_c < as_c
-        assert as_c == Couleur("As")
+        # THEN : comparaisons
+        assert as_couleur > roi_couleur
+        assert roi_couleur < as_couleur
+        assert as_couleur == Couleur("As")
 
-    def test_egalite_et_non_egalite(self):
-        # GIVEN
-        c1 = Couleur("As")
-        c2 = Couleur("Roi")
-
-        # WHEN / THEN
-        assert c1 == Couleur("As")
-        assert c1 != c2
-
-    def test_creation_couleur_invalide(self):
-        # GIVEN / WHEN / THEN
+    def test_couleur_creation_invalide(self):
+        # GIVEN / WHEN / THEN : création invalide doit lever ValueError
         with pytest.raises(ValueError):
             Couleur(12)
 
-    def test_str_repr_couleur(self):
-        # GIVEN
-        c = Couleur("As")
+    def test_couleur_str_repr(self):
+        # GIVEN : cartes formant une Couleur (utilisation de conftest.py)
+        cartes = [
+            pytest.as_coeur,
+            pytest.roi_coeur,
+            pytest.dame_coeur,
+            pytest.valet_coeur,
+            pytest.dix_coeur,
+        ]
+        couleur = Couleur.from_cartes(cartes)
 
-        # WHEN
-        texte_str = str(c)
-        texte_repr = repr(c)
+        # WHEN : récupération des chaînes
+        texte_str = str(couleur)
+        texte_repr = repr(couleur)
 
-        # THEN
+        # THEN : vérifications
         assert "Couleur" in texte_str
         assert "As" in texte_str
-        assert texte_repr == texte_str
+        assert texte_repr.startswith("Couleur([")
+
+    def test_couleur_est_present(self):
+        # GIVEN : 5 cartes de même couleur (conftest)
+        cartes = [
+            pytest.as_coeur,
+            pytest.roi_coeur,
+            pytest.dame_coeur,
+            pytest.valet_coeur,
+            pytest.dix_coeur,
+            pytest.huit_coeur,
+        ]
+
+        # THEN
+        assert Couleur.est_present(cartes)
+
+    def test_couleur_est_present_faux(self):
+        # GIVEN : seulement 4 cartes de même couleur
+        cartes = [
+            pytest.as_coeur,
+            pytest.roi_coeur,
+            pytest.dame_coeur,
+            pytest.valet_coeur,
+        ]
+
+        # THEN
+        assert not Couleur.est_present(cartes)

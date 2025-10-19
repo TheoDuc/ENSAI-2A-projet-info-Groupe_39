@@ -1,58 +1,60 @@
-"""Implémentation des tests pour la classe Brelan"""
-
 import pytest
 
 from business_object.combinaison.brelan import Brelan
 
 
-# ---------- Classe de tests ----------
 class Test_Brelan:
-    def test_creation_brelan(self):
-        # GIVEN
-        hauteur = "Dame"
-        kicker = ("10", "8")
+    """Tests unitaires pour la classe Brelan."""
 
-        # WHEN
-        b = Brelan(hauteur, kicker)
+    def test_brelan_init_succes(self):
+        # GIVEN : cartes formant un brelan
+        cartes = [pytest.dame_coeur, pytest.dame_trefle, pytest.dame_carreau]
 
-        # THEN
-        assert b.hauteur == "Dame"
-        assert b.kicker == ("10", "8")
-        assert Brelan.FORCE() == 3
+        # WHEN : création du brelan
+        brelan = Brelan.from_cartes(cartes)
 
-    def test_comparaison_brelan(self):
-        # GIVEN
-        b_dame = Brelan("Dame", ("10", "8"))
-        b_valet = Brelan("Valet", ("Roi", "9"))
+        # THEN : vérifications
+        assert brelan.hauteur == "Dame"
+        assert all(c.valeur == "Dame" for c in cartes)
 
-        # WHEN / THEN
-        assert b_dame > b_valet
-        assert b_valet < b_dame
-        assert b_dame == Brelan("Dame", ("10", "8"))
+    def test_brelan_init_hauteur_invalide(self):
+        # GIVEN : cartes ne formant pas de brelan
+        cartes = [pytest.deux_pique, pytest.trois_coeur, pytest.quatre_trefle]
 
-    def test_egalite_et_non_egalite(self):
-        # GIVEN
-        b_dame = Brelan("Dame", ("10", "8"))
-        b_valet = Brelan("Valet", ("Roi", "9"))
+        # WHEN / THEN : création échoue avec ValueError
+        with pytest.raises(ValueError, match="Aucun brelan présent dans les cartes"):
+            Brelan.from_cartes(cartes)
 
-        # WHEN / THEN
-        assert b_dame == Brelan("Dame", ("10", "8"))
-        assert b_dame != b_valet
+    def test_brelan_comparaison(self):
+        # GIVEN : deux brelans différents
+        brelan_dame = Brelan.from_cartes(
+            [pytest.dame_coeur, pytest.dame_trefle, pytest.dame_carreau]
+        )
+        brelan_roi = Brelan.from_cartes([pytest.roi_coeur, pytest.roi_trefle, pytest.roi_carreau])
 
-    def test_creation_brelan_invalide(self):
-        # GIVEN / WHEN / THEN
-        with pytest.raises(ValueError):
-            Brelan(12, ("10", "8"))
+        # THEN : vérifications des comparaisons
+        assert brelan_roi > brelan_dame
+        assert not brelan_dame > brelan_roi
+        assert brelan_dame == Brelan.from_cartes(
+            [pytest.dame_coeur, pytest.dame_trefle, pytest.dame_carreau]
+        )
 
-    def test_str_repr_brelan(self):
-        # GIVEN
-        b = Brelan("Dame", ("10", "8"))
+    def test_brelan_str(self):
+        # GIVEN : un brelan
+        brelan = Brelan.from_cartes([pytest.dame_coeur, pytest.dame_trefle, pytest.dame_carreau])
 
-        # WHEN
-        texte_str = str(b)
-        texte_repr = repr(b)
+        # THEN : représentation lisible
+        assert str(brelan) == "Brelan de Dame"
 
-        # THEN
-        assert "Brelan" in texte_str
-        assert "Dame" in texte_str
-        assert texte_repr == texte_str
+    def test_brelan_repr(self):
+        # GIVEN : cartes formant un brelan
+        cartes = [pytest.dame_coeur, pytest.dame_trefle, pytest.dame_carreau]
+        brelan = Brelan.from_cartes(cartes)
+
+        # THEN : représentation technique
+        attendu = (
+            f"Brelan([{cartes[0].valeur} de {cartes[0].couleur}, "
+            f"{cartes[1].valeur} de {cartes[1].couleur}, "
+            f"{cartes[2].valeur} de {cartes[2].couleur}])"
+        )
+        assert repr(brelan) == attendu

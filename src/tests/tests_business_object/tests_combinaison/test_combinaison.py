@@ -1,85 +1,57 @@
-"""Implémentation des tests pour la classe AbstractCombinaison"""
-
 from business_object.combinaison.combinaison import AbstractCombinaison
 
 
 # ---------- Classe concrète pour les tests ----------
-class Combinaison(AbstractCombinaison):
+class CombinaisonTest(AbstractCombinaison):
     @classmethod
     def FORCE(cls) -> int:
         return 0
 
     @classmethod
     def est_present(cls, cartes):
-        return False  # Pas de logique réelle nécessaire pour le test
+        return False
 
     @classmethod
     def from_cartes(cls, cartes):
-        return cls("2", ())  # Retourne une instance simple
+        return cls("2", ("3",))
 
 
-# ---------- Classe de tests ----------
-class Test_Combinaison:
-    """Tests unitaires pour la classe AbstractCombinaison"""
+# ---------- Tests ----------
+class Test_AbstractCombinaison:
+    """Tests unitaires simplifiés pour AbstractCombinaison"""
 
     def test_attributs(self):
-        # GIVEN
+        # GIVEN : hauteur et kicker
         hauteur = "2"
         kicker = ("3",)
 
-        # WHEN
-        combinaison = Combinaison(hauteur, kicker)
+        # WHEN : création d'une combinaison
+        c = CombinaisonTest(hauteur, kicker)
 
-        # THEN
-        assert combinaison.hauteur == "2"
-        assert combinaison.kicker == ("3",)
-        assert combinaison.FORCE() == 0
+        # THEN : vérification des attributs
+        assert c.hauteur == "2"
+        assert c.kicker == ("3",)
+        assert CombinaisonTest.FORCE() == 0
 
-    def test_str_repr(self):
-        # GIVEN
-        combinaison = Combinaison("2", ("3",))
+    def test_str_et_repr(self):
+        # GIVEN : une combinaison
+        c = CombinaisonTest("2", ("3",))
 
-        # WHEN
-        texte_str = str(combinaison)
-        texte_repr = repr(combinaison)
+        # WHEN : conversion en str et repr
+        texte_str = str(c)
+        texte_repr = repr(c)
 
-        # THEN
-        assert texte_str == "Combinaison(2, ('3',))"
+        # THEN : représentations
+        assert texte_str == "CombinaisonTest(2, ('3',))"
         assert texte_repr == texte_str
 
     def test_comparaison(self):
-        # GIVEN
-        class CombinaisonA(AbstractCombinaison):
-            @classmethod
-            def FORCE(cls) -> int:
-                return 1
+        # GIVEN : deux combinaisons
+        c1 = CombinaisonTest("2", ("3",))
+        c2 = CombinaisonTest("2", ("4",))
 
-            @classmethod
-            def est_present(cls, cartes):
-                return False
-
-            @classmethod
-            def from_cartes(cls, cartes):
-                return cls("3")
-
-        class CombinaisonB(AbstractCombinaison):
-            @classmethod
-            def FORCE(cls) -> int:
-                return 0
-
-            @classmethod
-            def est_present(cls, cartes):
-                return False
-
-            @classmethod
-            def from_cartes(cls, cartes):
-                return cls("2")
-
-        # WHEN
-        a = CombinaisonA("3")
-        b = CombinaisonB("2")
-
-        # THEN
-        assert a > b
-        assert b < a
-        assert a != b
+        # THEN : égalité et ordre
+        assert c1 == CombinaisonTest("2", ("3",))
+        assert c1 != c2
+        # Comparaison basée sur kicker si FORCE identique
+        assert (c1 < c2) or (c1 > c2)

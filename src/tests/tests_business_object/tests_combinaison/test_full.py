@@ -1,90 +1,87 @@
-"""Implémentation des tests pour la classe Full"""
+"""Tests unitaires pour la combinaison Full avec structure GIVEN / WHEN / THEN"""
 
 import pytest
 
 from business_object.combinaison.full import Full
 
-"""Tests unitaires pour la combinaison Full"""
 
-
-# ---------- Fixtures ----------
-@pytest.fixture
-def full():
-    """Fixture qui fournit un Full de test"""
-    return Full("Dame", ("Roi", "10"))
-
-
-@pytest.fixture
-def autre_full():
-    """Fixture pour comparaison"""
-    return Full("Valet", ("As", "9"))
-
-
-# ---------- Classe de tests ----------
 class Test_Full:
-    def test_creation_full(self, full):
-        # GIVEN
-        hauteur = "Dame"
-        kicker = ("Roi", "10")
+    def test_full_init_succes(self):
+        # GIVEN : cartes formant un Full (brelan + paire)
+        cartes = [
+            pytest.dame_coeur,
+            pytest.dame_pique,
+            pytest.dame_trefle,
+            pytest.roi_coeur,
+            pytest.roi_carreau,
+        ]
 
-        # WHEN
-        f = full
+        # WHEN : création du Full
+        full = Full.from_cartes(cartes)
 
-        # THEN
-        assert f.hauteur == "Dame"
-        assert f.kicker == ("Roi", "10")
+        # THEN : vérifications
+        assert full.hauteur == "Dame"  # brelan
+        assert full.kicker == ("Roi",)  # paire
         assert Full.FORCE() == 6
 
-    def test_comparaison_full(self, full, autre_full):
-        # GIVEN
-        f_dame = full
-        f_valet = autre_full
+    def test_full_init_invalide(self):
+        # GIVEN : cartes ne formant pas un Full
+        cartes = [pytest.dame_coeur, pytest.dame_pique, pytest.roi_coeur, pytest.valet_coeur]
+
+        # WHEN / THEN : création échoue
+        with pytest.raises(ValueError):
+            Full.from_cartes(cartes)
+
+    def test_full_est_present(self):
+        # GIVEN : cartes contenant un Full
+        cartes = [
+            pytest.dame_coeur,
+            pytest.dame_pique,
+            pytest.dame_trefle,
+            pytest.roi_coeur,
+            pytest.roi_carreau,
+        ]
+
+        # WHEN / THEN : méthode est_present retourne True
+        assert Full.est_present(cartes)
+
+    def test_full_est_present_faux(self):
+        # GIVEN : cartes sans Full
+        cartes = [
+            pytest.dame_coeur,
+            pytest.dame_pique,
+            pytest.valet_coeur,
+            pytest.roi_coeur,
+            pytest.as_coeur,
+        ]
+
+        # WHEN / THEN : méthode est_present retourne False
+        assert not Full.est_present(cartes)
+
+    def test_full_comparaison(self):
+        # GIVEN : deux Full de hauteurs différentes
+        full_dame = Full("Dame", ("Roi",))
+        full_valet = Full("Valet", ("As",))
 
         # WHEN
-        resultat_sup = f_dame > f_valet
-        resultat_inf = f_valet > f_dame
-        resultat_egal = f_dame == Full("Dame", ("Roi", "10"))
+        resultat_sup = full_dame > full_valet
+        resultat_inf = full_valet > full_dame
+        resultat_egal = full_dame == Full("Dame", ("Roi",))
 
-        # THEN
+        # THEN : vérifications
         assert resultat_sup
         assert not resultat_inf
         assert resultat_egal
 
-    def test_comparaison_inverse(self, full, autre_full):
-        # GIVEN
-        f_dame = full
-        f_valet = autre_full
-
-        # THEN
-        assert f_valet < f_dame
-
-    def test_egalite_et_non_egalite(self, full, autre_full):
-        # GIVEN
-        f_dame = full
-        f_valet = autre_full
-
-        # WHEN / THEN
-        assert f_dame == Full("Dame", ("Roi", "10"))
-        assert f_dame != f_valet
-
-    def test_creation_full_invalide(self):
-        # GIVEN
-        hauteur_invalide = 12
-        kicker = ("Roi", "10")
-
-        # WHEN / THEN
-        with pytest.raises(ValueError):
-            Full(hauteur_invalide, kicker)
-
-    def test_str_repr_full(self, full):
-        # GIVEN
-        f = full
+    def test_full_str_repr(self):
+        # GIVEN : Full
+        full = Full("Dame", ("Roi",))
 
         # WHEN
-        texte_str = str(f)
-        texte_repr = repr(f)
+        texte_str = str(full)
+        texte_repr = repr(full)
 
-        # THEN
+        # THEN : vérifications
         assert "Full" in texte_str
         assert "Dame" in texte_str
         assert texte_repr == texte_str

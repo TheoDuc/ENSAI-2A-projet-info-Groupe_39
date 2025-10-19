@@ -25,7 +25,7 @@ class TestReserve(AbstractListeCartesTest):
         ]
 
         # WHEN
-        reserve = Reserve(None)
+        reserve = Reserve()
 
         # THEN
         assert reserve.cartes == resultat
@@ -36,7 +36,7 @@ class TestReserve(AbstractListeCartesTest):
         resultat = [pytest.huit_coeur, pytest.valet_trefle, pytest.deux_coeur]
 
         # WHEN
-        reserve = reserve.bruler()
+        reserve.bruler()
 
         # THEN
         assert reserve.cartes == resultat
@@ -49,7 +49,7 @@ class TestReserve(AbstractListeCartesTest):
         resultat_board = [pytest.roi_pique, pytest.as_pique]
 
         # WHEN
-        reserve, board = reserve.reveler(board)
+        reserve.reveler(board)
 
         # THEN
         assert reserve.cartes == resultat_reserve
@@ -65,21 +65,35 @@ class TestReserve(AbstractListeCartesTest):
         with pytest.raises(ValueError, match=message_attendu):
             reserve.reveler(main)
 
-    def test_reserve_distribuer_succes():
+    def test_reserve_distribuer_succes(self):
         # GIVEN
         reserve = Reserve(
             [pytest.as_pique, pytest.quatre_trefle, pytest.valet_carreau, pytest.valet_coeur]
         )
         n_joueurs = 2
         resultat = [
-            Main(pytest.as_pique, pytest.valet_carreau),
-            Main(pytest.quatre_trefle, pytest.valet_coeur)
+            Main([pytest.as_pique, pytest.valet_carreau]),
+            Main([pytest.quatre_trefle, pytest.valet_coeur]),
         ]
         resultat_reserve = []
 
         # WHEN
-        reserve_f, mains = reserve.distribuer(n_joueurs)
+        mains = reserve.distribuer(n_joueurs)
 
         # THEN
         assert mains == resultat
-        assert reserve_f.cartes == resultat_reserve
+        assert reserve.cartes == resultat_reserve
+
+    def test_reserve_distribuer_echec(self):
+        # GIVEN
+        reserve = Reserve(
+            [pytest.as_pique, pytest.quatre_trefle, pytest.valet_carreau, pytest.valet_coeur]
+        )
+        n_joueurs = 3
+        message_attendu = (
+            f"le nombre de carte dans la reserve est trop petit : {len(reserve.cartes)}"
+        )
+
+        # WHEN / THEN
+        with pytest.raises(ValueError, match=message_attendu):
+            reserve.distribuer(n_joueurs)
