@@ -87,19 +87,19 @@ class Manche:
     def flop(self):
         """Révélation des 3 premières cartes communes"""
         for _ in range(3):
-            self.__board.reveler(self.__reserve)
+            self.__reserve.reveler(self.__board)
         self.__tour += 1
         self.__indice_joueur_actuel = 2
 
     def turn(self):
         """Révélation de la quatrième carte commune"""
-        self.__board.reveler(self.__reserve)
+        self.__reserve.reveler(self.__board)
         self.__tour += 1
         self.__indice_joueur_actuel = 2
 
     def river(self):
         """Révélation de la cinquième carte commune"""
-        self.__board.reveler(self.__reserve)
+        self.__reserve.reveler(self.__board)
         self.__tour += 1
         self.__indice_joueur_actuel = 2
 
