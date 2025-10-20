@@ -1,6 +1,7 @@
-"""Tests Pytest pour la classe Joueur"""
+"""Implémentation des tests pour la classe Joueur"""
 
 import pytest
+
 from src.business_object.joueur import Joueur
 
 

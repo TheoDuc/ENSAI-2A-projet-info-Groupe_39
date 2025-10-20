@@ -80,6 +80,15 @@ class Joueur:
     def pays(self, value: str):
         self._pays = value
 
+    # --- Affichage et utilitaires ---
+    def __str__(self):
+        """Permet d'afficher les informations du joueur"""
+        return f"Joueur({self.pseudo}, {self.age} ans, {self.credit} crédits, actif={self.actif})"
+
+    def as_list(self) -> list:
+        """Retourne les attributs principaux du joueur dans une liste"""
+        return [self.pseudo, self.age, self.mail, self.fan_pokemon, self.pays, self.credit]
+
     # --- Méthodes métier ---
     def changer_pseudo(self, pseudo: str):
         """Change le pseudo du joueur"""
@@ -91,18 +100,23 @@ class Joueur:
 
     def ajouter_credits(self, credits: int):
         """Ajoute des crédits au joueur"""
+
         if credits < 0:
             raise ValueError("Le nombre de crédits à ajouter doit être positif.")
+
         self.credit += credits
 
     def retirer_credits(self, credits: int) -> int:
         """Retire des crédits au joueur et retourne le nouveau solde"""
+
         if credits < 0:
             raise ValueError("Le nombre de crédits à retirer doit être positif.")
+
         if credits > self.credit:
             raise ValueError(
                 "Le nombre de crédits à retirer doit être supérieur aux crédits possédés"
             )
+
         self.credit -= credits
         return self.credit
 
@@ -115,6 +129,7 @@ class Joueur:
         Associe le joueur à une table (si non déjà présent)
         et informe la table de l'arrivée du joueur.
         """
+
         if self.table is not None:
             raise ValueError(f"Le joueur {self.pseudo} est déjà à une table.")
 
@@ -146,12 +161,3 @@ class Joueur:
                 self.table = None
         else:
             self.table = None
-
-    # --- Affichage et utilitaires ---
-    def __str__(self):
-        """Permet d'afficher les informations du joueur"""
-        return f"Joueur({self.pseudo}, {self.age} ans, {self.credit} crédits, actif={self.actif})"
-
-    def as_list(self) -> list:
-        """Retourne les attributs principaux du joueur dans une liste"""
-        return [self.pseudo, self.age, self.mail, self.fan_pokemon, self.pays, self.credit]
