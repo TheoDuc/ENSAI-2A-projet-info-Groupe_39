@@ -24,24 +24,31 @@ class EvaluateurCombinaison:
         Retourne une instance de la classe correspondante.
         """
         if not cartes or len(cartes) < 5:
-            raise ValueError("Au moins 5 cartes sont nécessaires pour évaluer une combinaison.")
+            raise ValueError(
+                f"Au moins 5 cartes sont nécessaires pour évaluer une combinaison : {cartes}"
+            )
 
         # Priorité des combinaisons par force décroissante
-        # On commence par les combinaisons les plus fortes
-        if QuinteFlush.est_present(cartes):
-            return QuinteFlush.from_cartes(cartes)
-        if Carre.est_present(cartes):
-            return Carre.from_cartes(cartes)
-        if Full.est_present(cartes):
-            return Full.from_cartes(cartes)
-        if Couleur.est_present(cartes):
-            return Couleur.from_cartes(cartes)
-        if Quinte.est_present(cartes):
-            return Quinte.from_cartes(cartes)
-        if Brelan.est_present(cartes):
-            return Brelan.from_cartes(cartes)
-        if DoublePaire.est_present(cartes):
-            return DoublePaire.from_cartes(cartes)
-        if Paire.est_present(cartes):
-            return Paire.from_cartes(cartes)
-        return Simple.from_cartes(cartes)
+        try:
+            if QuinteFlush.est_present(cartes):
+                return QuinteFlush.from_cartes(cartes)
+            if Carre.est_present(cartes):
+                return Carre.from_cartes(cartes)
+            if Full.est_present(cartes):
+                return Full.from_cartes(cartes)
+            if Couleur.est_present(cartes):
+                return Couleur.from_cartes(cartes)
+            if Quinte.est_present(cartes):
+                return Quinte.from_cartes(cartes)
+            if Brelan.est_present(cartes):
+                return Brelan.from_cartes(cartes)
+            if DoublePaire.est_present(cartes):
+                return DoublePaire.from_cartes(cartes)
+            if Paire.est_present(cartes):
+                return Paire.from_cartes(cartes)
+            return Simple.from_cartes(cartes)
+        except Exception as e:
+            # On enrichit le message avec la valeur problématique
+            raise ValueError(
+                f"Erreur lors de l'évaluation de la combinaison pour les cartes {cartes}: {e}"
+            ) from e

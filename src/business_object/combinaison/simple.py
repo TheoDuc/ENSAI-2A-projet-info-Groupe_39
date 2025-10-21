@@ -43,10 +43,7 @@ class Simple(AbstractCombinaison):
         return cls(hauteur, kicker)
 
     def __str__(self) -> str:
-        # Représentation lisible pour le joueur
-        # Exemple : "Simple As et Roi Dame 10"
         return f"Simple {self.hauteur}" + (f" et {' '.join(self.kicker)}" if self.kicker else "")
 
     def __repr__(self) -> str:
-        # Représentation pour debug / tests, identique à __str__
         return str(self)

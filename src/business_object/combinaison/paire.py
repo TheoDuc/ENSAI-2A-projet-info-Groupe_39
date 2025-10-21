@@ -6,6 +6,10 @@ from .combinaison import AbstractCombinaison
 class Paire(AbstractCombinaison):
     """Classe représentant une Paire (deux cartes de même valeur) au poker."""
 
+    def __init__(self, hauteur: str, kicker: tuple[str, ...]):
+        # Initialisation via le constructeur parent : hauteur de la plus forte paire et kicker
+        super().__init__(hauteur, kicker)
+
     # Force relative d'une Paire dans le classement des combinaisons
     @classmethod
     def FORCE(cls) -> int:
@@ -47,7 +51,5 @@ class Paire(AbstractCombinaison):
             f"Paire {self.hauteur} et {self.kicker[0]}" if self.kicker else f"Paire {self.hauteur}"
         )
 
-    # Représentation technique pour debug / tests
     def __repr__(self):
-        # Simplement repr le même que __str__
         return str(self)

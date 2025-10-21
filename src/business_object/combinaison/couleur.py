@@ -1,4 +1,4 @@
-from typing import List, Optional, Tuple
+from typing import List, Optional
 
 from business_object.carte import Carte
 
@@ -11,7 +11,6 @@ class Couleur(AbstractCombinaison):
     def __init__(
         self,
         hauteur: str,
-        kicker: Optional[Tuple[str, ...]] = None,
         cartes: Optional[List[Carte]] = None,
     ):
         """
@@ -21,14 +20,11 @@ class Couleur(AbstractCombinaison):
         ----------
         hauteur : str
             Valeur de la carte la plus haute dans la couleur
-        kicker : tuple, optionnel
-            Les autres cartes de la couleur triées par valeur décroissante
         cartes : list[Carte], optionnel
             Liste des cartes exactes de la couleur
         """
-        # Appel du constructeur parent
-        super().__init__(hauteur, kicker)
-        # Stocke les cartes de la couleur, ou une liste vide si non fournies
+
+        super().__init__(hauteur, kicker=None)
         self.cartes = cartes or []
 
     # Force relative de la combinaison Couleur
@@ -40,31 +36,21 @@ class Couleur(AbstractCombinaison):
     @classmethod
     def est_present(cls, cartes: List[Carte]) -> bool:
         couleurs = [c.couleur for c in cartes]
-        # True si au moins 5 cartes de la même couleur
         return any(couleurs.count(c) >= 5 for c in set(couleurs))
 
     # Crée un objet Couleur à partir d’une liste de cartes
     @classmethod
     def from_cartes(cls, cartes: List[Carte]) -> "Couleur":
-        # Recherche la couleur ayant au moins 5 cartes
         couleurs = [c.couleur for c in cartes]
-        couleur_max = None
-        for c in set(couleurs):
-            if couleurs.count(c) >= 5:
-                couleur_max = c
-                break
+        couleur_max = next((c for c in set(couleurs) if couleurs.count(c) >= 5), None)
 
-        # Si aucune couleur avec 5 cartes n’est trouvée, on lève une erreur
         if couleur_max is None:
             raise ValueError("Aucune Couleur présente dans les cartes")
 
-        # On garde toutes les cartes de cette couleur
         cartes_couleur = [c for c in cartes if c.couleur == couleur_max]
+        hauteur = max(cartes_couleur, key=lambda c: Carte.VALEURS().index(c.valeur))
 
-        # Hauteur = carte la plus forte de cette couleur
-        hauteur = max(cartes_couleur)
-
-        # Kicker = les autres cartes de cette couleur triées par valeur décroissante
+        # kicker calculé automatiquement
         kicker = tuple(
             sorted(
                 [c.valeur for c in cartes_couleur if c.valeur != hauteur.valeur],
@@ -73,14 +59,12 @@ class Couleur(AbstractCombinaison):
             )
         )
 
-        # Retourne la combinaison construite
-        return cls(hauteur.valeur, kicker, cartes_couleur)
+        # retourne la combinaison avec le kicker calculé
+        return cls(hauteur.valeur, cartes_couleur)
 
-    # Représentation lisible pour un joueur de poker
     def __str__(self) -> str:
-        return f"Couleur de {self.hauteur}"  # Exemple : "Couleur de As"
+        return f"Couleur de {self.hauteur}"
 
-    # Représentation technique pour le débogage
     def __repr__(self) -> str:
         cartes_str = ", ".join(f"{c.valeur} de {c.couleur}" for c in self.cartes)
-        return f"Couleur([{cartes_str}])"  # Exemple : "Couleur([As de Coeur, 10 de Coeur, ...])"
+        return f"Couleur([{cartes_str}])"
