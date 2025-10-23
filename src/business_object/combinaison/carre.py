@@ -6,45 +6,111 @@ from .combinaison import AbstractCombinaison
 
 
 class Carre(AbstractCombinaison):
-    """Classe représentant un Carré (quatre cartes de même valeur)."""
+    """
+    Représente un Carré (quatre cartes de même valeur).
+
+    Un Carré est une combinaison de poker composée de quatre cartes identiques et d'une carte supplémentaire
+    appelée "kicker" servant à départager les égalités.
+    """
 
     def __init__(self, cartes: List[Carte], kicker: Tuple[str, ...] = ()):
-        # Vérifie que exactement 4 cartes sont fournies
+        """
+        Initialise un objet Carré avec une liste de cartes et un kicker optionnel.
+
+        Paramètres
+        ----------
+        cartes : List[Carte]
+            Liste des quatre cartes constituant le Carré.
+        kicker : Tuple[str, ...], optionnel
+            Cartes restantes servant à départager les égalités, triées de la plus forte à la plus faible.
+
+        Renvois
+        -------
+        None
+
+        Exceptions
+        ----------
+        ValueError
+            Levée si le nombre de cartes n’est pas 4 ou si toutes les cartes n’ont pas la même valeur.
+        """
         if len(cartes) != 4:
-            raise ValueError("Un Carré doit être constitué de 4 cartes")
-        # Hauteur du carré = valeur des cartes
+            raise ValueError(
+                f"Un Carré doit être constitué de 4 cartes,mais {len(cartes)} cartes ont été fournies"
+            )
         hauteur = cartes[0].valeur
-        # Vérifie que toutes les cartes ont la même valeur
         if not all(c.valeur == hauteur for c in cartes):
-            raise ValueError("Toutes les cartes doivent avoir la même valeur pour un Carré")
-        # Appel du constructeur parent pour initialiser hauteur et kicker
+            valeurs_diff = [c.valeur for c in cartes if c.valeur != hauteur]
+            raise ValueError(
+                f"Toutes les cartes doivent avoir la même valeur pour un Carré"
+                f", mais les valeurs suivantes diffèrent : {valeurs_diff}"
+            )
         super().__init__(hauteur, kicker)
-        # Stocke les cartes réelles pour __repr__ et __str__
         self.cartes = cartes
 
-    # Force relative du Carré dans le classement des combinaisons
     @classmethod
     def FORCE(cls) -> int:
+        """
+        Renvoie la force relative de la combinaison Carré.
+
+        Paramètres
+        ----------
+        Aucun
+
+        Renvois
+        -------
+        int
+            Force numérique associée au Carré (7).
+            Une valeur plus élevée indique une combinaison plus forte.
+        """
         return 7
 
-    # Vérifie si un Carré est présent dans une liste de cartes
     @classmethod
     def est_present(cls, cartes: List[Carte]) -> bool:
+        """
+        Vérifie si un Carré est présent dans une liste de cartes.
+
+        Paramètres
+        ----------
+        cartes : List[Carte]
+            Liste des cartes parmi lesquelles rechercher un Carré.
+
+        Renvois
+        -------
+        bool
+            True si une valeur apparaît exactement quatre fois, sinon False.
+        """
         valeurs = [c.valeur for c in cartes]
         return any(valeurs.count(v) == 4 for v in set(valeurs))
 
-    # Crée un objet Carre à partir d’une liste de cartes
     @classmethod
     def from_cartes(cls, cartes: List[Carte]) -> "Carre":
+        """
+        Construit un objet Carré à partir d’une liste de cartes.
+
+        Paramètres
+        ----------
+        cartes : List[Carte]
+            Liste des cartes disponibles.
+
+        Renvois
+        -------
+        Carre
+            Instance de la classe représentant le Carré détecté.
+
+        Exceptions
+        ----------
+        ValueError
+            Levée si aucune combinaison de quatre cartes de même valeur n’est trouvée.
+        """
         valeurs = [c.valeur for c in cartes]
-        # Recherche la valeur qui apparaît 4 fois
         try:
             hauteur = next(v for v in set(valeurs) if valeurs.count(v) == 4)
         except StopIteration:
-            raise ValueError("Aucun Carré présent dans les cartes")
-        # Sélectionne les cartes du carré
+            compte_valeurs = {v: valeurs.count(v) for v in set(valeurs)}
+            raise ValueError(
+                f"Aucun Carré présent dans les cartes. Occurrences des valeurs : {compte_valeurs}"
+            )
         carre_cartes = [c for c in cartes if c.valeur == hauteur]
-        # Les cartes restantes deviennent les kickers, triées de la plus forte à la plus faible
         kicker = tuple(
             sorted(
                 [c.valeur for c in cartes if c.valeur != hauteur],
@@ -52,14 +118,35 @@ class Carre(AbstractCombinaison):
                 reverse=True,
             )
         )
-        # Retourne le Carré construit
         return cls(carre_cartes, kicker)
 
-    # Représentation lisible pour un joueur
     def __str__(self) -> str:
-        return f"Carre de {self.hauteur}"  # Exemple : "Carre de Roi"
+        """
+        Renvoie une représentation textuelle lisible du Carré.
 
-    # Représentation technique pour le développeur / debug
+        Paramètres
+        ----------
+        Aucun
+
+        Renvois
+        -------
+        str
+            Chaîne lisible par un joueur, par exemple : "Carre de Roi".
+        """
+        return f"Carre de {self.hauteur}"
+
     def __repr__(self) -> str:
+        """
+        Renvoie une représentation technique du Carré
+        Paramètres
+        ----------
+        Aucun
+
+        Renvois
+        -------
+        str
+            Chaîne détaillant la combinaison, par exemple :
+            "Carre([Roi de Coeur, Roi de Pique, Roi de Carreau, Roi de Trèfle])".
+        """
         cartes_str = ", ".join(f"{c.valeur} de {c.couleur}" for c in self.cartes)
-        return f"Carre([{cartes_str}])"  # Exemple : "Carre([Roi de Coeur, Roi de Pique, ...])"
+        return f"Carre([{cartes_str}])"

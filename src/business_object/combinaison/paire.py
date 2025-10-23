@@ -7,33 +7,63 @@ class Paire(AbstractCombinaison):
     """Classe représentant une Paire (deux cartes de même valeur) au poker."""
 
     def __init__(self, hauteur: str, kicker: tuple[str, ...]):
-        # Initialisation via le constructeur parent : hauteur de la plus forte paire et kicker
+        """
+        Initialise une combinaison Paire.
+
+        Paramètres
+        ----------
+        hauteur : str
+            Valeur de la Paire.
+        kicker : tuple[str, ...]
+            Cartes restantes servant de kickers pour comparaison.
+        """
         super().__init__(hauteur, kicker)
 
-    # Force relative d'une Paire dans le classement des combinaisons
     @classmethod
     def FORCE(cls) -> int:
+        """Renvoie la force hiérarchique de la combinaison Paire (1)."""
         return 1
 
-    # Vérifie si une Paire est présente dans la main
     @classmethod
     def est_present(cls, cartes: list[Carte]) -> bool:
+        """
+        Vérifie si une Paire est présente dans une liste de cartes.
+
+        Paramètres
+        ----------
+        cartes : list[Carte]
+            Liste d’objets Carte à analyser.
+
+        Renvois
+        -------
+        bool
+            True si au moins une Paire est présente, False sinon.
+        """
         valeurs = [c.valeur for c in cartes]
-        # True si au moins une valeur apparaît exactement deux fois
         return any(valeurs.count(v) == 2 for v in set(valeurs))
 
-    # Construit un objet Paire à partir d'une liste de cartes
     @classmethod
     def from_cartes(cls, cartes: list[Carte]) -> "Paire":
+        """
+        Construit une instance de Paire à partir d’une liste de cartes.
+
+        Paramètres
+        ----------
+        cartes : list[Carte]
+            Liste de cartes à partir de laquelle on cherche une Paire.
+
+        Renvois
+        -------
+        Paire
+            Instance représentant la Paire détectée, avec ses kickers.
+        """
         valeurs = [c.valeur for c in cartes]
 
-        # Recherche la paire la plus forte
         paire = max(
             [v for v in set(valeurs) if valeurs.count(v) == 2],
             key=lambda x: Carte.VALEURS().index(x),
         )
 
-        # Les kickers = cartes restantes triées par valeur décroissante
         kicker = tuple(
             sorted(
                 [v for v in valeurs if v != paire],
@@ -44,12 +74,25 @@ class Paire(AbstractCombinaison):
 
         return cls(paire, kicker)
 
-    # Représentation lisible pour un joueur de poker
     def __str__(self):
-        # Exemple : "Paire As et Roi" si kicker, sinon "Paire As"
+        """
+        Renvoie une représentation textuelle lisible de la Paire.
+
+        Renvois
+        -------
+        str
+            Exemple : "Paire As et Roi" si kicker, sinon "Paire As".
+        """
         return (
             f"Paire {self.hauteur} et {self.kicker[0]}" if self.kicker else f"Paire {self.hauteur}"
         )
 
     def __repr__(self):
+        """
+        Renvoie une représentation technique de la Paire
+
+        Renvois
+        -------
+
+        """
         return str(self)

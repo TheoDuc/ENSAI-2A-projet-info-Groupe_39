@@ -21,7 +21,7 @@ class Test_Full:
 
         # THEN : vérifications
         assert full.hauteur == "Dame"  # brelan
-        assert full.kicker == ("Roi",)  # paire
+        assert full.paire == "Roi"  # paire
         assert Full.FORCE() == 6
 
     def test_full_init_invalide(self):
@@ -60,13 +60,20 @@ class Test_Full:
 
     def test_full_comparaison(self):
         # GIVEN : deux Full de hauteurs différentes
-        full_dame = Full("Dame", ("Roi",))
-        full_valet = Full("Valet", ("As",))
+        full_dame = Full("Dame", None)
+        full_dame._paire = "Roi"
+
+        full_valet = Full("Valet", None)
+        full_valet._paire = "As"
+
+        # GIVEN pour comparaison d’égalité
+        full_dame2 = Full("Dame", None)
+        full_dame2._paire = "Roi"
 
         # WHEN
         resultat_sup = full_dame > full_valet
         resultat_inf = full_valet > full_dame
-        resultat_egal = full_dame == Full("Dame", ("Roi",))
+        resultat_egal = full_dame == full_dame2
 
         # THEN : vérifications
         assert resultat_sup
@@ -75,7 +82,8 @@ class Test_Full:
 
     def test_full_str_repr(self):
         # GIVEN : Full
-        full = Full("Dame", ("Roi",))
+        full = Full("Dame", None)
+        full._paire = "Roi"
 
         # WHEN
         texte_str = str(full)
@@ -84,4 +92,5 @@ class Test_Full:
         # THEN : vérifications
         assert "Full" in texte_str
         assert "Dame" in texte_str
+        assert "Roi" in texte_str
         assert texte_repr == texte_str

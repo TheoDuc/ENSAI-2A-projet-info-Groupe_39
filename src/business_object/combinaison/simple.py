@@ -7,27 +7,59 @@ class Simple(AbstractCombinaison):
     """Classe représentant une combinaison 'Simple' (la carte la plus haute seule)."""
 
     def __init__(self, hauteur: str, kicker: tuple[str]):
-        # Hauteur = carte la plus forte
-        # Kicker = toutes les autres cartes triées par valeur décroissante
+        """
+        Initialise une combinaison Simple.
+
+        Paramètres
+        ----------
+        hauteur : str
+            Valeur de la carte la plus haute.
+        kicker : tuple[str]
+            Cartes restantes triées par valeur décroissante, servant de kickers pour comparaison.
+        """
         super().__init__(hauteur, kicker)
 
     @classmethod
     def FORCE(cls) -> int:
-        # Force minimale parmi toutes les combinaisons
+        """Renvoie la force hiérarchique de la combinaison Simple (0)."""
         return 0
 
     @classmethod
     def est_present(cls, cartes: list[Carte]) -> bool:
-        # Une Simple est toujours présente si la liste de cartes n'est pas vide
+        """
+        Vérifie si une Simple est présente.
+
+        Paramètres
+        ----------
+        cartes : list[Carte]
+            Liste d’objets Carte à analyser.
+
+        Renvois
+        -------
+        bool
+            True si la liste n’est pas vide (une Simple est toujours présente), False sinon.
+        """
         return len(cartes) > 0
 
     @classmethod
     def from_cartes(cls, cartes: list[Carte]) -> "Simple":
         """
-        Crée une Simple à partir d'une liste de cartes :
-        - Hauteur = la carte la plus forte
-        - Kicker = toutes les autres cartes triées par valeur décroissante
-        - Lève une erreur si la liste est vide
+        Construit une instance de Simple à partir d’une liste de cartes.
+
+        Paramètres
+        ----------
+        cartes : list[Carte]
+            Liste de cartes à partir de laquelle on construit la Simple.
+
+        Renvois
+        -------
+        Simple
+            Instance représentant la carte la plus haute avec ses kickers.
+
+        Exceptions
+        ----------
+        ValueError
+            Si la liste de cartes est vide.
         """
         if not cartes:
             raise ValueError("Impossible de créer une Simple avec une liste vide")
@@ -43,7 +75,22 @@ class Simple(AbstractCombinaison):
         return cls(hauteur, kicker)
 
     def __str__(self) -> str:
+        """
+        Renvoie une représentation textuelle lisible de la Simple.
+
+        Renvois
+        -------
+        str
+            Exemple : "Simple As et Roi Dame", en incluant les kickers si présents.
+        """
         return f"Simple {self.hauteur}" + (f" et {' '.join(self.kicker)}" if self.kicker else "")
 
     def __repr__(self) -> str:
+        """
+        Renvoie une représentation technique de la Simple
+
+        Renvois
+        -------
+
+        """
         return str(self)
