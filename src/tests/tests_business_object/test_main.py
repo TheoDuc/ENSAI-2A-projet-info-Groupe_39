@@ -25,7 +25,7 @@ class TestMain(AbstractListeCartesTest):
         # THEN
         assert main.cartes == resultat
 
-    def test_main_init_trop_grand(self, liste_cartes):
+    def test_main_init_trop_grand(self):
         # GIVEN
         cartes = [pytest.as_pique, pytest.dix_coeur, pytest.as_pique]
         message_attendu = f"Le nombre de cartes dans la main est trop grand : {len(cartes)}"
@@ -44,3 +44,25 @@ class TestMain(AbstractListeCartesTest):
 
         # THEN
         assert main.cartes == resultat
+
+    def test_main_ajouter_carte_succes(self):
+        # GIVEN
+        carte = pytest.cinq_trefle
+        main = Main([pytest.as_pique])
+        resultat = [pytest.as_pique, pytest.cinq_trefle]
+
+        # WHEN
+        main.ajouter_carte(carte)
+
+        # THEN
+        assert main.cartes == resultat
+
+    def test_main_ajouter_cartes_echec(self):
+        # GIVEN
+        main = Main([pytest.as_pique, pytest.dix_coeur])
+        carte = pytest.as_coeur
+        message_attendu = f"Le nombre de cartes dans la main est trop grand : {len(main.cartes)+1}"
+
+        # WHEN / THEN
+        with pytest.raises(ValueError, match=message_attendu):
+            main.ajouter_carte(carte)

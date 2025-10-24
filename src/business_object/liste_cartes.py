@@ -90,7 +90,7 @@ class AbstractListeCartes(ABC):
 
         return True
 
-    def ajouter_carte(self, carte: Carte) -> None:
+    def ajouter_carte_base(self, carte: Carte) -> None:
         """
         Ajoute une carte dans la liste de cartes
 

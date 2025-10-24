@@ -26,6 +26,18 @@ class Reserve(AbstractListeCartes):
 
         super().__init__(cartes)
 
+    def ajouter_carte(self, carte: Carte):
+        """
+        Ajoute une carte dans la reserve
+
+        Paramètres
+        ----------
+        carte : Carte
+            carte à ajouter à la reserve
+        """
+        self.ajouter_carte_base(carte)
+
+
     def bruler(self):
         """
         Positionne la premiere carte du paquet en dernier
