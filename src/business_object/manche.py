@@ -1,16 +1,15 @@
 """Implémentation de la classe Manche"""
 
+from business_object.board import Board
+from business_object.combinaison.combinaison import AbstractCombinaison
+from business_object.evaluateur_combinaison import EvaluateurCombinaison
 from business_object.info_manche import InfoManche
 from business_object.reserve import Reserve
-from business_object.board import Board
-from business_object.evaluateur_combinaison import EvaluateurCombinaison
-from business_object.combinaison.combinaison import AbstractCombinaison
-from business_object.joueur import Joueur
 
 
 class Manche:
-    """ 
-    Modélisation d'une manche de poker, depuis la distribution des cartes jusqu'à l'attribution du pot. 
+    """
+    Modélisation d'une manche de poker, depuis la distribution des cartes jusqu'à l'attribution du pot.
     """
 
     __TOURS = ("preflop", "flop", "turn", "river")
@@ -78,9 +77,7 @@ class Manche:
     def preflop(self):
         """Distribution des cartes initiales et mise des blinds"""
         self.__reserve.melanger()
-        self.__info.assignation_mains(
-            self.__reserve.distribuer(len(self.__info.joueurs))
-        )
+        self.__info.assignation_mains(self.__reserve.distribuer(len(self.__info.joueurs)))
         self.__info.miser(0, self.__grosse_blind // 2)
         self.__info.miser(1, self.__grosse_blind)
 
@@ -126,9 +123,8 @@ class Manche:
         classement = [i for i in joueurs_en_lice]
         for i in range(1, len(classement)):
             j = i - 1
-            while (
-                j >= 0
-                and AbstractCombinaison.gt(joueurs_en_lice[classement[j]], joueurs_en_lice[classement[i]])
+            while j >= 0 and AbstractCombinaison.gt(
+                joueurs_en_lice[classement[j]], joueurs_en_lice[classement[i]]
             ):
                 classement[j + 1] = classement[j]
                 j -= 1
