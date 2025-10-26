@@ -100,6 +100,21 @@ class Manche:
         self.__tour += 1
         self.__indice_joueur_actuel = 2
 
+    def fin_du_tour(self) -> bool:
+        """
+        Indique si les conditions sont réunies pour passer au tour suivant
+
+        Paramètres
+        ----------
+        None
+
+        Renvois
+        -------
+        bool
+            Vrai si tout les joueurs ont égalisé / couché / All in
+        """
+        pass
+
     # -------------------- Gestion du pot -------------------- #
     def ajouter_au_pot(self, credit):
         """Ajoute un montant au pot courant"""
@@ -165,3 +180,9 @@ class Manche:
                 else:
                     indice += 1
             return indice
+
+    def jouer(self):
+        """
+        Lance une manche en entier
+        """
+        pass
