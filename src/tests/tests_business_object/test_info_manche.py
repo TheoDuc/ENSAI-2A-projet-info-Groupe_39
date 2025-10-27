@@ -17,7 +17,10 @@ class TestInfoManche:
 
     @pytest.fixture
     def mains(self):
-        return [Main([pytest.as_pique, pytest.roi_coeur]), Main([pytest.dix_carreau, pytest.dix_trefle])]
+        return [
+            Main([pytest.as_pique, pytest.roi_coeur]),
+            Main([pytest.dix_carreau, pytest.dix_trefle]),
+        ]
 
     # ---------------------------------------------------------------------- #
     # Tests d’initialisation
@@ -47,7 +50,9 @@ class TestInfoManche:
         mauvais_joueurs = ["Alice", "Bob"]
 
         # WHEN / THEN
-        with pytest.raises(TypeError, match="Tous les éléments de 'joueurs' doivent être des instances de Joueur."):
+        with pytest.raises(
+            TypeError, match="Tous les éléments de 'joueurs' doivent être des instances de Joueur."
+        ):
             InfoManche(mauvais_joueurs)
 
     def test_infomanche_init_vide(self):
@@ -55,7 +60,9 @@ class TestInfoManche:
         joueurs = []
 
         # WHEN / THEN
-        with pytest.raises(ValueError, match="La liste des joueurs ne peut pas être vide."):
+        with pytest.raises(
+            ValueError, match=f"Au moins deux joueurs doivent être présents : {len(joueurs)}"
+        ):
             InfoManche(joueurs)
 
     # ---------------------------------------------------------------------- #
@@ -86,7 +93,9 @@ class TestInfoManche:
         mauvaises_mains = [mains[0]]  # seulement une main
 
         # WHEN / THEN
-        with pytest.raises(ValueError, match="Le nombre de mains doit correspondre au nombre de joueurs."):
+        with pytest.raises(
+            ValueError, match="Le nombre de mains doit correspondre au nombre de joueurs."
+        ):
             manche.assignation_mains(mauvaises_mains)
 
     # ---------------------------------------------------------------------- #

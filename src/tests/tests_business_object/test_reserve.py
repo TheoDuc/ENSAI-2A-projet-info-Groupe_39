@@ -30,6 +30,18 @@ class TestReserve(AbstractListeCartesTest):
         # THEN
         assert reserve.cartes == resultat
 
+    def test_reserve_ajouter_carte_succes(self):
+        # GIVEN
+        carte = pytest.cinq_trefle
+        reserve = Reserve([pytest.as_pique])
+        resultat = [pytest.as_pique, pytest.cinq_trefle]
+
+        # WHEN
+        reserve.ajouter_carte(carte)
+
+        # THEN
+        assert reserve.cartes == resultat
+
     def test_reserve_bruler(self):
         # GIVEN
         reserve = Reserve([pytest.deux_coeur, pytest.huit_coeur, pytest.valet_trefle])

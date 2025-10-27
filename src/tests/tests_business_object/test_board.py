@@ -40,3 +40,25 @@ class TestBoard(AbstractListeCartesTest):
         # WHEN / THEN
         with pytest.raises(ValueError, match=message_attendu):
             Board(cartes)
+        
+    def test_board_ajouter_carte_succes(self):
+        # GIVEN
+        carte = pytest.cinq_trefle
+        board = Board([pytest.as_pique])
+        resultat = [pytest.as_pique, pytest.cinq_trefle]
+
+        # WHEN
+        board.ajouter_carte(carte)
+
+        # THEN
+        assert board.cartes == resultat
+
+    def test_board_ajouter_cartes_echec(self):
+        # GIVEN
+        board = Board([pytest.as_pique, pytest.dix_coeur, pytest.as_pique, pytest.dix_coeur, pytest.as_pique])
+        carte = pytest.as_coeur
+        message_attendu = f"Le nombre de cartes dans le board est trop grand : {len(board.cartes)+1}"
+
+        # WHEN / THEN
+        with pytest.raises(ValueError, match=message_attendu):
+            board.ajouter_carte(carte)
