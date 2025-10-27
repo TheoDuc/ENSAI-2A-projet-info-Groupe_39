@@ -25,7 +25,7 @@ class EvaluateurCombinaison:
         """
         if not cartes or len(cartes) < 5:
             raise ValueError(
-                f"Au moins 5 cartes sont nécessaires pour évaluer une combinaison : {cartes}"
+                f"Au moins 5 cartes sont nécessaires pour évaluer une combinaison, actuellement vous avez {len(cartes)}"
             )
 
         # Priorité des combinaisons par force décroissante

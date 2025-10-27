@@ -1,5 +1,6 @@
 import pytest
 
+from business_object.carte import Carte
 from business_object.combinaison.brelan import Brelan
 
 
@@ -15,7 +16,8 @@ class Test_Brelan:
 
         # THEN : vérifications
         assert brelan.hauteur == "Dame"
-        assert all(c.valeur == "Dame" for c in cartes)
+        # tous les kickers sont corrects (ici il n'y en a pas)
+        assert brelan.kicker == ()
 
     def test_brelan_init_hauteur_invalide(self):
         # GIVEN : cartes ne formant pas de brelan
@@ -52,9 +54,18 @@ class Test_Brelan:
         brelan = Brelan.from_cartes(cartes)
 
         # THEN : représentation technique
-        attendu = (
-            f"Brelan([{cartes[0].valeur} de {cartes[0].couleur}, "
-            f"{cartes[1].valeur} de {cartes[1].couleur}, "
-            f"{cartes[2].valeur} de {cartes[2].couleur}])"
+        # construction des kickers (ici aucune carte restante donc tuple vide)
+        kicker = tuple(
+            sorted(
+                [c.valeur for c in cartes if c.valeur != "Dame"],
+                key=lambda x: Carte.VALEURS().index(x),
+                reverse=True,
+            )
         )
+
+        if kicker:
+            attendu = f"Brelan(hauteur=Dame, kickers={kicker})"
+        else:
+            attendu = "Brelan(hauteur=Dame)"
+
         assert repr(brelan) == attendu

@@ -139,10 +139,16 @@ class AbstractCombinaison(ABC):
         tuple
             Tuple numérique permettant les comparaisons entre combinaisons.
         """
+        kickers = self.kicker
+        if isinstance(kickers, str):
+            kickers = (kickers,)
+        elif isinstance(kickers, list):
+            kickers = tuple(kickers)
+
         return (
             self.FORCE(),
             Carte.VALEURS().index(self.hauteur),
-            tuple(Carte.VALEURS().index(k) for k in self.kicker),
+            tuple(Carte.VALEURS().index(k) for k in kickers),
         )
 
     def __eq__(self, other) -> bool:

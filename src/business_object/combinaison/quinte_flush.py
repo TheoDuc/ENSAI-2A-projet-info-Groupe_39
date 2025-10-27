@@ -91,7 +91,9 @@ class QuinteFlush(AbstractCombinaison):
         str
             Exemple : "Quinte Flush As".
         """
-        return f"Quinte Flush {self.hauteur}"
+        if self.hauteur == "As":
+            return "Quinte Flush Royale"
+        return "Quinte Flush"
 
     def __repr__(self) -> str:
         """
@@ -101,4 +103,4 @@ class QuinteFlush(AbstractCombinaison):
         -------
 
         """
-        return str(self)
+        return f"QuinteFlush(hauteur='{self.hauteur}')"

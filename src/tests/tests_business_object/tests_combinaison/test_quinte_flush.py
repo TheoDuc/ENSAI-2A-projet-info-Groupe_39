@@ -6,7 +6,7 @@ from business_object.combinaison.quinte_flush import QuinteFlush
 class Test_QuinteFlush:
     """Tests unitaires QuinteFlush avec GIVEN / WHEN / THEN"""
 
-    def test_creation_quinte_flush(self):
+    def test_quinte_flush_creation(self):
         # GIVEN : cartes formant une Quinte Flush
         cartes = [
             pytest.as_coeur,
@@ -24,7 +24,7 @@ class Test_QuinteFlush:
         assert q.kicker == ()
         assert QuinteFlush.FORCE() == 8
 
-    def test_est_present(self):
+    def test_quinte_flush_est_present(self):
         # GIVEN : cartes avec quinte flush
         cartes = [
             pytest.as_coeur,
@@ -37,7 +37,7 @@ class Test_QuinteFlush:
         # WHEN / THEN
         assert QuinteFlush.est_present(cartes)
 
-    def test_est_present_faux(self):
+    def test_quinte_flush_est_present_faux(self):
         # GIVEN : cartes sans quinte flush
         cartes = [
             pytest.as_coeur,
@@ -50,8 +50,8 @@ class Test_QuinteFlush:
         # WHEN / THEN
         assert not QuinteFlush.est_present(cartes)
 
-    def test_str_repr_quinte_flush(self):
-        # GIVEN : une Quinte Flush
+    def test_quinte_flush_str_repr(self):
+        # GIVEN : une Quinte Flush As
         q = QuinteFlush("As")
 
         # WHEN : récupération des chaînes
@@ -59,6 +59,16 @@ class Test_QuinteFlush:
         texte_repr = repr(q)
 
         # THEN : vérifications
-        assert "Quinte Flush" in texte_str
-        assert "As" in texte_str
-        assert texte_repr == texte_str
+        assert texte_str == "Quinte Flush Royale"  # str lisible pour joueur
+        assert texte_repr == "QuinteFlush(hauteur='As')"  # repr technique
+
+        # GIVEN : une Quinte Flush autre que As
+        q2 = QuinteFlush("Roi")
+
+        # WHEN
+        texte_str2 = str(q2)
+        texte_repr2 = repr(q2)
+
+        # THEN
+        assert texte_str2 == "Quinte Flush"
+        assert texte_repr2 == "QuinteFlush(hauteur='Roi')"

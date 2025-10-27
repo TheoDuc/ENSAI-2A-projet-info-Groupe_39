@@ -6,7 +6,7 @@ from business_object.combinaison.simple import Simple
 class Test_Simple:
     """Tests unitaires pour la combinaison Simple avec GIVEN / WHEN / THEN"""
 
-    def test_creation_simple(self):
+    def test_simple_creation_simple(self):
         # GIVEN : un jeu de cartes quelconques
         cartes = [
             pytest.as_coeur,
@@ -24,21 +24,21 @@ class Test_Simple:
         assert simple.kicker == ("Roi", "Dame", "Valet", "10")
         assert Simple.FORCE() == 0
 
-    def test_est_present(self):
+    def test_simple_est_present(self):
         # GIVEN : des cartes non vides
         cartes = [pytest.as_coeur, pytest.roi_carreau]
 
         # WHEN / THEN
         assert Simple.est_present(cartes)
 
-    def test_est_present_faux(self):
+    def test_simple_est_present_faux(self):
         # GIVEN : aucune carte
         cartes = []
 
         # WHEN / THEN
         assert not Simple.est_present(cartes)
 
-    def test_str_repr_simple(self):
+    def test_simple_str_repr(self):
         # GIVEN : création d'une Simple
         cartes = [
             pytest.as_coeur,
@@ -52,6 +52,5 @@ class Test_Simple:
         texte_repr = repr(simple)
 
         # THEN : vérifications
-        assert "Simple" in texte_str
-        assert "As" in texte_str
-        assert texte_repr == texte_str
+        assert texte_str == "Simple As"  # format attendu
+        assert texte_repr == "Simple(hauteur='As', kicker=('Roi', 'Dame'))"

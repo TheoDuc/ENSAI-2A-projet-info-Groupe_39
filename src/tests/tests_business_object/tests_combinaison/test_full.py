@@ -60,15 +60,15 @@ class Test_Full:
 
     def test_full_comparaison(self):
         # GIVEN : deux Full de hauteurs différentes
-        full_dame = Full("Dame", None)
-        full_dame._paire = "Roi"
+        full_dame = Full("Dame")
+        full_dame.paire = "Roi"
 
-        full_valet = Full("Valet", None)
-        full_valet._paire = "As"
+        full_valet = Full("Valet")
+        full_valet.paire = "As"
 
         # GIVEN pour comparaison d’égalité
-        full_dame2 = Full("Dame", None)
-        full_dame2._paire = "Roi"
+        full_dame2 = Full("Dame")
+        full_dame2.paire = "Roi"
 
         # WHEN
         resultat_sup = full_dame > full_valet
@@ -82,8 +82,8 @@ class Test_Full:
 
     def test_full_str_repr(self):
         # GIVEN : Full
-        full = Full("Dame", None)
-        full._paire = "Roi"
+        full = Full("Dame")
+        full.paire = "Roi"
 
         # WHEN
         texte_str = str(full)
@@ -93,4 +93,7 @@ class Test_Full:
         assert "Full" in texte_str
         assert "Dame" in texte_str
         assert "Roi" in texte_str
-        assert texte_repr == texte_str
+        # Vérification du repr technique adapté
+        assert texte_repr == "Full(Hauteur(Dame), Paire(Roi))"
+        # str reste lisible
+        assert texte_str == "Full Dame et Roi"

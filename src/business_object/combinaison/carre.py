@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List
 
 from business_object.carte import Carte
 
@@ -13,15 +13,15 @@ class Carre(AbstractCombinaison):
     appelée "kicker" servant à départager les égalités.
     """
 
-    def __init__(self, cartes: List[Carte], kicker: Tuple[str, ...] = ()):
+    def __init__(self, hauteur: str, kicker: str):
         """
         Initialise un objet Carré avec une liste de cartes et un kicker optionnel.
 
         Paramètres
         ----------
-        cartes : List[Carte]
-            Liste des quatre cartes constituant le Carré.
-        kicker : Tuple[str, ...], optionnel
+        hauteur : str
+            Valeur des cartes formant le Carré (ex. 'Roi').
+        kicker : str, optionnel
             Cartes restantes servant à départager les égalités, triées de la plus forte à la plus faible.
 
         Renvois
@@ -33,19 +33,8 @@ class Carre(AbstractCombinaison):
         ValueError
             Levée si le nombre de cartes n’est pas 4 ou si toutes les cartes n’ont pas la même valeur.
         """
-        if len(cartes) != 4:
-            raise ValueError(
-                f"Un Carré doit être constitué de 4 cartes,mais {len(cartes)} cartes ont été fournies"
-            )
-        hauteur = cartes[0].valeur
-        if not all(c.valeur == hauteur for c in cartes):
-            valeurs_diff = [c.valeur for c in cartes if c.valeur != hauteur]
-            raise ValueError(
-                f"Toutes les cartes doivent avoir la même valeur pour un Carré"
-                f", mais les valeurs suivantes diffèrent : {valeurs_diff}"
-            )
+
         super().__init__(hauteur, kicker)
-        self.cartes = cartes
 
     @classmethod
     def FORCE(cls) -> int:
@@ -110,15 +99,12 @@ class Carre(AbstractCombinaison):
             raise ValueError(
                 f"Aucun Carré présent dans les cartes. Occurrences des valeurs : {compte_valeurs}"
             )
-        carre_cartes = [c for c in cartes if c.valeur == hauteur]
-        kicker = tuple(
-            sorted(
-                [c.valeur for c in cartes if c.valeur != hauteur],
-                key=lambda x: Carte.VALEURS().index(x),
-                reverse=True,
-            )
-        )
-        return cls(carre_cartes, kicker)
+        kicker_list = [c.valeur for c in cartes if c.valeur != hauteur]
+        if len(kicker_list) != 1:
+            raise ValueError(f"Un Carré doit avoir exactement 1 kicker, trouvé : {kicker_list}")
+
+        kicker = kicker_list[0]  # kicker unique
+        return cls(hauteur, kicker)
 
     def __str__(self) -> str:
         """
@@ -148,5 +134,5 @@ class Carre(AbstractCombinaison):
             Chaîne détaillant la combinaison, par exemple :
             "Carre([Roi de Coeur, Roi de Pique, Roi de Carreau, Roi de Trèfle])".
         """
-        cartes_str = ", ".join(f"{c.valeur} de {c.couleur}" for c in self.cartes)
-        return f"Carre([{cartes_str}])"
+
+        return f"Carre(hauteur={self.hauteur}, kicker={self.kicker})"

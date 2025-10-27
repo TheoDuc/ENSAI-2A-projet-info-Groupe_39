@@ -12,7 +12,7 @@ class Brelan(AbstractCombinaison):
     et de deux cartes supplémentaires appelées "kickers" servant à départager les égalités.
     """
 
-    def __init__(self, hauteur: str, cartes: list[Carte], kicker=None):
+    def __init__(self, hauteur: str, kicker: tuple[str] = None):
         """
         Initialise un objet Brelan avec une hauteur donnée et la liste de ses cartes.
 
@@ -20,8 +20,7 @@ class Brelan(AbstractCombinaison):
         ----------
         hauteur : str
             Valeur principale du Brelan (ex. 'Roi', '10', 'As').
-        cartes : list[Carte]
-            Liste complète des cartes de la main.
+
         kicker : tuple[str], optionnel
             Valeurs des cartes restantes servant à départager les égalités.
 
@@ -30,7 +29,6 @@ class Brelan(AbstractCombinaison):
         None
         """
         super().__init__(hauteur, kicker)
-        self.cartes = cartes
 
     @classmethod
     def FORCE(cls) -> int:
@@ -90,9 +88,10 @@ class Brelan(AbstractCombinaison):
         valeurs = [c.valeur for c in cartes]
         compteur = Counter(valeurs)
 
-        brelans = [v for v, count in compteur.items() if count >= 3]
+        brelans = [v for v, count in compteur.items() if count == 3]
         if not brelans:
-            raise ValueError("Aucun brelan présent dans les cartes")
+            details = ", ".join(f"{val}:{nb}" for val, nb in compteur.items())
+            raise ValueError(f"Aucun brelan présent dans les cartes {details}")
 
         hauteur = max(brelans, key=lambda v: Carte.VALEURS().index(v))
         kicker = tuple(
@@ -102,7 +101,7 @@ class Brelan(AbstractCombinaison):
                 reverse=True,
             )
         )
-        return cls(hauteur, cartes, kicker)
+        return cls(hauteur, kicker)
 
     def __str__(self):
         """
@@ -131,7 +130,10 @@ class Brelan(AbstractCombinaison):
         -------
         str
             Chaîne détaillant la combinaison, par exemple :
-            "Brelan([Roi de Coeur, Roi de Pique, Roi de Carreau])".
+            "Brelan(hauteur=Roi, kickers=(As, Dame))"
         """
-        cartes_repr = ", ".join(f"{c.valeur} de {c.couleur}" for c in self.cartes)
-        return f"Brelan([{cartes_repr}])"
+
+        if self.kicker:
+            return f"Brelan(hauteur={self.hauteur}, kickers={self.kicker})"
+        else:
+            return f"Brelan(hauteur={self.hauteur})"

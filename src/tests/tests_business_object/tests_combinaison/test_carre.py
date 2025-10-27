@@ -1,6 +1,5 @@
 import pytest
 
-from business_object.carte import Carte
 from business_object.combinaison.carre import Carre
 
 
@@ -9,14 +8,20 @@ class Test_Carre:
 
     def test_carre_init_succes(self):
         # GIVEN : 4 cartes identiques pour former un Carré
-        cartes = [pytest.dame_coeur, pytest.dame_pique, pytest.dame_trefle, pytest.dame_carreau]
+        cartes = [
+            pytest.dame_coeur,
+            pytest.dame_pique,
+            pytest.dame_trefle,
+            pytest.dame_carreau,
+            pytest.huit_coeur,
+        ]
 
         # WHEN : création du Carré à partir des cartes
         carre = Carre.from_cartes(cartes)
 
-        # THEN : vérifier la hauteur, la force et les kickers
+        # THEN : vérifier la hauteur, la force et le kicker
         assert carre.hauteur == "Dame"
-        assert all(k in Carte.VALEURS() for k in carre.kicker)
+        assert carre.kicker == "8"
         assert Carre.FORCE() == 7
 
     def test_carre_init_hauteur_invalide(self):
@@ -30,23 +35,47 @@ class Test_Carre:
     def test_carre_comparaison_gt_lt_eq(self):
         # GIVEN : deux Carrés différents
         carre_dame = Carre.from_cartes(
-            [pytest.dame_coeur, pytest.dame_pique, pytest.dame_trefle, pytest.dame_carreau]
+            [
+                pytest.dame_coeur,
+                pytest.dame_pique,
+                pytest.dame_trefle,
+                pytest.dame_carreau,
+                pytest.huit_coeur,
+            ]
         )
         carre_roi = Carre.from_cartes(
-            [pytest.roi_coeur, pytest.roi_pique, pytest.roi_trefle, pytest.roi_carreau]
+            [
+                pytest.roi_coeur,
+                pytest.roi_pique,
+                pytest.roi_trefle,
+                pytest.roi_carreau,
+                pytest.as_coeur,
+            ]
         )
 
         # WHEN / THEN : comparer les Carrés
         assert carre_roi > carre_dame
         assert not carre_dame > carre_roi
         assert carre_dame == Carre.from_cartes(
-            [pytest.dame_coeur, pytest.dame_pique, pytest.dame_trefle, pytest.dame_carreau]
+            [
+                pytest.dame_coeur,
+                pytest.dame_pique,
+                pytest.dame_trefle,
+                pytest.dame_carreau,
+                pytest.huit_coeur,
+            ]
         )
 
     def test_carre_str(self):
         # GIVEN : Carré de Dames
         carre = Carre.from_cartes(
-            [pytest.dame_coeur, pytest.dame_pique, pytest.dame_trefle, pytest.dame_carreau]
+            [
+                pytest.dame_coeur,
+                pytest.dame_pique,
+                pytest.dame_trefle,
+                pytest.dame_carreau,
+                pytest.huit_coeur,
+            ]
         )
 
         # WHEN / THEN : vérifier la représentation __str__
@@ -55,11 +84,17 @@ class Test_Carre:
     def test_carre_repr(self):
         # GIVEN : Carré de Dames
         carre = Carre.from_cartes(
-            [pytest.dame_coeur, pytest.dame_pique, pytest.dame_trefle, pytest.dame_carreau]
+            [
+                pytest.dame_coeur,
+                pytest.dame_pique,
+                pytest.dame_trefle,
+                pytest.dame_carreau,
+                pytest.huit_coeur,
+            ]
         )
 
         # WHEN / THEN : vérifier la représentation __repr__
-        attendu = "Carre([Dame de Coeur, Dame de Pique, Dame de Trêfle, Dame de Carreau])"
+        attendu = f"Carre(hauteur={carre.hauteur}, kicker={carre.kicker})"
         assert repr(carre) == attendu
 
     def test_carre_est_present(self):

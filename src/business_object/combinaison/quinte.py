@@ -89,4 +89,4 @@ class Quinte(AbstractCombinaison):
         -------
 
         """
-        return str(self)
+        return f"Quinte(hauteur='{self.hauteur}')"

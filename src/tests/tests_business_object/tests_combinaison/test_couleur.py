@@ -50,9 +50,8 @@ class Test_Couleur:
         texte_repr = repr(couleur)
 
         # THEN : vérifications
-        assert "Couleur" in texte_str
-        assert "As" in texte_str
-        assert texte_repr.startswith("Couleur([")
+        assert texte_str == "Nous avons des couleurs"
+        assert texte_repr.startswith("Couleur(")
 
     def test_couleur_est_present(self):
         # GIVEN : 5 cartes de même couleur (conftest)

@@ -95,4 +95,4 @@ class Paire(AbstractCombinaison):
         -------
 
         """
-        return str(self)
+        return f"Paire(hauteur={self.hauteur}, kicker={self.kicker})"

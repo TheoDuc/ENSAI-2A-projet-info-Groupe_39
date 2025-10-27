@@ -83,7 +83,7 @@ class Simple(AbstractCombinaison):
         str
             Exemple : "Simple As et Roi Dame", en incluant les kickers si présents.
         """
-        return f"Simple {self.hauteur}" + (f" et {' '.join(self.kicker)}" if self.kicker else "")
+        return f"Simple {self.hauteur}"
 
     def __repr__(self) -> str:
         """
@@ -93,4 +93,4 @@ class Simple(AbstractCombinaison):
         -------
 
         """
-        return str(self)
+        return f"Simple(hauteur='{self.hauteur}', kicker={self.kicker})"

@@ -20,7 +20,7 @@ class CombinaisonTest(AbstractCombinaison):
 class Test_AbstractCombinaison:
     """Tests unitaires simplifiés pour AbstractCombinaison"""
 
-    def test_attributs(self):
+    def test_AbstractCombinaison_attributs(self):
         # GIVEN : hauteur et kicker
         hauteur = "2"
         kicker = ("3",)
@@ -33,7 +33,7 @@ class Test_AbstractCombinaison:
         assert c.kicker == ("3",)
         assert CombinaisonTest.FORCE() == 0
 
-    def test_str_et_repr(self):
+    def test_AbstractCombinaison_str_et_repr(self):
         # GIVEN : une combinaison
         c = CombinaisonTest("2", ("3",))
 
@@ -45,7 +45,7 @@ class Test_AbstractCombinaison:
         assert texte_str == "CombinaisonTest(2, ('3',))"
         assert texte_repr == texte_str
 
-    def test_comparaison(self):
+    def test_AbstractCombinaison_comparaison(self):
         # GIVEN : deux combinaisons
         c1 = CombinaisonTest("2", ("3",))
         c2 = CombinaisonTest("2", ("4",))

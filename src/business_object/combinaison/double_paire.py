@@ -85,6 +85,7 @@ class DoublePaire(AbstractCombinaison):
 
 
         """
+
         valeurs = [c.valeur for c in cartes]
 
         paires = sorted(
@@ -97,10 +98,8 @@ class DoublePaire(AbstractCombinaison):
             raise ValueError("Pas assez de paires pour créer une Double Paire")
 
         kickers = [v for v in valeurs if v not in paires]
-        kicker = (
-            paires[1],
-            *sorted(kickers, key=lambda x: Carte.VALEURS().index(x), reverse=True)[:1],
-        )
+        kicker_supp = sorted(kickers, key=lambda x: Carte.VALEURS().index(x), reverse=True)
+        kicker = (paires[1], kicker_supp[0]) if kicker_supp else (paires[1],)
 
         return cls(paires[0], kicker)
 
