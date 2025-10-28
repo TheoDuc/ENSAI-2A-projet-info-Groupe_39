@@ -6,7 +6,7 @@ from .combinaison import AbstractCombinaison
 class Quinte(AbstractCombinaison):
     """Classe représentant une Quinte (suite de 5 cartes de valeurs consécutives)."""
 
-    def __init__(self, hauteur: list[str], kicker=None):
+    def __init__(self, hauteur: str, kicker):
         """
         Initialise une combinaison Quinte.
 
@@ -16,7 +16,7 @@ class Quinte(AbstractCombinaison):
             Valeur de la carte la plus haute de la Quinte.
         """
         hauteur = sorted(hauteur, key=lambda x: Carte.VALEURS().index(x), reverse=True)
-        super().__init__(hauteur, kicker)
+        super().__init__(hauteur, kicker=None)
 
     @classmethod
     def FORCE(cls) -> int:
@@ -70,11 +70,13 @@ class Quinte(AbstractCombinaison):
         for i in range(len(valeurs) - 4):
             suite = valeurs[i : i + 5]
             if suite == list(range(suite[0], suite[0] + 5)):
-                suites.append([Carte.VALEURS()[v] for v in reversed(suite)])
+                suites.append(suite)
         if not suites:
             raise ValueError("Aucune Quinte présente.")
-        meilleure_suite = max(suites, key=lambda s: Carte.VALEURS().index(s[0]))
-        return cls(hauteur=meilleure_suite)
+        # On prend la carte la plus haute de la meilleure suite
+        max_suite = max(suites, key=lambda s: s[-1])
+        hauteur = Carte.VALEURS()[max_suite[-1]]
+        return cls(hauteur=hauteur)
 
     def __str__(self) -> str:
         """

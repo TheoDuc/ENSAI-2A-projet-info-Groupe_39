@@ -65,8 +65,8 @@ class Simple(AbstractCombinaison):
         cls.verifier_min_cartes(cartes)
 
         cartes_triees = sorted(cartes, key=lambda c: Carte.VALEURS().index(c.valeur), reverse=True)
-        hauteur = cartes_triees[0].valeur
-        kickers = [c.valeur for c in cartes_triees[1:]]
+        hauteur = cartes_triees.pop(0).valeur
+        kickers = [c.valeur for c in cartes_triees[:4]]
         return cls(hauteur=hauteur, kicker=kickers)
 
     def __str__(self) -> str:
