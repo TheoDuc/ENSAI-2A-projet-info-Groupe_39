@@ -85,6 +85,8 @@ class Brelan(AbstractCombinaison):
         ValueError
             Levée si aucune combinaison de trois cartes de même valeur n’est trouvée.
         """
+        if len(cartes) < 5:
+            raise ValueError("Il faut au moins 5 cartes pour former un Brelan")
         valeurs = [c.valeur for c in cartes]
         compteur = Counter(valeurs)
 
@@ -99,7 +101,7 @@ class Brelan(AbstractCombinaison):
                 [c.valeur for c in cartes if c.valeur != hauteur],
                 key=lambda x: Carte.VALEURS().index(x),
                 reverse=True,
-            )
+            )[:2]  # On retient seulement les deux plus hauts kickers dans la combinaison
         )
         return cls(hauteur, kicker)
 
@@ -116,6 +118,8 @@ class Brelan(AbstractCombinaison):
         str
             Chaîne lisible par un joueur, par exemple : "Brelan de Roi".
         """
+        if self.hauteur == "As":
+            return "Brelan d'As"
         return f"Brelan de {self.hauteur}"
 
     def __repr__(self):

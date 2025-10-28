@@ -83,6 +83,9 @@ class Paire(AbstractCombinaison):
         str
             Exemple : "Paire As et Roi" si kicker, sinon "Paire As".
         """
+        if self.hauteur == "As":
+            return f"Paire d'As et {self.kicker[0]}" if self.kicker else f"Paire {self.hauteur}"
+
         return (
             f"Paire {self.hauteur} et {self.kicker[0]}" if self.kicker else f"Paire {self.hauteur}"
         )

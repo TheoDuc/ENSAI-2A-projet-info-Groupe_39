@@ -1,3 +1,4 @@
+from collections import Counter
 from typing import List
 
 from business_object.carte import Carte
@@ -73,37 +74,25 @@ class Carre(AbstractCombinaison):
 
     @classmethod
     def from_cartes(cls, cartes: List[Carte]) -> "Carre":
-        """
-        Construit un objet Carré à partir d’une liste de cartes.
+        if len(cartes) < 5:
+            raise ValueError("Il faut au moins 5 cartes pour former un Carré")
 
-        Paramètres
-        ----------
-        cartes : List[Carte]
-            Liste des cartes disponibles.
-
-        Renvois
-        -------
-        Carre
-            Instance de la classe représentant le Carré détecté.
-
-        Exceptions
-        ----------
-        ValueError
-            Levée si aucune combinaison de quatre cartes de même valeur n’est trouvée.
-        """
         valeurs = [c.valeur for c in cartes]
-        try:
-            hauteur = next(v for v in set(valeurs) if valeurs.count(v) == 4)
-        except StopIteration:
-            compte_valeurs = {v: valeurs.count(v) for v in set(valeurs)}
-            raise ValueError(
-                f"Aucun Carré présent dans les cartes. Occurrences des valeurs : {compte_valeurs}"
-            )
-        kicker_list = [c.valeur for c in cartes if c.valeur != hauteur]
-        if len(kicker_list) != 1:
-            raise ValueError(f"Un Carré doit avoir exactement 1 kicker, trouvé : {kicker_list}")
+        compteur = Counter(valeurs)
+        carres_possibles = [v for v, count in compteur.items() if count == 4]
 
-        kicker = kicker_list[0]  # kicker unique
+        if not carres_possibles:
+            raise ValueError(f"Aucun Carré présent dans les cartes: {dict(compteur)}")
+
+        # Hauteur : string
+        hauteur = max(carres_possibles, key=lambda v: Carte.VALEURS().index(v))
+
+        # Kicker : tuple avec une seule carte
+        kicker_valeur = max(
+            [c.valeur for c in cartes if c.valeur != hauteur],
+            key=lambda x: Carte.VALEURS().index(x),
+        )
+        kicker = (kicker_valeur,)
         return cls(hauteur, kicker)
 
     def __str__(self) -> str:
@@ -119,6 +108,8 @@ class Carre(AbstractCombinaison):
         str
             Chaîne lisible par un joueur, par exemple : "Carre de Roi".
         """
+        if self.hauteur == "As":
+            return "Carre d'As"
         return f"Carre de {self.hauteur}"
 
     def __repr__(self) -> str:

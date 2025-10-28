@@ -50,7 +50,7 @@ class Test_Couleur:
         texte_repr = repr(couleur)
 
         # THEN : vérifications
-        assert texte_str == "Nous avons des couleurs"
+        assert texte_str == "Couleurs"
         assert texte_repr.startswith("Couleur(")
 
     def test_couleur_est_present(self):

@@ -79,7 +79,7 @@ class Quinte(AbstractCombinaison):
         str
             Exemple : "Quinte As".
         """
-        return f"Quinte {self.hauteur}"
+        return "Quinte"
 
     def __repr__(self) -> str:
         """

@@ -7,13 +7,15 @@ class Test_Carre:
     """Tests unitaires pour la combinaison 'Carré' avec structure Given / When / Then"""
 
     def test_carre_init_succes(self):
-        # GIVEN : 4 cartes identiques pour former un Carré
+        # GIVEN : 7 cartes avec un Carré et 3 kickers possibles
         cartes = [
             pytest.dame_coeur,
             pytest.dame_pique,
             pytest.dame_trefle,
-            pytest.dame_carreau,
+            pytest.dame_carreau,  # le Carré
             pytest.huit_coeur,
+            pytest.roi_pique,
+            pytest.as_coeur,
         ]
 
         # WHEN : création du Carré à partir des cartes
@@ -21,7 +23,8 @@ class Test_Carre:
 
         # THEN : vérifier la hauteur, la force et le kicker
         assert carre.hauteur == "Dame"
-        assert carre.kicker == "8"
+        # le kicker doit être le plus fort parmi les cartes restantes (As)
+        assert carre.kicker == "As"
         assert Carre.FORCE() == 7
 
     def test_carre_init_hauteur_invalide(self):

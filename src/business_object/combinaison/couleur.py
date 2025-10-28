@@ -113,9 +113,9 @@ class Couleur(AbstractCombinaison):
         str
             Chaîne lisible par un joueur, par exemple : "Couleur de As".
         """
-        return "Nous avons des couleurs"
+        return "Couleurs"
 
-    def __repr__(self) -> str:
+    def __repr__(self):
         """
         Renvoie une représentation détaillée de la *Couleur* pour le débogage.
 
