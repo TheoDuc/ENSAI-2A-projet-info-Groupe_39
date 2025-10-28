@@ -58,6 +58,10 @@ class Manche:
         return self.__board
 
     @property
+    def indice_joueur_actuel(self) -> int:
+        return self.__indice_joueur_actuel
+
+    @property
     def grosse_blind(self) -> int:
         return self.__grosse_blind
 
@@ -116,10 +120,11 @@ class Manche:
             Vrai si tout les joueurs ont égalisé / couché / All in
         """
         
-        for i in range(len(self.info.statuts)):
-            if self.info.statuts[i] in ["en retard", "à jour", "all in"]:
-                dernier_joueur = i
-        if self.__indice_joueur_actuel != dernier_joueur:
+        i = 0
+        while self.info.statuts[i] not in ["en retard", "à jour", "all in"]:
+            i += 1
+        premier_joueur = i
+        if self.__indice_joueur_actuel != premier_joueur:
             return False
         for s in self.infomanche.statuts:
             if s == "en retard" : return False
@@ -178,7 +183,7 @@ class Manche:
         """
         Retourne l'indice du joueur suivant qui n'est pas couché.
         """
-        indice = self.__indice_joueur_actuel + 1
+        indice = self.indice_joueur_actuel + 1
         tour_couche = self.info.tour_couche
 
         if None not in tour_couche:
@@ -189,15 +194,15 @@ class Manche:
                     indice = 0
                 else:
                     indice += 1
-            return indice
+        self.__indice_joueur_actuel += 1
 
     def jouer(self):
         """
         Lance une manche en entier
         """
-        self.preflop()
-        time = 0
-        while self.__indice_joueur_actuel and time < 100:
-            time += 1
-            
+        pass
+        ## là c'est une méthode de service déguisée parce qu'on ne peut dérouler une manche complète
+        #  qu'avec les actions des joueurs qui seront faites via l'api donc les endpoints de jeu
+        # appelleronts des méthodes services qui modifieronts les instances de manche mais la 
+        # jouer n'a pas de sens telle que décrite
 

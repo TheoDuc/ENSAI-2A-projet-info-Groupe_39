@@ -15,3 +15,5 @@ class PartieService:
         #regarde si des places sont libres sinon créer une table etc
 
     def retirer_un_joueur(self)
+
+    
