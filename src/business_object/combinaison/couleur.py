@@ -16,7 +16,7 @@ class Couleur(AbstractCombinaison):
 
     def __init__(
         self,
-        hauteur: str,
+        hauteur: list[str],
         kicker=None,
     ):
         """
@@ -96,9 +96,9 @@ class Couleur(AbstractCombinaison):
             raise ValueError("Aucune Couleur présente dans les cartes")
 
         cartes_couleur = [c for c in cartes if c.couleur == couleur_max]
-        hauteur = max(cartes_couleur, key=lambda c: Carte.VALEURS().index(c.valeur))
-
-        return cls(hauteur.valeur, kicker=None)
+        cartes_couleur.sort(key=lambda c: Carte.VALEURS().index(c.valeur), reverse=True)
+        hauteur = [c.valeur for c in cartes_couleur[:5]]
+        return cls(hauteur, kicker=None)
 
     def __str__(self) -> str:
         """
