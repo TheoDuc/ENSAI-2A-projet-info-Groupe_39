@@ -74,8 +74,7 @@ class Carre(AbstractCombinaison):
 
     @classmethod
     def from_cartes(cls, cartes: List[Carte]) -> "Carre":
-        if len(cartes) < 5:
-            raise ValueError("Il faut au moins 5 cartes pour former un Carré")
+        cls.verifier_min_cartes(cartes)
 
         valeurs = [c.valeur for c in cartes]
         compteur = Counter(valeurs)

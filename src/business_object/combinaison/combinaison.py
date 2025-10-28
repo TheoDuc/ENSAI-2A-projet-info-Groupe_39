@@ -23,6 +23,26 @@ class AbstractCombinaison(ABC):
         self._hauteur = hauteur
         self._kicker = tuple(kicker) if kicker else ()
 
+    @staticmethod
+    def verifier_min_cartes(cartes: list, n: int = 5):
+        """
+        Vérifie que la liste de cartes contient au moins `n` cartes.
+
+        Paramètres
+        ----------
+        cartes : list
+            Liste de cartes à vérifier.
+        n : int
+            Nombre minimal de cartes requis (par défaut 5).
+
+        Raises
+        ------
+        ValueError
+            Si le nombre de cartes est inférieur à `n`.
+        """
+        if len(cartes) < n:
+            raise ValueError(f"Il faut au moins {n} cartes pour évaluer cette combinaison.")
+
     @property
     def hauteur(self):
         return self._hauteur

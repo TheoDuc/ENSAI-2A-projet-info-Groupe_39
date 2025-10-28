@@ -1,3 +1,5 @@
+from collections import Counter
+
 from business_object.carte import Carte
 
 from .combinaison import AbstractCombinaison
@@ -6,7 +8,7 @@ from .combinaison import AbstractCombinaison
 class Paire(AbstractCombinaison):
     """Classe représentant une Paire (deux cartes de même valeur) au poker."""
 
-    def __init__(self, hauteur: str, kicker: tuple[str, ...]):
+    def __init__(self, hauteur: str, kicker: list[str]):
         """
         Initialise une combinaison Paire.
 
@@ -14,7 +16,7 @@ class Paire(AbstractCombinaison):
         ----------
         hauteur : str
             Valeur de la Paire.
-        kicker : tuple[str, ...]
+        kicker : list[str]
             Cartes restantes servant de kickers pour comparaison.
         """
         super().__init__(hauteur, kicker)
@@ -40,7 +42,8 @@ class Paire(AbstractCombinaison):
             True si au moins une Paire est présente, False sinon.
         """
         valeurs = [c.valeur for c in cartes]
-        return any(valeurs.count(v) == 2 for v in set(valeurs))
+        compteur = Counter(valeurs)
+        return any(count >= 2 for count in compteur.values())
 
     @classmethod
     def from_cartes(cls, cartes: list[Carte]) -> "Paire":
@@ -57,22 +60,18 @@ class Paire(AbstractCombinaison):
         Paire
             Instance représentant la Paire détectée, avec ses kickers.
         """
+        cls.verifier_min_cartes(cartes)
         valeurs = [c.valeur for c in cartes]
+        compteur = Counter(valeurs)
+        paires = [v for v, count in compteur.items() if count >= 2]
+        if not paires:
+            raise ValueError("Aucune Paire présente")
+        meilleure_paire = max(paires, key=lambda v: Carte.VALEURS().index(v))
 
-        paire = max(
-            [v for v in set(valeurs) if valeurs.count(v) == 2],
-            key=lambda x: Carte.VALEURS().index(x),
-        )
+        cartes_restantes = [v for v in valeurs if v != meilleure_paire]
+        kickers = sorted(cartes_restantes, key=lambda v: Carte.VALEURS().index(v), reverse=True)
 
-        kicker = tuple(
-            sorted(
-                [v for v in valeurs if v != paire],
-                key=lambda x: Carte.VALEURS().index(x),
-                reverse=True,
-            )
-        )
-
-        return cls(paire, kicker)
+        return cls(hauteur=meilleure_paire, kicker=kickers)
 
     def __str__(self):
         """
@@ -84,11 +83,9 @@ class Paire(AbstractCombinaison):
             Exemple : "Paire As et Roi" si kicker, sinon "Paire As".
         """
         if self.hauteur == "As":
-            return f"Paire d'As et {self.kicker[0]}" if self.kicker else f"Paire {self.hauteur}"
-
-        return (
-            f"Paire {self.hauteur} et {self.kicker[0]}" if self.kicker else f"Paire {self.hauteur}"
-        )
+            return "Paire d'As"
+        else:
+            return f"Paire {self.hauteur}"
 
     def __repr__(self):
         """

@@ -12,7 +12,7 @@ class Brelan(AbstractCombinaison):
     et de deux cartes supplémentaires appelées "kickers" servant à départager les égalités.
     """
 
-    def __init__(self, hauteur: str, kicker: tuple[str] = None):
+    def __init__(self, hauteur: str, kicker: tuple[str]):
         """
         Initialise un objet Brelan avec une hauteur donnée et la liste de ses cartes.
 
@@ -85,8 +85,7 @@ class Brelan(AbstractCombinaison):
         ValueError
             Levée si aucune combinaison de trois cartes de même valeur n’est trouvée.
         """
-        if len(cartes) < 5:
-            raise ValueError("Il faut au moins 5 cartes pour former un Brelan")
+        cls.verifier_min_cartes(cartes)
         valeurs = [c.valeur for c in cartes]
         compteur = Counter(valeurs)
 

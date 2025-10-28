@@ -39,7 +39,7 @@ class Simple(AbstractCombinaison):
         bool
             True si la liste n’est pas vide (une Simple est toujours présente), False sinon.
         """
-        return len(cartes) > 0
+        return len(cartes) >= 1
 
     @classmethod
     def from_cartes(cls, cartes: list[Carte]) -> "Simple":
@@ -61,18 +61,13 @@ class Simple(AbstractCombinaison):
         ValueError
             Si la liste de cartes est vide.
         """
-        if not cartes:
-            raise ValueError("Impossible de créer une Simple avec une liste vide")
 
-        hauteur = max(cartes, key=lambda c: Carte.VALEURS().index(c.valeur)).valeur
-        kicker = tuple(
-            sorted(
-                [c.valeur for c in cartes if c.valeur != hauteur],
-                key=lambda v: Carte.VALEURS().index(v),
-                reverse=True,
-            )
-        )
-        return cls(hauteur, kicker)
+        cls.verifier_min_cartes(cartes)
+
+        cartes_triees = sorted(cartes, key=lambda c: Carte.VALEURS().index(c.valeur), reverse=True)
+        hauteur = cartes_triees[0].valeur
+        kickers = [c.valeur for c in cartes_triees[1:]]
+        return cls(hauteur=hauteur, kicker=kickers)
 
     def __str__(self) -> str:
         """

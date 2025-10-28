@@ -1,121 +1,111 @@
 import pytest
 
-from business_object.combinaison.carre import Carre
+from business_object.combinaison.brelan import Brelan
 
 
-class Test_Carre:
-    """Tests unitaires pour la combinaison 'Carré' avec structure Given / When / Then"""
+class Test_Brelan:
+    """Tests unitaires pour la classe Brelan avec GIVEN / WHEN / THEN"""
 
-    def test_carre_init_succes(self):
-        # GIVEN : 7 cartes avec un Carré et 3 kickers possibles
+    def test_brelan_init_succes(self):
+        # GIVEN : cartes formant un Brelan
         cartes = [
             pytest.dame_coeur,
-            pytest.dame_pique,
             pytest.dame_trefle,
-            pytest.dame_carreau,  # le Carré
-            pytest.huit_coeur,
-            pytest.roi_pique,
-            pytest.as_coeur,
+            pytest.dame_carreau,  # le Brelan
+            pytest.as_pique,
+            pytest.roi_coeur,
+            pytest.neuf_carreau,
         ]
 
-        # WHEN : création du Carré à partir des cartes
-        carre = Carre.from_cartes(cartes)
+        # WHEN : création du Brelan
+        brelan = Brelan.from_cartes(cartes)
 
-        # THEN : vérifier la hauteur, la force et le kicker
-        assert carre.hauteur == "Dame"
-        # le kicker doit être le plus fort parmi les cartes restantes (As)
-        assert carre.kicker == "As"
-        assert Carre.FORCE() == 7
+        # THEN : vérifier hauteur et kickers
+        assert brelan.hauteur == "Dame"
+        assert brelan.kicker == ("As", "Roi")
+        assert Brelan.FORCE() == 4
 
-    def test_carre_init_hauteur_invalide(self):
-        # GIVEN : cartes ne formant pas un Carré
-        cartes = [pytest.dame_coeur, pytest.dame_pique, pytest.valet_coeur]
+    def test_brelan_init_erreur(self):
+        # GIVEN : cartes sans Brelan
+        cartes = [
+            pytest.deux_coeur,
+            pytest.trois_coeur,
+            pytest.quatre_trefle,
+            pytest.cinq_coeur,
+            pytest.sept_trefle,
+        ]
 
-        # WHEN / THEN : la création doit lever une erreur
-        with pytest.raises(ValueError):
-            Carre.from_cartes(cartes)
+        # WHEN / THEN : création échoue
+        with pytest.raises(ValueError, match="Aucun brelan présent"):
+            Brelan.from_cartes(cartes)
 
-    def test_carre_comparaison_gt_lt_eq(self):
-        # GIVEN : deux Carrés différents
-        carre_dame = Carre.from_cartes(
+    def test_brelan_comparaison(self):
+        # GIVEN : deux Brelans différents
+        brelan_dame = Brelan.from_cartes(
             [
                 pytest.dame_coeur,
-                pytest.dame_pique,
                 pytest.dame_trefle,
                 pytest.dame_carreau,
-                pytest.huit_coeur,
+                pytest.as_pique,
+                pytest.roi_coeur,
             ]
         )
-        carre_roi = Carre.from_cartes(
+        brelan_roi = Brelan.from_cartes(
             [
                 pytest.roi_coeur,
-                pytest.roi_pique,
                 pytest.roi_trefle,
                 pytest.roi_carreau,
                 pytest.as_coeur,
+                pytest.valet_pique,
             ]
         )
 
-        # WHEN / THEN : comparer les Carrés
-        assert carre_roi > carre_dame
-        assert not carre_dame > carre_roi
-        assert carre_dame == Carre.from_cartes(
+        # THEN : comparaison fonctionne
+        assert brelan_roi > brelan_dame
+        assert not brelan_dame > brelan_roi
+        assert brelan_dame == Brelan.from_cartes(
             [
                 pytest.dame_coeur,
-                pytest.dame_pique,
                 pytest.dame_trefle,
                 pytest.dame_carreau,
-                pytest.huit_coeur,
+                pytest.as_pique,
+                pytest.roi_coeur,
             ]
         )
 
-    def test_carre_str(self):
-        # GIVEN : Carré de Dames
-        carre = Carre.from_cartes(
-            [
-                pytest.dame_coeur,
-                pytest.dame_pique,
-                pytest.dame_trefle,
-                pytest.dame_carreau,
-                pytest.huit_coeur,
-            ]
-        )
-
-        # WHEN / THEN : vérifier la représentation __str__
-        assert str(carre) == "Carre de Dame"
-
-    def test_carre_repr(self):
-        # GIVEN : Carré de Dames
-        carre = Carre.from_cartes(
-            [
-                pytest.dame_coeur,
-                pytest.dame_pique,
-                pytest.dame_trefle,
-                pytest.dame_carreau,
-                pytest.huit_coeur,
-            ]
-        )
-
-        # WHEN / THEN : vérifier la représentation __repr__
-        attendu = f"Carre(hauteur={carre.hauteur}, kicker={carre.kicker})"
-        assert repr(carre) == attendu
-
-    def test_carre_est_present(self):
-        # GIVEN : une main contenant un Carré
+    def test_brelan_str_repr(self):
+        # GIVEN : Brelan de Dame
         cartes = [
             pytest.dame_coeur,
-            pytest.dame_pique,
             pytest.dame_trefle,
             pytest.dame_carreau,
-            pytest.huit_coeur,
+            pytest.as_pique,
+            pytest.roi_coeur,
+        ]
+        brelan = Brelan.from_cartes(cartes)
+
+        # THEN : __str__ et __repr__
+        assert str(brelan) == "Brelan de Dame"
+        kicker = ("As", "Roi")
+        assert repr(brelan) == f"Brelan(hauteur={brelan.hauteur}, kickers={kicker})"
+
+    def test_brelan_est_present(self):
+        # GIVEN : cartes avec et sans Brelan
+        cartes_ok = [
+            pytest.dame_coeur,
+            pytest.dame_trefle,
+            pytest.dame_carreau,
+            pytest.as_pique,
+            pytest.roi_coeur,
+        ]
+        cartes_non = [
+            pytest.deux_coeur,
+            pytest.trois_trefle,
+            pytest.quatre_carreau,
+            pytest.cinq_coeur,
+            pytest.sept_trefle,
         ]
 
-        # WHEN / THEN : est_present doit retourner True
-        assert Carre.est_present(cartes)
-
-    def test_carre_est_present_faux(self):
-        # GIVEN : une main sans Carré
-        cartes = [pytest.dame_coeur, pytest.dame_pique, pytest.valet_coeur, pytest.huit_coeur]
-
-        # WHEN / THEN : est_present doit retourner False
-        assert not Carre.est_present(cartes)
+        # THEN : est_present correct
+        assert Brelan.est_present(cartes_ok)
+        assert not Brelan.est_present(cartes_non)

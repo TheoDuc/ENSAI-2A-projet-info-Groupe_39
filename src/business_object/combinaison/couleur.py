@@ -89,6 +89,7 @@ class Couleur(AbstractCombinaison):
 
 
         """
+        cls.verifier_min_cartes(cartes)
         couleurs = [c.couleur for c in cartes]
         couleur_max = next((c for c in set(couleurs) if couleurs.count(c) >= 5), None)
 

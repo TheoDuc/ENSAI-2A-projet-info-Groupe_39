@@ -6,17 +6,19 @@ from .combinaison import AbstractCombinaison
 class QuinteFlush(AbstractCombinaison):
     """Classe représentant une Quinte Flush (suite de 5 cartes de même couleur)."""
 
-    def __init__(self, hauteur: str):
+    def __init__(self, hauteur: list[str], kicker=None):
         """
         Initialise une combinaison Quinte Flush.
 
         Paramètres
         ----------
-        hauteur : str
-            Valeur de la carte la plus haute de la Quinte Flush.
+        hauteur : list[str]
+            Liste des valeurs des cartes formant la Quinte Flush, de la plus haute à la plus basse.
+
 
         """
-        super().__init__(hauteur, kicker=None)
+        hauteur = sorted(hauteur, key=lambda x: Carte.VALEURS().index(x), reverse=True)
+        super().__init__(hauteur, kicker)
 
     @classmethod
     def FORCE(cls) -> int:
@@ -38,16 +40,16 @@ class QuinteFlush(AbstractCombinaison):
         bool
             True si une Quinte Flush est détectée, False sinon.
         """
-        if len(cartes) < 5:
+        couleurs = [c.couleur for c in cartes]
+        couleur_max = next((c for c in set(couleurs) if couleurs.count(c) >= 5), None)
+        if not couleur_max:
             return False
 
-        couleurs = [c.couleur for c in cartes]
-        for couleur in set(couleurs):
-            cartes_couleur = [c for c in cartes if c.couleur == couleur]
-            indices = sorted([Carte.VALEURS().index(c.valeur) for c in cartes_couleur])
-            for i in range(len(indices) - 4):
-                if indices[i + 4] - indices[i] == 4:
-                    return True
+        cartes_couleur = [c for c in cartes if c.couleur == couleur_max]
+        valeurs = sorted([Carte.VALEURS().index(c.valeur) for c in cartes_couleur])
+        for i in range(len(valeurs) - 4):
+            if valeurs[i : i + 5] == list(range(valeurs[i], valeurs[i] + 5)):
+                return True
         return False
 
     @classmethod
@@ -70,17 +72,25 @@ class QuinteFlush(AbstractCombinaison):
         ValueError
             Si aucune Quinte Flush n’est trouvée dans les cartes.
         """
+        cls.verifier_min_cartes(cartes)
         couleurs = [c.couleur for c in cartes]
-        for couleur in set(couleurs):
-            cartes_couleur = [c for c in cartes if c.couleur == couleur]
-            indices = sorted(
-                [Carte.VALEURS().index(c.valeur) for c in cartes_couleur], reverse=True
-            )
-            for i in range(len(indices) - 4):
-                if indices[i] - indices[i + 4] == 4:
-                    hauteur = Carte.VALEURS()[indices[i]]
-                    return cls(hauteur)
-        raise ValueError("Pas de quinte flush dans ces cartes")
+        couleur_max = next((c for c in set(couleurs) if couleurs.count(c) >= 5), None)
+        if not couleur_max:
+            raise ValueError("Aucune couleur avec les 5 cartes.")
+
+        cartes_couleur = [c for c in cartes if c.couleur == couleur_max]
+        valeurs = sorted([Carte.VALEURS().index(c.valeur) for c in cartes_couleur])
+
+        meilleures_suites = []
+        for i in range(len(valeurs) - 4):
+            suite = valeurs[i : i + 5]
+            if suite == list(range(suite[0], suite[0] + 5)):
+                meilleures_suites.append([Carte.VALEURS()[v] for v in reversed(suite)])
+        if not meilleures_suites:
+            raise ValueError("Aucune Quinte Flush présente.")
+        meilleure_suite = max(meilleures_suites, key=lambda s: Carte.VALEURS().index(s[0]))
+
+        return cls(hauteur=meilleure_suite)
 
     def __str__(self) -> str:
         """
@@ -91,8 +101,8 @@ class QuinteFlush(AbstractCombinaison):
         str
             Exemple : "Quinte Flush As".
         """
-        if self.hauteur == "As":
-            return "Quinte Flush Royale"
+        if self.hauteur[0] == "As":
+            return "QuinteFlush Royale"
         return "Quinte Flush"
 
     def __repr__(self) -> str:
@@ -103,4 +113,4 @@ class QuinteFlush(AbstractCombinaison):
         -------
 
         """
-        return f"QuinteFlush(hauteur='{self.hauteur}')"
+        return f"QuinteFlush(hauteur={self.hauteur})"

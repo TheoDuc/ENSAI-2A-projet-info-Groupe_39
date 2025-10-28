@@ -1,3 +1,5 @@
+from collections import Counter
+
 from business_object.carte import Carte
 
 from .combinaison import AbstractCombinaison
@@ -13,18 +15,18 @@ class DoublePaire(AbstractCombinaison):
     - et éventuellement la carte restante servant de kicker supplémentaire.
     """
 
-    def __init__(self, hauteur: str, kicker: tuple[str, ...]):
+    def __init__(self, hauteur: list[str], kicker: str):
         """
         Initialise une combinaison Double Paire.
 
         Paramètres
         ----------
-        hauteur : str
-            Valeur de la paire la plus forte (ex. 'Roi').
-        kicker : tuple[str, ...]
-            Tuple contenant la valeur de la deuxième paire et éventuellement
-            la carte restante servant de kicker.
+        hauteur : list[str]
+        Liste des deux valeurs des paires (ex. ['Roi', 'Valet']), triée de la plus haute à la plus basse.
+        kicker : str
+        La carte restante servant de kicker.
         """
+        hauteur = sorted(hauteur, key=lambda x: Carte.VALEURS().index(x), reverse=True)
         super().__init__(hauteur, kicker)
 
     @classmethod
@@ -54,8 +56,6 @@ class DoublePaire(AbstractCombinaison):
         -------
         bool
             True si au moins deux valeurs apparaissent au moins deux fois, False sinon.
-
-
         """
         valeurs = [c.valeur for c in cartes]
         return len([v for v in set(valeurs) if valeurs.count(v) >= 2]) >= 2
@@ -85,23 +85,29 @@ class DoublePaire(AbstractCombinaison):
 
 
         """
+        cls.verifier_min_cartes(cartes)
 
         valeurs = [c.valeur for c in cartes]
+        compteur = Counter(valeurs)
 
-        paires = sorted(
-            [v for v in set(valeurs) if valeurs.count(v) >= 2],
-            key=lambda x: Carte.VALEURS().index(x),
-            reverse=True,
+        # Trouver toutes les valeurs ayant au moins deux cartes
+        paires_possibles = [v for v, count in compteur.items() if count >= 2]
+        if len(paires_possibles) < 2:
+            raise ValueError("Aucune Double Paire présente dans les cartes")
+        # Prendre les deux paires les plus hautes
+        paires_hautes = sorted(
+            paires_possibles, key=lambda v: Carte.VALEURS().index(v), reverse=True
+        )[:2]
+
+        # Déterminer le kicker : carte la plus haute restante
+        cartes_restantes = [c.valeur for c in cartes if c.valeur not in paires_hautes]
+        kicker = (
+            max(cartes_restantes, key=lambda c: Carte.VALEURS().index(c.valeur).valeur)
+            if cartes_restantes
+            else None
         )
 
-        if len(paires) < 2:
-            raise ValueError("Pas assez de paires pour créer une Double Paire")
-
-        kickers = [v for v in valeurs if v not in paires]
-        kicker_supp = sorted(kickers, key=lambda x: Carte.VALEURS().index(x), reverse=True)
-        kicker = (paires[1], kicker_supp[0]) if kicker_supp else (paires[1],)
-
-        return cls(paires[0], kicker)
+        return cls(hauteur=paires_hautes, kicker=kicker)
 
     def __str__(self):
         """
@@ -115,9 +121,9 @@ class DoublePaire(AbstractCombinaison):
         -------
         str
             Chaîne lisible par un joueur, par exemple :
-            "Double Paire Roi et Dame".
+            "Double Paire Roi  Dame".
         """
-        return f"Double Paire {self.hauteur} et {self.kicker[0]}"
+        return f"Double Paire {self.hauteur[0]} {self.hauteur[1]}  {self.kicker or ''}"
 
     def __repr__(self) -> str:
         """
@@ -132,5 +138,5 @@ class DoublePaire(AbstractCombinaison):
         str
             Exemple : "DoublePaire(hauteur=Roi, kicker=(Dame, 9))".
         """
-        kicker_str = ", ".join(self.kicker)
-        return f"DoublePaire(hauteur={self.hauteur}, kicker=({kicker_str}))"
+        kicker_str = self.kicker if self.kicker else "None"
+        return f"DoublePaire(hauteur={self.hauteur}, kicker={kicker_str})"

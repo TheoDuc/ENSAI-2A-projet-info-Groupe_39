@@ -1,5 +1,5 @@
 from collections import Counter
-from typing import List, Optional
+from typing import List
 
 from business_object.carte import Carte
 
@@ -9,71 +9,21 @@ from .combinaison import AbstractCombinaison
 class Full(AbstractCombinaison):
     """Classe représentant un Full (Brelan + Paire) au poker."""
 
-    def __init__(self, brelan: str, kicker: Optional[None] = None):
+    def __init__(self, hauteur: list[str], kicker=None):
         """
         Initialise une combinaison Full.
 
         Paramètres
         ----------
-        brelan : str
-            Valeur du Brelan (trois cartes identiques).
-        kicker : None
-            Toujours None pour Full.
+        hauteur : list[str]
+            Liste de deux valeurs : [brelan, paire], la plus forte en premier.
 
         Renvois
         -------
         None
         """
-        super().__init__(brelan, kicker)
-        self._paire: Optional[str] = None  # sera défini après analyse des cartes
-
-    @property
-    def brelan(self) -> str:
-        """
-        Renvoie la valeur du Brelan du Full.
-
-        Paramètres
-        ----------
-        Aucun
-
-        Renvois
-        -------
-        str
-            Valeur du Brelan (trois cartes identiques).
-        """
-        return self.hauteur
-
-    @property
-    def paire(self) -> Optional[str]:
-        """
-        Renvoie la valeur de la Paire du Full.
-
-        Paramètres
-        ----------
-        Aucun
-
-        Renvois
-        -------
-        str | None
-            Valeur de la Paire si définie, sinon None.
-        """
-        return self._paire
-
-    @paire.setter
-    def paire(self, valeur: str):
-        """
-        Définit la valeur de la Paire du Full.
-
-        Paramètres
-        ----------
-        valeur : str
-            Valeur de la Paire à attribuer.
-
-        Renvois
-        -------
-        None
-        """
-        self._paire = valeur
+        hauteur = sorted(hauteur, key=lambda x: Carte.VALEURS().index(x), reverse=True)
+        super().__init__(hauteur, kicker)
 
     @classmethod
     def FORCE(cls) -> int:
@@ -107,9 +57,10 @@ class Full(AbstractCombinaison):
             True si un Brelan et une Paire distincte sont présents, False sinon.
         """
         valeurs = [c.valeur for c in cartes]
-        brelans = [v for v in set(valeurs) if valeurs.count(v) >= 3]
-        paires = [v for v in set(valeurs) if valeurs.count(v) >= 2 and v not in brelans]
-        return bool(brelans and paires)
+        compteur = Counter(valeurs)
+        has_brelan = any(count >= 3 for count in compteur.values())
+        has_paire = any(count >= 2 for v, count in compteur.items() if count < 3)
+        return has_brelan and has_paire
 
     @classmethod
     def from_cartes(cls, cartes: List["Carte"]) -> "Full":
@@ -131,22 +82,23 @@ class Full(AbstractCombinaison):
         ValueError
             Si aucun Brelan ou Paire n’est trouvé pour constituer le Full.
         """
+        cls.verifier_min_cartes(cartes)
         valeurs = [c.valeur for c in cartes]
         compteur = Counter(valeurs)
 
-        brelans = [v for v in compteur if compteur[v] >= 3]
+        # Le brelan le plus fort
+        brelans = [v for v, count in compteur.items() if count >= 3]
         if not brelans:
-            raise ValueError(f"Aucun Brelan pour Full. Occurrences : {dict(compteur)}")
-        brelan = max(brelans, key=lambda x: Carte.VALEURS().index(x))
+            raise ValueError("Aucun brelan pour former un Full")
+        brelan = max(brelans, key=lambda v: Carte.VALEURS().index(v))
 
-        paires = [v for v in compteur if compteur[v] >= 2 and v != brelan]
+        # La paire la plus forte différente du brelan
+        paires = [v for v, count in compteur.items() if count >= 2 and v != brelan]
         if not paires:
-            raise ValueError(f"Aucune Paire pour Full. Occurrences : {dict(compteur)}")
-        paire = max(paires, key=lambda x: Carte.VALEURS().index(x))
+            raise ValueError("Aucune paire pour former un Full")
+        paire = max(paires, key=lambda v: Carte.VALEURS().index(v))
 
-        full = cls(brelan)
-        full.paire = paire
-        return full
+        return cls(hauteur=[brelan, paire])
 
     def __str__(self):
         """
@@ -159,9 +111,9 @@ class Full(AbstractCombinaison):
         Renvois
         -------
         str
-            Exemple : "Full Dame et Roi".
+            Exemple : "Full Dame Roi".
         """
-        return f"Full {self.hauteur} et {self._paire}"
+        return f"Full {self.hauteur[0]}  {self.hauteur[1]}"
 
     def __repr__(self):
         """
@@ -176,64 +128,4 @@ class Full(AbstractCombinaison):
         str
             Exemple : "Full(Hauteur(Dame), Paire(Roi))".
         """
-        return f"Full(Hauteur({self.hauteur}), Paire({self._paire}))"
-
-    def __eq__(self, other):
-        """
-        Vérifie l’égalité avec un autre Full.
-
-        Paramètres
-        ----------
-        other : Full
-            L’autre Full à comparer.
-
-        Renvois
-        -------
-        bool
-            True si même brelan et même paire, sinon False.
-        """
-        if not isinstance(other, Full):
-            return False
-        return self.hauteur == other.hauteur and self._paire == other._paire
-
-    def __lt__(self, other):
-        """
-        Compare si ce Full est inférieur à un autre Full.
-
-        Paramètres
-        ----------
-        other : Full
-            L’autre Full à comparer.
-
-        Renvois
-        -------
-        bool
-            True si ce Full est plus faible que l’autre, False sinon.
-        """
-        if not isinstance(other, Full):
-            return NotImplemented
-        valeurs = Carte.VALEURS()
-        if valeurs.index(self.hauteur) != valeurs.index(other.hauteur):
-            return valeurs.index(self.hauteur) < valeurs.index(other.hauteur)
-        return valeurs.index(self._paire) < valeurs.index(other._paire)
-
-    def __gt__(self, other):
-        """
-        Compare si ce Full est supérieur à un autre Full.
-
-        Paramètres
-        ----------
-        other : Full
-            L’autre Full à comparer.
-
-        Renvois
-        -------
-        bool
-            True si ce Full est plus fort que l’autre, False sinon.
-        """
-        if not isinstance(other, Full):
-            return NotImplemented
-        valeurs = Carte.VALEURS()
-        if valeurs.index(self.hauteur) != valeurs.index(other.hauteur):
-            return valeurs.index(self.hauteur) > valeurs.index(other.hauteur)
-        return valeurs.index(self._paire) > valeurs.index(other._paire)
+        return f"Full(Hauteur({self.hauteur}))"

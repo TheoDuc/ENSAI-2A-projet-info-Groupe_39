@@ -5,18 +5,18 @@ from business_object.combinaison.brelan import Brelan
 
 
 class Test_Brelan:
-    """Tests unitaires pour la classe Brelan."""
+    """Tests unitaires pour la classe Brelan avec GIVEN / WHEN / THEN."""
 
     def test_brelan_init_succes(self):
         # GIVEN : cartes formant un brelan
         cartes = [
             pytest.dame_coeur,
             pytest.dame_trefle,
-            pytest.dame_carreau,  # le brelan
+            pytest.dame_carreau,
             pytest.as_pique,
             pytest.roi_coeur,
             pytest.neuf_carreau,
-            pytest.deux_trefle,  # kickers possibles
+            pytest.deux_trefle,
         ]
 
         # WHEN : création du brelan
@@ -24,22 +24,22 @@ class Test_Brelan:
 
         # THEN : vérifications
         assert brelan.hauteur == "Dame"
-        # kickers = les 2 cartes les plus hautes restantes
         assert brelan.kicker == ("As", "Roi")
 
-    def test_brelan_init_hauteur_invalide(self):
-        # GIVEN : cartes ne formant pas de brelan
+    def test_brelan_init_invalide(self):
+        # GIVEN : cartes sans brelan
         cartes = [
             pytest.deux_pique,
             pytest.trois_coeur,
             pytest.quatre_trefle,
             pytest.cinq_coeur,
-            pytest.sept_trefle,  # minimum 5 cartes
+            pytest.sept_trefle,
             pytest.huit_pique,
             pytest.neuf_coeur,
         ]
+
         # WHEN / THEN : création échoue avec ValueError
-        with pytest.raises(ValueError, match="Aucun brelan présent dans les cartes"):
+        with pytest.raises(ValueError, match="Aucun brelan présent"):
             Brelan.from_cartes(cartes)
 
     def test_brelan_comparaison(self):
@@ -70,7 +70,6 @@ class Test_Brelan:
         # THEN : vérifications des comparaisons
         assert brelan_roi > brelan_dame
         assert not brelan_dame > brelan_roi
-        # comparaison avec un brelan identique
         assert brelan_dame == Brelan.from_cartes(
             [
                 pytest.dame_coeur,
@@ -92,6 +91,8 @@ class Test_Brelan:
             pytest.as_pique,
             pytest.roi_coeur,
         ]
+
+        # WHEN : création du brelan
         brelan = Brelan.from_cartes(cartes)
 
         # THEN : représentation lisible
@@ -106,6 +107,8 @@ class Test_Brelan:
             pytest.as_pique,
             pytest.roi_coeur,
         ]
+
+        # WHEN : création du brelan
         brelan = Brelan.from_cartes(cartes)
 
         # THEN : représentation technique
@@ -114,8 +117,7 @@ class Test_Brelan:
                 [c.valeur for c in cartes if c.valeur != "Dame"],
                 key=lambda x: Carte.VALEURS().index(x),
                 reverse=True,
-            )[:2]  # seulement les 2 kickers les plus élevés
+            )[:2]
         )
-
         attendu = f"Brelan(hauteur={brelan.hauteur}, kickers={kicker})"
         assert repr(brelan) == attendu
