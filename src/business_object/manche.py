@@ -78,8 +78,10 @@ class Manche:
         """Distribution des cartes initiales et mise des blinds"""
         self.__reserve.melanger()
         self.__info.assignation_mains(self.__reserve.distribuer(len(self.__info.joueurs)))
-        self.__info.miser(0, self.__grosse_blind // 2)
+        self.__info.miser(0, self.__grosse_blind / 2)
+        self.__indice_joueur_actuel = 1
         self.__info.miser(1, self.__grosse_blind)
+        self.__indice_joueur_actuel = 2
 
     def flop(self):
         """Révélation des 3 premières cartes communes"""
@@ -113,7 +115,15 @@ class Manche:
         bool
             Vrai si tout les joueurs ont égalisé / couché / All in
         """
-        pass
+        
+        for i in range(len(self.info.statuts)):
+            if self.info.statuts[i] in ["en retard", "à jour", "all in"]:
+                dernier_joueur = i
+        if self.__indice_joueur_actuel != dernier_joueur:
+            return False
+        for s in self.infomanche.statuts:
+            if s == "en retard" : return False
+        return True
 
     # -------------------- Gestion du pot -------------------- #
     def ajouter_au_pot(self, credit):
@@ -185,4 +195,9 @@ class Manche:
         """
         Lance une manche en entier
         """
-        pass
+        self.preflop()
+        time = 0
+        while self.__indice_joueur_actuel and time < 100:
+            time += 1
+            
+

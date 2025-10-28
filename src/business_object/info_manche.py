@@ -105,8 +105,12 @@ class InfoManche:
             raise TypeError("indice_joueur doit être un entier")
         if not isinstance(montant, (int, float)) or montant <= 0:
             raise ValueError("Le montant doit être un entier strictement positif")
-
-        self.__mises[indice_joueur] += montant
+        if self.joueurs[indice_joueur].credit > self.mises[indice_joueur] + montant:
+            self.__mises[indice_joueur] += montant
+            self.__statuts[indice_joueur] = "à jour"
+        if self.joueurs[indice_joueur].credit <= self.mises[indice_joueur] + montant:
+            self.__mises[indice_joueur] = self.joueurs[indice_joueur].credit
+            self.__statuts[indice_joueur] == "all in"
 
     def coucher_joueur(self, indice_joueur: int):
         """
@@ -118,11 +122,13 @@ class InfoManche:
             Indice du joueur dans la liste
         """
         self.__tour_couche[indice_joueur] = True
+        self.__statuts[indice_joueur] == "couché"
 
     # -------------------- Représentation -------------------- #
     def __str__(self):
         return (
             f"InfoManche(joueurs={self.joueurs}, "
+            f"statuts={self.statuts}, "
             f"mains={self.mains}, "
             f"mises={self.mises}, "
             f"tour_couche={self.tour_couche})"
