@@ -36,7 +36,7 @@ class Manche:
         self.__indice_joueur_actuel = 0
         self.__grosse_blind = grosse_blind
 
-    # -------------------- Propriétés -------------------- #
+    # Propriétés
     @property
     def tour(self) -> int:
         return self.__tour
@@ -77,7 +77,7 @@ class Manche:
             f"board={self.board})"
         )
 
-    # -------------------- Déroulement des tours -------------------- #
+    # Déroulement des tours
     def preflop(self):
         """Distribution des cartes initiales et mise des blinds"""
         self.__reserve.melanger()
@@ -120,17 +120,16 @@ class Manche:
             Vrai si tout les joueurs ont égalisé / couché / All in
         """
         
-        i = 0
-        while self.info.statuts[i] not in ["en retard", "à jour", "all in"]:
-            i += 1
-        premier_joueur = i
-        if self.__indice_joueur_actuel != premier_joueur:
+        for i in range(len(self.info.statuts)):
+            if self.info.statuts[i] in ["en retard", "à jour", "all in"]:
+                dernier_joueur = i
+        if self.__indice_joueur_actuel != dernier_joueur:
             return False
-        for s in self.infomanche.statuts:
+        for s in self.info.statuts:
             if s == "en retard" : return False
         return True
 
-    # -------------------- Gestion du pot -------------------- #
+    # Gestion du pot
     def ajouter_au_pot(self, credit):
         """Ajoute un montant au pot courant"""
         self.__pot += credit
@@ -145,7 +144,7 @@ class Manche:
 
         # Évaluation des mains des joueurs encore actifs
         for i in range(len(self.info.joueurs)):
-            if self.info.tour_couche[i] is None:
+            if self.info.statuts[i] in ["à jour", "all in"]:
                 main = self.info.mains[i]
                 joueurs_en_lice[i] = EvaluateurCombinaison.eval(main.cartes + board)
 
@@ -178,19 +177,19 @@ class Manche:
 
         return gains
 
-    # -------------------- Gestion des joueurs -------------------- #
+    # Gestion des joueurs
     def joueur_suivant(self):
         """
-        Retourne l'indice du joueur suivant qui n'est pas couché.
+        Retourne l'indice du joueur suivant qui n'est pas couché ou all in.
         """
         indice = self.indice_joueur_actuel + 1
-        tour_couche = self.info.tour_couche
+        statuts = self.info.statuts
 
-        if None not in tour_couche:
+        if all(s == "couché" for s in statuts):
             raise ValueError("Tous les joueurs ne peuvent être couchés.")
         else:
-            while tour_couche[indice] is not None:
-                if indice == len(tour_couche) - 1:
+            while statuts[indice] in ["couché", "all in"]:
+                if indice == len(statuts) - 1:
                     indice = 0
                 else:
                     indice += 1

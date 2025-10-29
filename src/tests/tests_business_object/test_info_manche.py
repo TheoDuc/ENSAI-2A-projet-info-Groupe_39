@@ -145,12 +145,13 @@ class TestInfoManche:
         # GIVEN
         manche = InfoManche(joueurs)
         indice = 1
+        tour = 1
 
         # WHEN
-        manche.coucher_joueur(indice)
+        manche.coucher_joueur(indice, tour)
 
         # THEN
-        assert manche.tour_couche[indice] is True
+        assert manche.tour_couche[indice] == tour
         assert manche.statuts[1] == "couché"
 
     # Tests __str__
