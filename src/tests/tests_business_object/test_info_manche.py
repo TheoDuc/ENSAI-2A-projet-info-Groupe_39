@@ -22,15 +22,15 @@ class TestInfoManche:
             Main([pytest.dix_carreau, pytest.dix_trefle]),
         ]
 
-    # ---------------------------------------------------------------------- #
     # Tests d’initialisation
-    # ---------------------------------------------------------------------- #
+
     def test_infomanche_init_ok(self, joueurs):
         # GIVEN / WHEN
         manche = InfoManche(joueurs)
 
         # THEN
         assert manche.joueurs == joueurs
+        assert manche.statuts == [0, 0]
         assert len(manche.mains) == len(joueurs)
         assert all(m is None for m in manche.mains)
         assert manche.mises == [0, 0]
@@ -39,10 +39,9 @@ class TestInfoManche:
     def test_infomanche_init_type_error(self):
         # GIVEN
         mauvais_param = "pas une liste"
-        message_attendu = "Le paramètre 'joueurs' doit être une liste"
 
         # WHEN / THEN
-        with pytest.raises(TypeError, match=message_attendu):
+        with pytest.raises(TypeError, match="Le paramètre 'joueurs' doit être une liste"):
             InfoManche(mauvais_param)
 
     def test_infomanche_init_joueur_non_instance(self):
@@ -56,18 +55,14 @@ class TestInfoManche:
             InfoManche(mauvais_joueurs)
 
     def test_infomanche_init_vide(self):
-        # GIVEN
-        joueurs = []
-
-        # WHEN / THEN
+        # GIVEN / WHEN / THEN
         with pytest.raises(
-            ValueError, match=f"Au moins deux joueurs doivent être présents : {len(joueurs)}"
+            ValueError, match=f"0 présents"
         ):
-            InfoManche(joueurs)
+            InfoManche([])
 
-    # ---------------------------------------------------------------------- #
     # Tests assignation_mains
-    # ---------------------------------------------------------------------- #
+
     def test_assignation_mains_ok(self, joueurs, mains):
         # GIVEN
         manche = InfoManche(joueurs)
@@ -98,10 +93,9 @@ class TestInfoManche:
         ):
             manche.assignation_mains(mauvaises_mains)
 
-    # ---------------------------------------------------------------------- #
     # Tests miser
-    # ---------------------------------------------------------------------- #
-    def test_miser_ok(self, joueurs):
+
+    def test_miser_ok_a_jour(self, joueurs):
         # GIVEN
         manche = InfoManche(joueurs)
         indice = 0
@@ -112,6 +106,20 @@ class TestInfoManche:
 
         # THEN
         assert manche.mises[indice] == montant
+        assert manche.statuts[indice] == "à jour"
+
+    def test_miser_ok_all_in(self, joueurs):
+        # GIVEN
+        manche = InfoManche(joueurs)
+        indice = 0
+        montant = 501
+
+        # WHEN
+        manche.miser(indice, montant)
+
+        # THEN
+        assert manche.mises[indice] == 500 # et non 501 car all in
+        assert manche.statuts[indice] == "all in"
 
     def test_miser_type_indice(self, joueurs):
         # GIVEN
@@ -131,9 +139,8 @@ class TestInfoManche:
         with pytest.raises(ValueError, match=message_attendu):
             manche.miser(0, -50)
 
-    # ---------------------------------------------------------------------- #
     # Tests coucher_joueur
-    # ---------------------------------------------------------------------- #
+
     def test_coucher_joueur_ok(self, joueurs):
         # GIVEN
         manche = InfoManche(joueurs)
@@ -144,11 +151,10 @@ class TestInfoManche:
 
         # THEN
         assert manche.tour_couche[indice] is True
-        assert manche.tour_couche[0] is None
+        assert manche.statuts[1] == "couché"
 
-    # ---------------------------------------------------------------------- #
     # Tests __str__
-    # ---------------------------------------------------------------------- #
+
     def test_str_contenu(self, joueurs):
         # GIVEN
         manche = InfoManche(joueurs)
@@ -159,5 +165,6 @@ class TestInfoManche:
         # THEN
         assert "InfoManche(" in texte
         assert "joueurs=" in texte
+        assert "statuts=" in texte
         assert "mains=" in texte
         assert "mises=" in texte
