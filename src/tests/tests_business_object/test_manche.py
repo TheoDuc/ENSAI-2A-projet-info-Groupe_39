@@ -1,12 +1,13 @@
 """Implémentation des tests pour la classe Manche"""
 
 import pytest
-from business_object.manche import Manche
+
+from business_object.board import Board
 from business_object.info_manche import InfoManche
 from business_object.joueur import Joueur
-from business_object.board import Board
-from business_object.reserve import Reserve
 from business_object.main import Main
+from business_object.manche import Manche
+from business_object.reserve import Reserve
 
 
 class TestManche:
@@ -14,8 +15,8 @@ class TestManche:
     @pytest.fixture
     def joueurs(self):
         return [
-            Joueur(1, "Alice", 500, True, "France", 25),
-            Joueur(2, "Bob", 500, True, "Canada", 30),
+            Joueur(1, "Alice", 500, "France"),
+            Joueur(2, "Bob", 500, "Canada"),
         ]
 
     @pytest.fixture

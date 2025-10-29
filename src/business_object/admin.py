@@ -1,44 +1,84 @@
 """Implémentation de la classe Admin"""
 
+from business_object.joueur import Joueur
+
 
 class Admin:
-    def __init__(self, id_admin: int):
-        """Crée un administrateur avec un identifiant unique."""
+    def __init__(self, id_admin: int) -> "Admin":
+        """
+        Crée un administrateur avec un identifiant unique
 
-        self._id_admin = id_admin
+        Paramètres
+        ----------
+        id_admin : int
+            l'identifiant de l'administrateur
+
+        Renvois
+        -------
+        Admin
+            Instance de 'Admin'
+        """
+
+        if not isinstance(id_admin, int):
+            raise TypeError(f"L'identifiant administrateur doit être un int : {type(id_admin)}")
+
+        if id_admin < 1:
+            raise ValueError(
+                f"L'identifiant du joueur doit être un entier strictement positif : {id_admin}"
+            )
+
+        self.__id_admin = id_admin
 
     @property
     def id_admin(self) -> int:
         """Retourne l'identifiant de l'administrateur."""
-        return self._id_admin
+        return self.__id_admin
 
-    @id_admin.setter
-    def id_admin(self, value: int):
-        """Modifie l'identifiant de l'administrateur."""
+    def crediter(self, joueur: Joueur, credits: int) -> None:
+        """
+        Ajoute des crédits à un joueur
 
-        if not isinstance(value, int):
-            raise TypeError("L'identifiant de l'admin doit être un entier.")
+        Paramètres
+        ----------
+        credits : int
+            nombre de crédits à ajouter
 
-        self._id_admin = value
+        Renvois
+        -------
+        None
+        """
 
-    # --- Méthodes principales ---
-    def crediter(self, joueur, credits: int):
-        """Ajoute des crédits à un joueur."""
+        joueur.ajouter_credits(credits)
 
-        if credits <= 0:
-            raise ValueError("Le nombre de crédits à ajouter doit être positif.")
+    def debiter(self, joueur: Joueur, credits: int) -> None:
+        """
+        Retire des crédits à un joueur
 
-        joueur.credits += credits
+        Paramètres
+        ----------
+        credits : int
+            nombre de crédits à retirer
 
-    def debiter(self, joueur, credits: int):
-        """Retire des crédits à un joueur."""
+        Renvois
+        -------
+        None
+        """
 
-        if credits <= 0:
-            raise ValueError("Le nombre de crédits à retirer doit être positif.")
+        joueur.retirer_credits(credits)
 
-        if joueur.credits < credits:
-            raise ValueError(
-                "Le nombre de crédits à retirer doit être inférieur au nombre de crédits du joueur"
-            )
+    def set_credits(self, joueur: Joueur, credits: int) -> None:
+        """
+        Met les crédits d'un joueur à un certain niveau
 
-        joueur.credits -= credits
+        Paramètres
+        ----------
+        credits : int
+            Nouvelle quantité de crédits du joueur
+
+        Renvois
+        -------
+        None
+        """
+
+        joueur.retirer_credits(joueur.credit)
+        joueur.ajouter_credits(credits)

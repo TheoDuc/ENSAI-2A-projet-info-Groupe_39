@@ -8,7 +8,7 @@ class Carte:
     __VALEURS = ("2", "3", "4", "5", "6", "7", "8", "9", "10", "Valet", "Dame", "Roi", "As")
     __COULEURS = ("Pique", "Carreau", "Coeur", "Trêfle")
 
-    def __init__(self, valeur: str, couleur: str):
+    def __init__(self, valeur: str, couleur: str) -> "Carte":
         """
         Instanciation d'une carte (Jeu de cartes)
 
@@ -34,7 +34,7 @@ class Carte:
         self.__couleur = couleur
 
     @classmethod
-    def VALEURS(cls) -> tuple:
+    def VALEURS(cls) -> tuple[str]:
         """Retourne la liste des valeurs possibles d'une carte"""
         return cls.__VALEURS
 

@@ -11,8 +11,8 @@ class TestInfoManche:
     @pytest.fixture
     def joueurs(self):
         return [
-            Joueur(1, "Alice", 500, True, "France", 25),
-            Joueur(2, "Bob", 300, True, "Canada", 30),
+            Joueur(1, "Alice", 500, "France"),
+            Joueur(2, "Bob", 300, "Canada"),
         ]
 
     @pytest.fixture
@@ -56,9 +56,7 @@ class TestInfoManche:
 
     def test_infomanche_init_vide(self):
         # GIVEN / WHEN / THEN
-        with pytest.raises(
-            ValueError, match=f"0 présents"
-        ):
+        with pytest.raises(ValueError, match="0 présents"):
             InfoManche([])
 
     # Tests assignation_mains
@@ -118,7 +116,7 @@ class TestInfoManche:
         manche.miser(indice, montant)
 
         # THEN
-        assert manche.mises[indice] == 500 # et non 501 car all in
+        assert manche.mises[indice] == 500  # et non 501 car all in
         assert manche.statuts[indice] == "all in"
 
     def test_miser_type_indice(self, joueurs):

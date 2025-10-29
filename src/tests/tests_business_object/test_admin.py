@@ -2,70 +2,75 @@
 
 import pytest
 
-from src.business_object.admin import Admin
+from business_object.admin import Admin
+from business_object.joueur import Joueur
 
 
-class Joueur:
-    """Classe minimale pour simuler un joueur."""
+class TestAdmin:
+    @pytest.fixture
+    def joueur(self):
+        """Fixture pour un joueur initialisé."""
+        return Joueur(1, "Crocorible", 200, "France")
 
-    def __init__(self, nom: str, credits: int = 0):
-        self.nom = nom
-        self.credits = credits
+    def test_admin_init_succes(self):
+        # GIVEN
+        id_admin = 1
 
+        # WHEN
+        admin = Admin(id_admin)
 
-@pytest.fixture
-def admin():
-    """Fixture pour un admin initialisé."""
-    return Admin(1)
+        # THEN
+        assert admin.id_admin == 1
 
+    def test_admin_init_echec_TypeError(self):
+        # GIVEN
+        id_admin = "1"
+        message_attendu = f"L'identifiant administrateur doit être un int : {type(id_admin)}"
 
-@pytest.fixture
-def joueur():
-    """Fixture pour un joueur initialisé."""
-    return Joueur("Alice", 100)
+        # WHEN / THEN
+        with pytest.raises(TypeError, match=message_attendu):
+            Admin(id_admin)
 
+    def test_admin_init_ValueError(self):
+        # GIVEN
+        id_admin = -1
+        message_attendu = (
+            f"L'identifiant du joueur doit être un entier strictement positif : {id_admin}"
+        )
 
-# --- Tests de la propriété id_admin ---
-def test_get_id_admin(admin):
-    assert admin.id_admin == 1
+        # WHEN / THEN
+        with pytest.raises(ValueError, match=message_attendu):
+            Admin(id_admin)
 
+    def test_admin_crediter(self, joueur):
+        # GIVEN
+        admin = Admin(1)
+        credits = 50
 
-def test_set_id_admin_valide(admin):
-    admin.id_admin = 42
-    assert admin.id_admin == 42
+        # WHEN
+        admin.crediter(joueur, credits)
 
+        # THEN
+        assert joueur.credit == 250
 
-def test_set_id_admin_invalide(admin):
-    with pytest.raises(TypeError):
-        admin.id_admin = "abc"
+    def test_admin_debiter(self, joueur):
+        # GIVEN
+        admin = Admin(1)
+        credits = 50
 
+        # WHEN
+        admin.debiter(joueur, credits)
 
-# --- Tests de crediter() ---
-def test_crediter_positif(admin, joueur):
-    admin.crediter(joueur, 50)
-    assert joueur.credits == 150
+        # THEN
+        assert joueur.credit == 150
 
+    def test_admin_set_credits(self, joueur):
+        # GIVEN
+        admin = Admin(1)
+        credits = 50
 
-def test_crediter_zero_ou_negatif(admin, joueur):
-    with pytest.raises(ValueError):
-        admin.crediter(joueur, 0)
-    with pytest.raises(ValueError):
-        admin.crediter(joueur, -10)
+        # WHEN
+        admin.set_credits(joueur, credits)
 
-
-# --- Tests de debiter() ---
-def test_debiter_positif(admin, joueur):
-    admin.debiter(joueur, 30)
-    assert joueur.credits == 70
-
-
-def test_debiter_trop(admin, joueur):
-    with pytest.raises(ValueError):
-        admin.debiter(joueur, 200)
-
-
-def test_debiter_zero_ou_negatif(admin, joueur):
-    with pytest.raises(ValueError):
-        admin.debiter(joueur, 0)
-    with pytest.raises(ValueError):
-        admin.debiter(joueur, -5)
+        # THEN
+        assert joueur.credit == 50
