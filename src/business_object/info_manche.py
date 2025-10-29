@@ -112,7 +112,7 @@ class InfoManche:
             self.__mises[indice_joueur] = self.joueurs[indice_joueur].credit
             self.__statuts[indice_joueur] = "all in"
 
-    def coucher_joueur(self, indice_joueur: int):
+    def coucher_joueur(self, indice_joueur: int, tour: int):
         """
         Marque un joueur comme couché.
 
@@ -121,7 +121,7 @@ class InfoManche:
         indice_joueur : int
             Indice du joueur dans la liste
         """
-        self.__tour_couche[indice_joueur] = True # à défaut d'avoir accès au tour
+        self.__tour_couche[indice_joueur] = tour
         self.__statuts[indice_joueur] = "couché"
 
     # Représentation

@@ -77,7 +77,7 @@ class TestManche:
         assert "pot=0" in texte
         assert "grosse_blind=100" in texte
 
-    # -------------------- Tests des tours -------------------- #
+    # Tests des tours
     def test_preflop(self, info_manche):
         # GIVEN
         manche = Manche(info_manche, 100)
@@ -123,7 +123,7 @@ class TestManche:
         assert len(manche.board.cartes) == 1
         assert manche.tour == 1
 
-    # -------------------- Tests pot et gestion joueurs -------------------- #
+    # Tests pot et gestion joueurs
     def test_ajouter_au_pot(self, info_manche):
         # GIVEN
         manche = Manche(info_manche, 100)
@@ -136,20 +136,20 @@ class TestManche:
 
     def test_joueur_suivant(self, info_manche):
         # GIVEN
+        info_manche.coucher_joueur(0, 0)
         manche = Manche(info_manche, 100)
-        info_manche.tour_couche[0] = True
-        info_manche.tour_couche[1] = None
 
         # WHEN
-        indice = manche.joueur_suivant()
+        manche.joueur_suivant()
 
         # THEN
-        assert indice == 1
+        assert manche.indice_joueur_actuel == 1
 
     def test_joueur_suivant_tous_couches(self, info_manche):
         # GIVEN
+        info_manche.coucher_joueur(0, 0)
+        info_manche.coucher_joueur(1, 0)
         manche = Manche(info_manche, 100)
-        info_manche.tour_couche[:] = [True, True]
 
         # WHEN / THEN
         with pytest.raises(ValueError, match="Tous les joueurs ne peuvent être couchés."):
