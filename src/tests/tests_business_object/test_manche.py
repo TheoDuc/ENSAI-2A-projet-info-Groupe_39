@@ -10,7 +10,7 @@ from business_object.main import Main
 
 
 class TestManche:
-    # -------------------- Fixtures -------------------- #
+    # Fixtures
     @pytest.fixture
     def joueurs(self):
         return [
@@ -22,7 +22,7 @@ class TestManche:
     def info_manche(self, joueurs):
         return InfoManche(joueurs)
 
-    # -------------------- Tests d’initialisation -------------------- #
+    # Tests d’initialisation
     def test_manche_init_succes(self, info_manche):
         # GIVEN
         grosse_blind = 100

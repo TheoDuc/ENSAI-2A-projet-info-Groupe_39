@@ -28,7 +28,7 @@ class InfoManche:
         ValueError
             Si la liste des joueurs est vide
         """
-        # --- Vérifications ---
+        # Vérifications
         if not isinstance(joueurs, list):
             raise TypeError(
                 f"Le paramètre 'joueurs' doit être une liste, pas {type(joueurs).__name__}."
@@ -36,18 +36,18 @@ class InfoManche:
         if not all(isinstance(j, Joueur) for j in joueurs):
             raise TypeError("Tous les éléments de 'joueurs' doivent être des instances de Joueur.")
         if len(joueurs) < 2:
-            raise ValueError(f"Au moins deux joueurs doivent être présents : {len(joueurs)}")
+            raise ValueError(f"Au moins deux joueurs doivent être présents : {len(joueurs)} présents")
 
-        # --- Initialisation des attributs privés ---
+        # Initialisation des attributs privés
         self.__joueurs = joueurs
         self.__statuts = [0 for _ in joueurs]
         self.__mains = [None for _ in joueurs]
         self.__mises = [0 for _ in joueurs]
         self.__tour_couche = [
             None for _ in joueurs
-        ]  # None = actif, Entier = couché mais bon le diagramme de classe ne permet pas dans InfoManche de savoir à quel tour on est en fait cet attribut est à visée DAO mais ça ne va pas être possible uniquement via InfoManche pareil pour le gain en attendant juste le statut couché sera indiqué
+        ]
 
-    # -------------------- Propriétés -------------------- #
+    # Propriétés
     @property
     def joueurs(self) -> list[Joueur]:
         """Liste des joueurs participant à la manche"""
@@ -73,7 +73,7 @@ class InfoManche:
         """État des joueurs : None pour actif, True pour couché"""
         return self.__tour_couche
 
-    # -------------------- Méthodes d'instance -------------------- #
+    # Méthodes d'instance
     def assignation_mains(self, mains: list[Main]):
         """
         Assigne les mains distribuées aux joueurs.
@@ -110,7 +110,7 @@ class InfoManche:
             self.__statuts[indice_joueur] = "à jour"
         if self.joueurs[indice_joueur].credit <= self.mises[indice_joueur] + montant:
             self.__mises[indice_joueur] = self.joueurs[indice_joueur].credit
-            self.__statuts[indice_joueur] == "all in"
+            self.__statuts[indice_joueur] = "all in"
 
     def coucher_joueur(self, indice_joueur: int):
         """
@@ -121,10 +121,10 @@ class InfoManche:
         indice_joueur : int
             Indice du joueur dans la liste
         """
-        self.__tour_couche[indice_joueur] = True
-        self.__statuts[indice_joueur] == "couché"
+        self.__tour_couche[indice_joueur] = True # à défaut d'avoir accès au tour
+        self.__statuts[indice_joueur] = "couché"
 
-    # -------------------- Représentation -------------------- #
+    # Représentation
     def __str__(self):
         return (
             f"InfoManche(joueurs={self.joueurs}, "
