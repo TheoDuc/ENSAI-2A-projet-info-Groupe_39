@@ -4,71 +4,92 @@ from business_object.combinaison.quinte_flush import QuinteFlush
 
 
 class Test_QuinteFlush:
-    """Tests unitaires QuinteFlush avec GIVEN / WHEN / THEN"""
-
     def test_quinte_flush_creation(self):
-        # GIVEN : cartes formant une Quinte Flush
+        # GIVEN : 7 cartes formant une Quinte Flush As haut
         cartes = [
             pytest.as_coeur,
             pytest.roi_coeur,
             pytest.dame_coeur,
             pytest.valet_coeur,
             pytest.dix_coeur,
+            pytest.neuf_coeur,
+            pytest.huit_coeur,
         ]
 
-        # WHEN : création
+        # WHEN : création via from_cartes
         q = QuinteFlush.from_cartes(cartes)
 
         # THEN
         assert q.hauteur == "As"
-        assert q.kicker == ()
+        assert q.kicker is None
         assert QuinteFlush.FORCE() == 8
 
     def test_quinte_flush_est_present(self):
-        # GIVEN : cartes avec quinte flush
         cartes = [
             pytest.as_coeur,
             pytest.roi_coeur,
             pytest.dame_coeur,
             pytest.valet_coeur,
             pytest.dix_coeur,
+            pytest.neuf_coeur,
+            pytest.huit_coeur,
         ]
-
-        # WHEN / THEN
         assert QuinteFlush.est_present(cartes)
 
     def test_quinte_flush_est_present_faux(self):
-        # GIVEN : cartes sans quinte flush
         cartes = [
             pytest.as_coeur,
             pytest.roi_coeur,
             pytest.dame_coeur,
             pytest.valet_coeur,
             pytest.neuf_carreau,
+            pytest.huit_coeur,
+            pytest.sept_coeur,
         ]
-
-        # WHEN / THEN
         assert not QuinteFlush.est_present(cartes)
 
     def test_quinte_flush_str_repr(self):
-        # GIVEN : une Quinte Flush As
-        q = QuinteFlush("As")
+        cartes = [
+            pytest.as_coeur,
+            pytest.roi_coeur,
+            pytest.dame_coeur,
+            pytest.valet_coeur,
+            pytest.dix_coeur,
+        ]
+        q = QuinteFlush.from_cartes(cartes)
 
-        # WHEN : récupération des chaînes
         texte_str = str(q)
         texte_repr = repr(q)
 
-        # THEN : vérifications
-        assert texte_str == "Quinte Flush Royale"  # str lisible pour joueur
-        assert texte_repr == "QuinteFlush(hauteur='As')"  # repr technique
+        assert texte_str == "Quinte Flush Royale"
+        assert texte_repr == "Quinte Flush(hauteur='As')"
 
-        # GIVEN : une Quinte Flush autre que As
-        q2 = QuinteFlush("Roi")
+        # GIVEN : Quinte Flush autre que As
+        cartes2 = [
+            pytest.roi_coeur,
+            pytest.dame_coeur,
+            pytest.valet_coeur,
+            pytest.dix_coeur,
+            pytest.neuf_coeur,
+        ]
+        q2 = QuinteFlush.from_cartes(cartes2)
 
-        # WHEN
         texte_str2 = str(q2)
         texte_repr2 = repr(q2)
 
-        # THEN
         assert texte_str2 == "Quinte Flush"
-        assert texte_repr2 == "QuinteFlush(hauteur='Roi')"
+        assert texte_repr2 == "Quinte Flush(hauteur='Roi')"
+
+    def test_quinte_flush_creation_invalide(self):
+        cartes = [
+            pytest.as_coeur,
+            pytest.roi_coeur,
+            pytest.dame_coeur,
+            pytest.valet_coeur,
+            pytest.neuf_carreau,
+            pytest.huit_coeur,
+            pytest.sept_coeur,
+        ]
+        # Pas de quinte flush complète
+        with pytest.raises(ValueError):
+            QuinteFlush.from_cartes(cartes)

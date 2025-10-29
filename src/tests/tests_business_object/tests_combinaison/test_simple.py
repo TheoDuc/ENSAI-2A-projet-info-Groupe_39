@@ -7,13 +7,15 @@ class Test_Simple:
     """Tests unitaires pour la combinaison Simple avec GIVEN / WHEN / THEN"""
 
     def test_simple_creation_simple(self):
-        # GIVEN : un jeu de cartes quelconques
+        # GIVEN : un jeu de 7 cartes
         cartes = [
             pytest.as_coeur,
             pytest.roi_carreau,
             pytest.dame_coeur,
             pytest.valet_pique,
             pytest.dix_carreau,
+            pytest.neuf_coeur,
+            pytest.huit_pique,
         ]
 
         # WHEN : création de la Simple
@@ -21,12 +23,18 @@ class Test_Simple:
 
         # THEN : vérifications
         assert simple.hauteur == "As"  # la carte la plus haute
-        assert simple.kicker == ("Roi", "Dame", "Valet", "10")
+        assert simple.kicker == ("Roi", "Dame", "Valet", "10")  # les 4 suivants
         assert Simple.FORCE() == 0
 
     def test_simple_est_present(self):
         # GIVEN : des cartes non vides
-        cartes = [pytest.as_coeur, pytest.roi_carreau]
+        cartes = [
+            pytest.as_coeur,
+            pytest.roi_carreau,
+            pytest.dame_coeur,
+            pytest.valet_pique,
+            pytest.dix_carreau,
+        ]
 
         # WHEN / THEN
         assert Simple.est_present(cartes)
@@ -39,11 +47,15 @@ class Test_Simple:
         assert not Simple.est_present(cartes)
 
     def test_simple_str_repr(self):
-        # GIVEN : création d'une Simple
+        # GIVEN : création d'une Simple avec 7 cartes
         cartes = [
             pytest.as_coeur,
             pytest.roi_carreau,
             pytest.dame_coeur,
+            pytest.valet_pique,
+            pytest.dix_carreau,
+            pytest.neuf_coeur,
+            pytest.huit_pique,
         ]
         simple = Simple.from_cartes(cartes)
 
@@ -52,5 +64,5 @@ class Test_Simple:
         texte_repr = repr(simple)
 
         # THEN : vérifications
-        assert texte_str == "Simple As"  # format attendu
-        assert texte_repr == "Simple(hauteur='As', kicker=('Roi', 'Dame'))"
+        assert texte_str == "Simple"
+        assert texte_repr == "Simple(hauteur='As', kicker=('Roi', 'Dame', 'Valet', '10'))"

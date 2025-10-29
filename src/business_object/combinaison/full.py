@@ -9,7 +9,7 @@ from .combinaison import AbstractCombinaison
 class Full(AbstractCombinaison):
     """Classe représentant un Full (Brelan + Paire) au poker."""
 
-    def __init__(self, hauteur: list[str], kicker=None):
+    def __init__(self, hauteur: list[str], kicker=None) -> None:
         """
         Initialise une combinaison Full.
 
@@ -22,7 +22,7 @@ class Full(AbstractCombinaison):
         -------
         None
         """
-        hauteur = sorted(hauteur, key=lambda x: Carte.VALEURS().index(x), reverse=True)
+        # hauteur = sorted(hauteur, key=lambda x: Carte.VALEURS().index(x), reverse=True)
         super().__init__(hauteur, kicker)
 
     @classmethod
@@ -100,7 +100,7 @@ class Full(AbstractCombinaison):
 
         return cls(hauteur=[brelan, paire])
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
         Renvoie une représentation lisible du Full pour le joueur.
 
@@ -113,9 +113,9 @@ class Full(AbstractCombinaison):
         str
             Exemple : "Full Dame Roi".
         """
-        return f"Full {self.hauteur[0]}  {self.hauteur[1]}"
+        return f"Full {self.hauteur[0]} {self.hauteur[1]}"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """
         Renvoie une représentation technique du Full pour le débogage.
 
@@ -128,4 +128,4 @@ class Full(AbstractCombinaison):
         str
             Exemple : "Full(Hauteur(Dame), Paire(Roi))".
         """
-        return f"Full(Hauteur({self.hauteur}))"
+        return f"Full(hauteur={self.hauteur}, kicker={self.kicker})"

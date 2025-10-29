@@ -8,7 +8,7 @@ from .combinaison import AbstractCombinaison
 class Paire(AbstractCombinaison):
     """Classe représentant une Paire (deux cartes de même valeur) au poker."""
 
-    def __init__(self, hauteur: str, kicker: list[str]):
+    def __init__(self, hauteur: str, kicker: tuple[str]) -> None:
         """
         Initialise une combinaison Paire.
 
@@ -73,7 +73,7 @@ class Paire(AbstractCombinaison):
 
         return cls(hauteur=meilleure_paire, kicker=kickers)
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
         Renvoie une représentation textuelle lisible de la Paire.
 
@@ -87,7 +87,7 @@ class Paire(AbstractCombinaison):
         else:
             return f"Paire {self.hauteur}"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """
         Renvoie une représentation technique de la Paire
 

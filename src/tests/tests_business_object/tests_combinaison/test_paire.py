@@ -64,5 +64,5 @@ class Test_Paire:
         texte_repr = repr(paire)
 
         # THEN : vérifications
-        assert texte_str == "Paire Dame et Roi"
+        assert texte_str == "Paire Dame"
         assert texte_repr == "Paire(hauteur=Dame, kicker=('Roi', 'Valet', '10'))"

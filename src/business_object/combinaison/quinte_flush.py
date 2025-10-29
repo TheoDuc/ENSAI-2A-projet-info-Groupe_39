@@ -6,7 +6,7 @@ from .combinaison import AbstractCombinaison
 class QuinteFlush(AbstractCombinaison):
     """Classe représentant une Quinte Flush (suite de 5 cartes de même couleur)."""
 
-    def __init__(self, hauteur: str, kicker):
+    def __init__(self, hauteur: str, kicker=None) -> None:
         """
         Initialise une combinaison Quinte Flush.
 
@@ -81,8 +81,6 @@ class QuinteFlush(AbstractCombinaison):
         cartes_couleur = [c for c in cartes if c.couleur == couleur_max]
         valeurs = sorted([Carte.VALEURS().index(c.valeur) for c in cartes_couleur])
 
-        cls.verifier_min_cartes(cartes)
-        valeurs = sorted({Carte.VALEURS().index(c.valeur) for c in cartes})
         suites = []
         for i in range(len(valeurs) - 4):
             suite = valeurs[i : i + 5]
@@ -104,7 +102,8 @@ class QuinteFlush(AbstractCombinaison):
         str
             Exemple : "Quinte Flush As".
         """
-        if self.hauteur[0] == "As":
+
+        if self.hauteur == "As":
             return "Quinte Flush Royale"
         return "Quinte Flush"
 
@@ -116,4 +115,5 @@ class QuinteFlush(AbstractCombinaison):
         -------
 
         """
-        return f"Quinte Flush(hauteur={self.hauteur})"
+
+        return f"Quinte Flush(hauteur='{self.hauteur}')"

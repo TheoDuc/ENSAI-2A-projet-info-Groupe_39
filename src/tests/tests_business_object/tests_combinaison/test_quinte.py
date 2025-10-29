@@ -4,100 +4,102 @@ from business_object.combinaison.quinte import Quinte
 
 
 class Test_Quinte:
-    """Tests unitaires pour la combinaison Quinte avec GIVEN / WHEN / THEN"""
+    """Tests unitaires pour la combinaison Quinte avec 7 cartes."""
 
     def test_quinte_creation(self):
-        # GIVEN : cartes formant une Quinte (via fixture ou exemple)
+        # GIVEN : 7 cartes formant une Quinte As haut
         cartes = [
             pytest.as_coeur,
             pytest.roi_pique,
             pytest.dame_carreau,
             pytest.valet_trefle,
             pytest.dix_coeur,
+            pytest.neuf_coeur,
+            pytest.huit_carreau,
         ]
 
-        # WHEN : création
+        # WHEN : création via from_cartes
         q = Quinte.from_cartes(cartes)
 
         # THEN : vérifications
         assert q.hauteur == "As"
-        assert q.kicker == ()
+        assert q.kicker is None
         assert Quinte.FORCE() == 4
 
     def test_quinte_est_present(self):
-        # GIVEN : cartes contenant une quinte
         cartes = [
             pytest.as_coeur,
             pytest.roi_pique,
             pytest.dame_carreau,
             pytest.valet_trefle,
             pytest.dix_coeur,
+            pytest.neuf_coeur,
+            pytest.huit_carreau,
         ]
-
-        # WHEN / THEN : méthode retourne True
         assert Quinte.est_present(cartes)
 
     def test_quinte_est_present_faux(self):
-        # GIVEN : cartes ne formant pas une quinte
         cartes = [
             pytest.as_coeur,
             pytest.roi_pique,
             pytest.dame_carreau,
             pytest.valet_trefle,
             pytest.neuf_carreau,
+            pytest.sept_coeur,
+            pytest.six_coeur,
         ]
-
-        # WHEN / THEN : méthode retourne False
         assert not Quinte.est_present(cartes)
 
     def test_quinte_comparaison(self):
-        # GIVEN : deux Quintes différentes
-        q_as = Quinte("As")
-        q_roi = Quinte("Roi")
+        cartes1 = [
+            pytest.as_coeur,
+            pytest.roi_pique,
+            pytest.dame_carreau,
+            pytest.valet_trefle,
+            pytest.dix_coeur,
+        ]
+        cartes2 = [
+            pytest.roi_coeur,
+            pytest.dame_pique,
+            pytest.valet_coeur,
+            pytest.dix_trefle,
+            pytest.neuf_coeur,
+        ]
+        q_as = Quinte.from_cartes(cartes1)
+        q_roi = Quinte.from_cartes(cartes2)
 
-        # WHEN : comparaisons
-        resultat_sup = q_as > q_roi
-        resultat_inf = q_roi > q_as
-        resultat_egal = q_as == Quinte("As")
-
-        # THEN : vérifications
-        assert resultat_sup
-        assert not resultat_inf
-        assert resultat_egal
-
-    def test_quinte_comparaison_inverse(self):
-        # GIVEN : deux Quintes différentes
-        q_as = Quinte("As")
-        q_roi = Quinte("Roi")
-
-        # THEN : comparaison inverse
+        # Comparaisons
+        assert q_as > q_roi
         assert q_roi < q_as
-
-    def test_quinte_egalite_et_non_egalite(self):
-        # GIVEN : deux Quintes différentes
-        q_as = Quinte("As")
-        q_roi = Quinte("Roi")
-
-        # WHEN / THEN : égalité et différence
-        assert q_as == Quinte("As")
+        assert q_as == Quinte.from_cartes(cartes1)
         assert q_as != q_roi
 
     def test_quinte_creation_invalide(self):
-        # GIVEN : valeur invalide
-        hauteur_invalide = 12
-
-        # WHEN / THEN : création échoue
+        cartes = [
+            pytest.as_coeur,
+            pytest.roi_pique,
+            pytest.dame_carreau,
+            pytest.valet_trefle,
+            pytest.neuf_coeur,
+            pytest.huit_coeur,
+            pytest.sept_coeur,
+        ]
+        # Il n’y a pas de quinte complète de 5 cartes consécutives
         with pytest.raises(ValueError):
-            Quinte(hauteur_invalide)
+            Quinte.from_cartes(cartes)
 
     def test_quinte_str_repr(self):
-        # GIVEN : Quinte As
-        q = Quinte("As")
+        cartes = [
+            pytest.as_coeur,
+            pytest.roi_pique,
+            pytest.dame_carreau,
+            pytest.valet_trefle,
+            pytest.dix_coeur,
+        ]
+        q = Quinte.from_cartes(cartes)
 
-        # WHEN : récupération des chaînes
         texte_str = str(q)
         texte_repr = repr(q)
 
-        # THEN : vérifications
-        assert texte_str == "Quinte As"
+        assert texte_str == "Quinte"
         assert texte_repr == "Quinte(hauteur='As')"

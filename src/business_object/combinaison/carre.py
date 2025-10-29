@@ -14,7 +14,7 @@ class Carre(AbstractCombinaison):
     appelée "kicker" servant à départager les égalités.
     """
 
-    def __init__(self, hauteur: str, kicker: str):
+    def __init__(self, hauteur: str, kicker: str) -> None:
         """
         Initialise un objet Carré avec une liste de cartes et un kicker optionnel.
 
@@ -91,8 +91,8 @@ class Carre(AbstractCombinaison):
             [c.valeur for c in cartes if c.valeur != hauteur],
             key=lambda x: Carte.VALEURS().index(x),
         )
-        kicker = (kicker_valeur,)
-        return cls(hauteur, kicker)
+
+        return cls(hauteur, kicker_valeur)
 
     def __str__(self) -> str:
         """

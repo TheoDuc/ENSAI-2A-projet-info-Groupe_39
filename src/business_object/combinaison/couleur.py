@@ -14,11 +14,7 @@ class Couleur(AbstractCombinaison):
     par la carte la plus haute, puis par les kickers éventuels.
     """
 
-    def __init__(
-        self,
-        hauteur: list[str],
-        kicker=None,
-    ):
+    def __init__(self, hauteur: tuple[str]) -> None:
         """
         Initialise une combinaison Couleur.
 
@@ -28,7 +24,7 @@ class Couleur(AbstractCombinaison):
             Valeur de la carte la plus haute de la couleur (ex. 'As').
         kicker: None
         """
-        super().__init__(hauteur, kicker)
+        super().__init__(hauteur, kicker=None)
 
     @classmethod
     def FORCE(cls) -> int:
@@ -99,7 +95,7 @@ class Couleur(AbstractCombinaison):
         cartes_couleur = [c for c in cartes if c.couleur == couleur_max]
         cartes_couleur.sort(key=lambda c: Carte.VALEURS().index(c.valeur), reverse=True)
         hauteur = [c.valeur for c in cartes_couleur[:5]]
-        return cls(hauteur, kicker=None)
+        return cls(hauteur)
 
     def __str__(self) -> str:
         """
@@ -114,9 +110,9 @@ class Couleur(AbstractCombinaison):
         str
             Chaîne lisible par un joueur, par exemple : "Couleur de As".
         """
-        return "Couleurs"
+        return "Couleur"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """
         Renvoie une représentation détaillée de la *Couleur* pour le débogage.
 
@@ -131,4 +127,4 @@ class Couleur(AbstractCombinaison):
             par exemple : "Couleur([As de cœur, Roi de cœur, Dame de cœur, Valet de cœur, 9 de cœur])".
         """
 
-        return f"Couleur([Hauteur{self.hauteur}])"
+        return f"Couleur(hauteur={self.hauteur})"

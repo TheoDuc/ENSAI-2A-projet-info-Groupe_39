@@ -15,7 +15,7 @@ class DoublePaire(AbstractCombinaison):
     - et éventuellement la carte restante servant de kicker supplémentaire.
     """
 
-    def __init__(self, hauteur: list[str], kicker: str):
+    def __init__(self, hauteur: tuple[str], kicker: str) -> None:
         """
         Initialise une combinaison Double Paire.
 
@@ -100,16 +100,17 @@ class DoublePaire(AbstractCombinaison):
         )[:2]
 
         # Déterminer le kicker : carte la plus haute restante
-        cartes_restantes = [c.valeur for c in cartes if c.valeur not in paires_hautes]
-        kicker = (
-            max(cartes_restantes, key=lambda c: Carte.VALEURS().index(c.valeur).valeur)
+        cartes_restantes = [v for v in valeurs if v not in paires_hautes]
+
+        kicker_val = (
+            max(cartes_restantes, key=lambda v: Carte.VALEURS().index(v))
             if cartes_restantes
             else None
         )
 
-        return cls(hauteur=paires_hautes, kicker=kicker)
+        return cls(hauteur=paires_hautes, kicker=kicker_val)
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
         Renvoie une représentation textuelle lisible de la Double Paire.
 
@@ -123,7 +124,7 @@ class DoublePaire(AbstractCombinaison):
             Chaîne lisible par un joueur, par exemple :
             "Double Paire Roi  Dame".
         """
-        return f"Double Paire {self.hauteur[0]} {self.hauteur[1]}  {self.kicker or ''}"
+        return f"Double Paire {self.hauteur[0]} {self.hauteur[1]}"
 
     def __repr__(self) -> str:
         """

@@ -12,7 +12,7 @@ class Brelan(AbstractCombinaison):
     et de deux cartes supplémentaires appelées "kickers" servant à départager les égalités.
     """
 
-    def __init__(self, hauteur: str, kicker: tuple[str]):
+    def __init__(self, hauteur: str, kicker: tuple[str, ...] = ()) -> None:
         """
         Initialise un objet Brelan avec une hauteur donnée et la liste de ses cartes.
 
@@ -104,7 +104,7 @@ class Brelan(AbstractCombinaison):
         )
         return cls(hauteur, kicker)
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
         Renvoie une représentation textuelle lisible du Brelan.
 
@@ -121,7 +121,7 @@ class Brelan(AbstractCombinaison):
             return "Brelan d'As"
         return f"Brelan de {self.hauteur}"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """
         Renvoie une représentation technique du Brelan.
 
@@ -136,7 +136,9 @@ class Brelan(AbstractCombinaison):
             "Brelan(hauteur=Roi, kickers=(As, Dame))"
         """
 
-        if self.kicker:
-            return f"Brelan(hauteur={self.hauteur}, kickers={self.kicker})"
-        else:
+        if self.kicker is None:
             return f"Brelan(hauteur={self.hauteur})"
+
+        # Forcer un tuple pour l'affichage
+        kicker_tuple = self.kicker if isinstance(self.kicker, tuple) else (self.kicker,)
+        return f"Brelan(hauteur={self.hauteur}, kickers={kicker_tuple})"

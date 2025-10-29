@@ -6,7 +6,7 @@ from .combinaison import AbstractCombinaison
 class Simple(AbstractCombinaison):
     """Classe représentant une combinaison 'Simple' (la carte la plus haute seule)."""
 
-    def __init__(self, hauteur: str, kicker: tuple[str]):
+    def __init__(self, hauteur: str, kicker: tuple[str]) -> None:
         """
         Initialise une combinaison Simple.
 
@@ -66,7 +66,7 @@ class Simple(AbstractCombinaison):
 
         cartes_triees = sorted(cartes, key=lambda c: Carte.VALEURS().index(c.valeur), reverse=True)
         hauteur = cartes_triees.pop(0).valeur
-        kickers = [c.valeur for c in cartes_triees[:4]]
+        kickers = tuple(c.valeur for c in cartes_triees[:4])
         return cls(hauteur=hauteur, kicker=kickers)
 
     def __str__(self) -> str:
@@ -76,9 +76,9 @@ class Simple(AbstractCombinaison):
         Renvois
         -------
         str
-            Exemple : "Simple As et Roi Dame", en incluant les kickers si présents.
+            Exemple : "Simple "
         """
-        return f"Simple {self.hauteur}"
+        return "Simple"
 
     def __repr__(self) -> str:
         """
