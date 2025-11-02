@@ -1,8 +1,13 @@
 """Implémentation de la classe Table"""
 
+import logging
+
 from business_object.info_manche import InfoManche
 from business_object.joueur import Joueur
 from business_object.manche import Manche
+from utils.log_decorator import log
+
+logger = logging.getLogger(__name__)
 
 
 class Table:
@@ -75,6 +80,7 @@ class Table:
         """Retourne le nombre de joueurs à la table"""
         return len(self.__joueurs)
 
+    @log
     def ajouter_joueur(self, joueur) -> None:
         """
         Ajoute un joueur à la table
@@ -88,13 +94,18 @@ class Table:
         -------
         None
         """
-        if len(self.__joueurs) >= self.__joueur_max:
-            raise ValueError("Nombre maximum de joueurs atteint")
-        elif not isinstance(joueur, Joueur):
-            raise TypeError("Le joueur n'est pas une instance de joueur")
-        else:
-            self.__joueurs.append(joueur)
 
+        if not isinstance(joueur, Joueur):
+            raise TypeError("Le joueur n'est pas une instance de joueur")
+
+        if len(self.__joueurs) >= self.__joueur_max:
+            logger.warning(f"Table pleine : impossible d'ajouter {joueur.pseudo}")
+            raise ValueError("Nombre maximum de joueurs atteint")
+
+        self.__joueurs.append(joueur)
+        logger.info(f"{joueur.pseudo} rejoint la table ({len(self.joueurs)}/{self.joueur_max})")
+
+    @log
     def retirer_joueur(self, indice: int) -> Joueur:
         """
         Retire un joueur de la liste des joueurs selon son indice
@@ -109,16 +120,21 @@ class Table:
         Joueur
             Retourne le joueru retirée de la liste des joueurs
         """
+
         if not isinstance(indice, int):
             raise TypeError("L'indice doit être un entier")
+
         if indice >= len(self.__joueurs):
             raise IndexError(f"Indice plus grand que le nombre de joueurs : {len(self.__joueurs)}")
-        if 0 > indice:
-            raise IndexError("Indice négatif impossible")
-        else:
-            return self.__joueurs.pop(indice)
 
-    def mettre_grosse_blind(self, credit: int) -> None:
+        if indice < 0:
+            raise IndexError("Indice négatif impossible")
+
+        logger.info(f"Le joueur {self.joueurs[indice].pseudo} est retiré de la table")
+        return self.__joueurs.pop(indice)
+
+    @log
+    def mettre_grosse_blind(self, montant: int) -> None:
         """
         Change la valeur de la grosse blind
 
@@ -128,16 +144,21 @@ class Table:
             nouvelle valeur de la grosse blind
 
         """
-        if not isinstance(credit, int):
+        if not isinstance(montant, int):
             raise TypeError("Le crédit doit être un entier")
-        else:
-            self.__grosse_blind = credit
 
+        self.__grosse_blind = montant
+        logger.info(f"La grosse blind de la table passe à {montant}")
+
+    @log
     def rotation_dealer(self) -> None:
         """Change l'ordre dans la liste de joueur"""
         dealer = self.retirer_joueur(0)
         self.ajouter_joueur(dealer)
 
+        logger.info(f"{dealer.pseudo} devient dealer")
+
+    @log
     def nouvelle_manche(self) -> None:
         """Lance une manche"""
         for indice_joueur in len(self.__joueurs):

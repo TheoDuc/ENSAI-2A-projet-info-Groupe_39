@@ -5,6 +5,7 @@ from business_object.combinaison.combinaison import AbstractCombinaison
 from business_object.evaluateur_combinaison import EvaluateurCombinaison
 from business_object.info_manche import InfoManche
 from business_object.reserve import Reserve
+from utils.log_decorator import log
 
 
 class Manche:
@@ -78,6 +79,7 @@ class Manche:
         )
 
     # Déroulement des tours
+    @log
     def preflop(self):
         """Distribution des cartes initiales et mise des blinds"""
         self.__reserve.melanger()
@@ -87,6 +89,7 @@ class Manche:
         self.__info.miser(1, self.__grosse_blind)
         self.__indice_joueur_actuel = 2
 
+    @log
     def flop(self):
         """Révélation des 3 premières cartes communes"""
         for _ in range(3):
@@ -94,12 +97,14 @@ class Manche:
         self.__tour += 1
         self.__indice_joueur_actuel = 2
 
+    @log
     def turn(self):
         """Révélation de la quatrième carte commune"""
         self.__reserve.reveler(self.__board)
         self.__tour += 1
         self.__indice_joueur_actuel = 2
 
+    @log
     def river(self):
         """Révélation de la cinquième carte commune"""
         self.__reserve.reveler(self.__board)
@@ -119,21 +124,25 @@ class Manche:
         bool
             Vrai si tout les joueurs ont égalisé / couché / All in
         """
-        
+
         for i in range(len(self.info.statuts)):
             if self.info.statuts[i] in ["en retard", "à jour", "all in"]:
                 dernier_joueur = i
         if self.__indice_joueur_actuel != dernier_joueur:
             return False
         for s in self.info.statuts:
-            if s == "en retard" : return False
+            if s == "en retard":
+                return False
         return True
 
     # Gestion du pot
-    def ajouter_au_pot(self, credit):
+    @log
+    def ajouter_au_pot(self, credit) -> int:
         """Ajoute un montant au pot courant"""
         self.__pot += credit
+        return self.pot
 
+    @log
     def distribuer_pot(self):
         """
         Distribution du pot aux joueurs encore en lice selon la force de leur main.
@@ -194,14 +203,3 @@ class Manche:
                 else:
                     indice += 1
         self.__indice_joueur_actuel += 1
-
-    def jouer(self):
-        """
-        Lance une manche en entier
-        """
-        pass
-        ## là c'est une méthode de service déguisée parce qu'on ne peut dérouler une manche complète
-        #  qu'avec les actions des joueurs qui seront faites via l'api donc les endpoints de jeu
-        # appelleronts des méthodes services qui modifieronts les instances de manche mais la 
-        # jouer n'a pas de sens telle que décrite
-

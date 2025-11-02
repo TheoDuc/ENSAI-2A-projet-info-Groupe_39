@@ -1,5 +1,11 @@
 """Implémentation de la classe Joueur"""
 
+import logging
+
+from utils.log_decorator import log
+
+logger = logging.getLogger(__name__)
+
 
 class Joueur:
     """Modélisation d'un joueur de poker"""
@@ -18,8 +24,8 @@ class Joueur:
             crédits que possède le joeuur
         pays : str
             pays du joueur
-        actif : bool
-            spécifie si le joueur est à une table ou non
+        table : Table
+            table où le joueur joue (None si il ne joue pas)
 
         Renvois
         -------
@@ -100,7 +106,8 @@ class Joueur:
 
         return self.__id_joueur == other.id_joueur
 
-    def ajouter_credits(self, credits: int) -> None:
+    @log
+    def ajouter_credits(self, credits: int) -> int:
         """
         Ajoute des crédits à un joueur
 
@@ -111,7 +118,8 @@ class Joueur:
 
         Renvois
         -------
-        None
+        int
+            Somme des crédits totaux après crédit
         """
 
         if not isinstance(credits, int):
@@ -121,7 +129,11 @@ class Joueur:
             raise ValueError(f"Le nombre de crédits à ajouter doit être positif : {credits}")
 
         self.__credit += credits
+        logger.info(f"{self.pseudo} reçoit {credits} crédits")
 
+        return self.credit
+
+    @log
     def retirer_credits(self, credits: int) -> int:
         """
         Retire des crédits à un joueur
@@ -144,13 +156,19 @@ class Joueur:
             raise ValueError(f"Le nombre de crédits à retirer doit être positif : {credits}")
 
         if credits > self.credit:
+            logger.warning(
+                f"Le joueur {self.pseudo} ne peut pas être débiter de {credits} (credit restant : {self.credit})"
+            )
             raise ValueError(
                 f"Le joueur {self.pseudo} a trop peu de crédits pour retirer {credits}: {self.credit}"
             )
 
         self.__credit -= credits
+        logger.info(f"Le joueur {self.pseudo} a été débité de {credits}")
+
         return self.credit
 
+    @log
     def rejoindre_table(self, table) -> None:
         """
         Associe le joueur à une table (si il n'en a pas déjà une)
@@ -175,7 +193,9 @@ class Joueur:
 
         table.ajouter_joueur(self)
         self.__table = table
+        logger.info(f"Le joueur {self.pseudo} a rejoint une table")
 
+    @log
     def quitter_table(self) -> None:
         """
         Retire le joueur de sa table si il en a une, et remplace son attribut table par None
@@ -196,3 +216,4 @@ class Joueur:
         indice = indice = self.__table.joueurs.index(self)
         self.__table.retirer_joueur(indice)
         self.__table = None
+        logger.info(f"Le joueur {self.pseudo} a quitté sa table")

@@ -1,6 +1,11 @@
 """Implémentation de la classe Admin"""
 
+import logging
+
 from business_object.joueur import Joueur
+from utils.log_decorator import log
+
+logger = logging.getLogger(__name__)
 
 
 class Admin:
@@ -34,6 +39,7 @@ class Admin:
         """Retourne l'identifiant de l'administrateur."""
         return self.__id_admin
 
+    @log
     def crediter(self, joueur: Joueur, credits: int) -> None:
         """
         Ajoute des crédits à un joueur
@@ -48,8 +54,10 @@ class Admin:
         None
         """
 
+        logger.info(f"L'admin crédite {credits} à {joueur.pseudo}")
         joueur.ajouter_credits(credits)
 
+    @log
     def debiter(self, joueur: Joueur, credits: int) -> None:
         """
         Retire des crédits à un joueur
@@ -64,8 +72,10 @@ class Admin:
         None
         """
 
+        logger.info(f"L'admin débite {credits} à {joueur.pseudo}")
         joueur.retirer_credits(credits)
 
+    @log
     def set_credits(self, joueur: Joueur, credits: int) -> None:
         """
         Met les crédits d'un joueur à un certain niveau
@@ -80,5 +90,6 @@ class Admin:
         None
         """
 
+        logger.info(f"L'admin met les crédits de {joueur.pseudo} à {credits}")
         joueur.retirer_credits(joueur.credit)
         joueur.ajouter_credits(credits)

@@ -2,6 +2,7 @@
 
 from business_object.joueur import Joueur
 from business_object.main import Main
+from utils.log_decorator import log
 
 
 class InfoManche:
@@ -36,16 +37,16 @@ class InfoManche:
         if not all(isinstance(j, Joueur) for j in joueurs):
             raise TypeError("Tous les éléments de 'joueurs' doivent être des instances de Joueur.")
         if len(joueurs) < 2:
-            raise ValueError(f"Au moins deux joueurs doivent être présents : {len(joueurs)} présents")
+            raise ValueError(
+                f"Au moins deux joueurs doivent être présents : {len(joueurs)} présents"
+            )
 
         # Initialisation des attributs privés
         self.__joueurs = joueurs
         self.__statuts = [0 for _ in joueurs]
         self.__mains = [None for _ in joueurs]
         self.__mises = [0 for _ in joueurs]
-        self.__tour_couche = [
-            None for _ in joueurs
-        ]
+        self.__tour_couche = [None for _ in joueurs]
 
     # Propriétés
     @property
@@ -69,7 +70,7 @@ class InfoManche:
         return self.__mises
 
     @property
-    def tour_couche(self) -> list:
+    def tour_couche(self) -> list[int]:
         """État des joueurs : None pour actif, True pour couché"""
         return self.__tour_couche
 
@@ -90,6 +91,7 @@ class InfoManche:
 
         self.__mains = mains
 
+    @log
     def miser(self, indice_joueur: int, montant: int):
         """
         Ajoute une mise pour un joueur.
@@ -112,6 +114,7 @@ class InfoManche:
             self.__mises[indice_joueur] = self.joueurs[indice_joueur].credit
             self.__statuts[indice_joueur] = "all in"
 
+    @log
     def coucher_joueur(self, indice_joueur: int, tour: int):
         """
         Marque un joueur comme couché.
