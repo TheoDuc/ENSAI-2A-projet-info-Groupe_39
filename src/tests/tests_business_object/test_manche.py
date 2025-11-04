@@ -1,26 +1,40 @@
 """Implémentation des tests pour la classe Manche"""
 
 import pytest
-from business_object.manche import Manche
-from business_object.info_manche import InfoManche
-from business_object.reserve import Reserve
+
 from business_object.board import Board
+from business_object.info_manche import InfoManche
+from business_object.joueur import Joueur
+from business_object.main import Main
+from business_object.manche import Manche
+from business_object.reserve import Reserve
 
 
 class TestManche:
+    # Fixtures
+    @pytest.fixture
+    def joueurs(self):
+        return [
+            Joueur(1, "Alice", 500, "France"),
+            Joueur(2, "Bob", 500, "Canada"),
+        ]
 
-    def test_manche_init_succes(self):
+    @pytest.fixture
+    def info_manche(self, joueurs):
+        return InfoManche(joueurs)
+
+    # Tests d’initialisation
+    def test_manche_init_succes(self, info_manche):
         # GIVEN
-        info = InfoManche()
         grosse_blind = 100
 
         # WHEN
-        manche = Manche(info, grosse_blind)
+        manche = Manche(info_manche, grosse_blind)
 
         # THEN
-        assert manche.info == info
-        assert manche.reserve == Reserve(None)
-        assert manche.board == Board([])
+        assert manche.info == info_manche
+        assert isinstance(manche.reserve, Reserve)
+        assert isinstance(manche.board, Board)
         assert manche.grosse_blind == 100
         assert manche.tour == 0
         assert manche.pot == 0
@@ -29,13 +43,17 @@ class TestManche:
         "info, grosse_blind, exception, msg",
         [
             ("pas_info", 100, TypeError, "info"),
-            (InfoManche(), "cent", TypeError, "grosse_blind"),
-            (InfoManche(), 0, ValueError, "grosse blind"),
-            (InfoManche(), -50, ValueError, "grosse blind"),
-        ]
+            (None, "cent", TypeError, "entier"),
+            (None, 0, ValueError, "strictement positif"),
+            (None, -50, ValueError, "strictement positif"),
+        ],
     )
-    def test_manche_init_erreurs(self, info, grosse_blind, exception, msg):
-        # GIVEN / WHEN / THEN
+    def test_manche_init_erreurs(self, joueurs, info, grosse_blind, exception, msg):
+        # GIVEN
+        if info is None:
+            info = InfoManche(joueurs)
+
+        # WHEN / THEN
         with pytest.raises(exception, match=msg):
             Manche(info, grosse_blind)
 
@@ -46,13 +64,93 @@ class TestManche:
         # THEN
         assert tours == ("preflop", "flop", "turn", "river")
 
-    def test_manche_str(self):
+    def test_manche_str(self, info_manche):
         # GIVEN
-        info = InfoManche()
-        grosse_blind = 100
+        manche = Manche(info_manche, 100)
 
         # WHEN
-        manche = Manche(info, grosse_blind)
+        texte = str(manche)
 
         # THEN
-        assert str(manche) == "Manche(tour=0, pot=0, grosse_blind=100, board=[])"
+        assert "Manche(" in texte
+        assert "tour=0" in texte
+        assert "pot=0" in texte
+        assert "grosse_blind=100" in texte
+
+    # Tests des tours
+    def test_preflop(self, info_manche):
+        # GIVEN
+        manche = Manche(info_manche, 100)
+
+        # WHEN
+        manche.preflop()
+
+        # THEN
+        assert all(isinstance(m, Main) for m in manche.info.mains)
+        assert manche.info.mises[0] == 50
+        assert manche.info.mises[1] == 100
+
+    def test_flop(self, info_manche):
+        # GIVEN
+        manche = Manche(info_manche, 100)
+
+        # WHEN
+        manche.flop()
+
+        # THEN
+        assert len(manche.board.cartes) == 3
+        assert manche.tour == 1
+
+    def test_turn(self, info_manche):
+        # GIVEN
+        manche = Manche(info_manche, 100)
+
+        # WHEN
+        manche.turn()
+
+        # THEN
+        assert len(manche.board.cartes) == 1
+        assert manche.tour == 1
+
+    def test_river(self, info_manche):
+        # GIVEN
+        manche = Manche(info_manche, 100)
+
+        # WHEN
+        manche.river()
+
+        # THEN
+        assert len(manche.board.cartes) == 1
+        assert manche.tour == 1
+
+    # Tests pot et gestion joueurs
+    def test_ajouter_au_pot(self, info_manche):
+        # GIVEN
+        manche = Manche(info_manche, 100)
+
+        # WHEN
+        manche.ajouter_au_pot(200)
+
+        # THEN
+        assert manche.pot == 200
+
+    def test_joueur_suivant(self, info_manche):
+        # GIVEN
+        info_manche.coucher_joueur(0, 0)
+        manche = Manche(info_manche, 100)
+
+        # WHEN
+        manche.joueur_suivant()
+
+        # THEN
+        assert manche.indice_joueur_actuel == 1
+
+    def test_joueur_suivant_tous_couches(self, info_manche):
+        # GIVEN
+        info_manche.coucher_joueur(0, 0)
+        info_manche.coucher_joueur(1, 0)
+        manche = Manche(info_manche, 100)
+
+        # WHEN / THEN
+        with pytest.raises(ValueError, match="Tous les joueurs ne peuvent être couchés."):
+            manche.joueur_suivant()

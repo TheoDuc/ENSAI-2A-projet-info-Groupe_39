@@ -85,7 +85,7 @@ class AbstractListeCartesTest(ABC):
         resultat = [pytest.as_pique, pytest.dix_coeur, pytest.cinq_trefle]
 
         # WHEN
-        liste_cartes.ajouter_carte(carte)
+        liste_cartes.ajouter_carte_base(carte)
 
         # THEN
         assert liste_cartes.cartes == resultat
@@ -98,7 +98,7 @@ class AbstractListeCartesTest(ABC):
 
         # WHEN / THEN
         with pytest.raises(TypeError, match=message_attendu):
-            liste_cartes.ajouter_carte(carte)
+            liste_cartes.ajouter_carte_base(carte)
 
     def test_liste_cartes_retirer_carte_succes(self, liste_cartes):
         # GIVEN

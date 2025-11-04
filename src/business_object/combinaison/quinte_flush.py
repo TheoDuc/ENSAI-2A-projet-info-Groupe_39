@@ -6,55 +6,114 @@ from .combinaison import AbstractCombinaison
 class QuinteFlush(AbstractCombinaison):
     """Classe représentant une Quinte Flush (suite de 5 cartes de même couleur)."""
 
-    def __init__(self, hauteur: str, kicker=None):
-        # Hauteur = carte la plus forte de la quinte flush
-        super().__init__(hauteur, kicker)
+    def __init__(self, hauteur: str, kicker=None) -> None:
+        """
+        Initialise une combinaison Quinte Flush.
 
-    # Force relative de la Quinte Flush dans le classement poker
+        Paramètres
+        ----------
+        hauteur : list[str]
+            Liste des valeurs des cartes formant la Quinte Flush, de la plus haute à la plus basse.
+
+
+        """
+
+        super().__init__(hauteur, kicker=None)
+
     @classmethod
     def FORCE(cls) -> int:
+        """Renvoie la force hiérarchique de la combinaison Quinte Flush (8)."""
         return 8
 
-    # Vérifie si une Quinte Flush est présente
     @classmethod
     def est_present(cls, cartes: list[Carte]) -> bool:
-        if len(cartes) < 5:
-            return False  # Impossible d'avoir une quinte flush avec moins de 5 cartes
+        """
+        Vérifie si une Quinte Flush est présente dans une liste de cartes.
 
+        Paramètres
+        ----------
+        cartes : list[Carte]
+            Liste d’objets Carte à analyser.
+
+        Renvois
+        -------
+        bool
+            True si une Quinte Flush est détectée, False sinon.
+        """
         couleurs = [c.couleur for c in cartes]
-        for couleur in set(couleurs):
-            cartes_couleur = [c for c in cartes if c.couleur == couleur]
-            # On récupère les indices des valeurs triés
-            indices = sorted([Carte.VALEURS().index(c.valeur) for c in cartes_couleur])
-            # Vérifie toutes les suites de 5 cartes
-            for i in range(len(indices) - 4):
-                if indices[i + 4] - indices[i] == 4:
-                    return True
+        couleur_max = next((c for c in set(couleurs) if couleurs.count(c) >= 5), None)
+        if not couleur_max:
+            return False
+
+        cartes_couleur = [c for c in cartes if c.couleur == couleur_max]
+        valeurs = sorted([Carte.VALEURS().index(c.valeur) for c in cartes_couleur])
+        for i in range(len(valeurs) - 4):
+            if valeurs[i : i + 5] == list(range(valeurs[i], valeurs[i] + 5)):
+                return True
         return False
 
-    # Construit un objet Quinte Flush à partir de cartes
     @classmethod
     def from_cartes(cls, cartes: list[Carte]) -> "QuinteFlush":
+        """
+        Construit une instance de Quinte Flush à partir d’une liste de cartes.
+
+        Paramètres
+        ----------
+        cartes : list[Carte]
+            Liste de cartes à partir de laquelle on cherche une Quinte Flush.
+
+        Renvois
+        -------
+        QuinteFlush
+            Instance représentant la Quinte Flush détectée.
+
+        Exceptions
+        ----------
+        ValueError
+            Si aucune Quinte Flush n’est trouvée dans les cartes.
+        """
+        cls.verifier_min_cartes(cartes)
         couleurs = [c.couleur for c in cartes]
-        for couleur in set(couleurs):
-            cartes_couleur = [c for c in cartes if c.couleur == couleur]
-            # Indices triés décroissants pour prendre la plus haute
-            indices = sorted(
-                [Carte.VALEURS().index(c.valeur) for c in cartes_couleur], reverse=True
-            )
-            # Cherche une suite de 5 cartes consécutives
-            for i in range(len(indices) - 4):
-                if indices[i] - indices[i + 4] == 4:
-                    hauteur = Carte.VALEURS()[indices[i]]
-                    return cls(hauteur)
-        # Si aucune quinte flush trouvée
-        raise ValueError("Pas de quinte flush dans ces cartes")
+        couleur_max = next((c for c in set(couleurs) if couleurs.count(c) >= 5), None)
+        if not couleur_max:
+            raise ValueError("Aucune couleur avec les 5 cartes.")
 
-    # Représentation lisible pour le joueur
+        cartes_couleur = [c for c in cartes if c.couleur == couleur_max]
+        valeurs = sorted([Carte.VALEURS().index(c.valeur) for c in cartes_couleur])
+
+        suites = []
+        for i in range(len(valeurs) - 4):
+            suite = valeurs[i : i + 5]
+            if suite == list(range(suite[0], suite[0] + 5)):
+                suites.append(suite)
+        if not suites:
+            raise ValueError("Aucune Quinte Flush présente.")
+        # On prend la carte la plus haute de la meilleure suite
+        max_suite = max(suites, key=lambda s: s[-1])
+        hauteur = Carte.VALEURS()[max_suite[-1]]
+        return cls(hauteur=hauteur)
+
     def __str__(self) -> str:
-        # Exemple : "Quinte Flush As"
-        return f"Quinte Flush {self.hauteur}"
+        """
+        Renvoie une représentation textuelle lisible de la Quinte Flush.
 
-    # Représentation pour debug / tests
+        Renvois
+        -------
+        str
+            Exemple : "Quinte Flush As".
+        """
+
+        if self.hauteur == "As":
+            return "Quinte Flush Royale"
+        return "Quinte Flush"
+
     def __repr__(self) -> str:
-        return str(self)
+        """
+        Renvoie une représentation technique de la Quinte Flush
+
+        Renvois
+        -------
+
+        """
+
+        return f"Quinte Flush(hauteur='{self.hauteur}')"

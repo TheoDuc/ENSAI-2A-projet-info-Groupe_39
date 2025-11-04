@@ -1,16 +1,16 @@
 """Implémentation de la classe Manche"""
 
+from business_object.board import Board
+from business_object.combinaison.combinaison import AbstractCombinaison
+from business_object.evaluateur_combinaison import EvaluateurCombinaison
 from business_object.info_manche import InfoManche
 from business_object.reserve import Reserve
-from business_object.board import Board
-from business_object.evaluateur_combinaison import EvaluateurCombinaison
-from business_object.combinaison.combinaison import AbstractCombinaison
-from business_object.joueur import Joueur
+from utils.log_decorator import log
 
 
 class Manche:
-    """ 
-    Modélisation d'une manche de poker, depuis la distribution des cartes jusqu'à l'attribution du pot. 
+    """
+    Modélisation d'une manche de poker, depuis la distribution des cartes jusqu'à l'attribution du pot.
     """
 
     __TOURS = ("preflop", "flop", "turn", "river")
@@ -37,7 +37,7 @@ class Manche:
         self.__indice_joueur_actuel = 0
         self.__grosse_blind = grosse_blind
 
-    # -------------------- Propriétés -------------------- #
+    # Propriétés
     @property
     def tour(self) -> int:
         return self.__tour
@@ -59,6 +59,10 @@ class Manche:
         return self.__board
 
     @property
+    def indice_joueur_actuel(self) -> int:
+        return self.__indice_joueur_actuel
+
+    @property
     def grosse_blind(self) -> int:
         return self.__grosse_blind
 
@@ -74,40 +78,71 @@ class Manche:
             f"board={self.board})"
         )
 
-    # -------------------- Déroulement des tours -------------------- #
+    # Déroulement des tours
+    @log
     def preflop(self):
         """Distribution des cartes initiales et mise des blinds"""
         self.__reserve.melanger()
-        self.__info.assignation_mains(
-            self.__reserve.distribuer(len(self.__info.joueurs))
-        )
-        self.__info.miser(0, self.__grosse_blind // 2)
+        self.__info.assignation_mains(self.__reserve.distribuer(len(self.__info.joueurs)))
+        self.__info.miser(0, self.__grosse_blind / 2)
+        self.__indice_joueur_actuel = 1
         self.__info.miser(1, self.__grosse_blind)
+        self.__indice_joueur_actuel = 2
 
+    @log
     def flop(self):
         """Révélation des 3 premières cartes communes"""
         for _ in range(3):
-            self.__board.reveler(self.__reserve)
+            self.__reserve.reveler(self.__board)
         self.__tour += 1
         self.__indice_joueur_actuel = 2
 
+    @log
     def turn(self):
         """Révélation de la quatrième carte commune"""
-        self.__board.reveler(self.__reserve)
+        self.__reserve.reveler(self.__board)
         self.__tour += 1
         self.__indice_joueur_actuel = 2
 
+    @log
     def river(self):
         """Révélation de la cinquième carte commune"""
-        self.__board.reveler(self.__reserve)
+        self.__reserve.reveler(self.__board)
         self.__tour += 1
         self.__indice_joueur_actuel = 2
 
-    # -------------------- Gestion du pot -------------------- #
-    def ajouter_au_pot(self, credit):
+    def fin_du_tour(self) -> bool:
+        """
+        Indique si les conditions sont réunies pour passer au tour suivant
+
+        Paramètres
+        ----------
+        None
+
+        Renvois
+        -------
+        bool
+            Vrai si tout les joueurs ont égalisé / couché / All in
+        """
+
+        for i in range(len(self.info.statuts)):
+            if self.info.statuts[i] in ["en retard", "à jour", "all in"]:
+                dernier_joueur = i
+        if self.__indice_joueur_actuel != dernier_joueur:
+            return False
+        for s in self.info.statuts:
+            if s == "en retard":
+                return False
+        return True
+
+    # Gestion du pot
+    @log
+    def ajouter_au_pot(self, credit) -> int:
         """Ajoute un montant au pot courant"""
         self.__pot += credit
+        return self.pot
 
+    @log
     def distribuer_pot(self):
         """
         Distribution du pot aux joueurs encore en lice selon la force de leur main.
@@ -118,7 +153,7 @@ class Manche:
 
         # Évaluation des mains des joueurs encore actifs
         for i in range(len(self.info.joueurs)):
-            if self.info.tour_couche[i] is None:
+            if self.info.statuts[i] in ["à jour", "all in"]:
                 main = self.info.mains[i]
                 joueurs_en_lice[i] = EvaluateurCombinaison.eval(main.cartes + board)
 
@@ -126,9 +161,8 @@ class Manche:
         classement = [i for i in joueurs_en_lice]
         for i in range(1, len(classement)):
             j = i - 1
-            while (
-                j >= 0
-                and AbstractCombinaison.gt(joueurs_en_lice[classement[j]], joueurs_en_lice[classement[i]])
+            while j >= 0 and AbstractCombinaison.gt(
+                joueurs_en_lice[classement[j]], joueurs_en_lice[classement[i]]
             ):
                 classement[j + 1] = classement[j]
                 j -= 1
@@ -152,20 +186,20 @@ class Manche:
 
         return gains
 
-    # -------------------- Gestion des joueurs -------------------- #
+    # Gestion des joueurs
     def joueur_suivant(self):
         """
-        Retourne l'indice du joueur suivant qui n'est pas couché.
+        Retourne l'indice du joueur suivant qui n'est pas couché ou all in.
         """
-        indice = self.__indice_joueur_actuel + 1
-        tour_couche = self.info.tour_couche
+        indice = self.indice_joueur_actuel + 1
+        statuts = self.info.statuts
 
-        if None not in tour_couche:
+        if all(s == "couché" for s in statuts):
             raise ValueError("Tous les joueurs ne peuvent être couchés.")
         else:
-            while tour_couche[indice] is not None:
-                if indice == len(tour_couche) - 1:
+            while statuts[indice] in ["couché", "all in"]:
+                if indice == len(statuts) - 1:
                     indice = 0
                 else:
                     indice += 1
-            return indice
+        self.__indice_joueur_actuel += 1

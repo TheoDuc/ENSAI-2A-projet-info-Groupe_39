@@ -1,3 +1,5 @@
+from collections import Counter
+
 from business_object.carte import Carte
 
 from .combinaison import AbstractCombinaison
@@ -6,48 +8,91 @@ from .combinaison import AbstractCombinaison
 class Paire(AbstractCombinaison):
     """Classe représentant une Paire (deux cartes de même valeur) au poker."""
 
-    # Force relative d'une Paire dans le classement des combinaisons
+    def __init__(self, hauteur: str, kicker: tuple[str]) -> None:
+        """
+        Initialise une combinaison Paire.
+
+        Paramètres
+        ----------
+        hauteur : str
+            Valeur de la Paire.
+        kicker : list[str]
+            Cartes restantes servant de kickers pour comparaison.
+        """
+        super().__init__(hauteur, kicker)
+
     @classmethod
     def FORCE(cls) -> int:
+        """Renvoie la force hiérarchique de la combinaison Paire (1)."""
         return 1
 
-    # Vérifie si une Paire est présente dans la main
     @classmethod
     def est_present(cls, cartes: list[Carte]) -> bool:
-        valeurs = [c.valeur for c in cartes]
-        # True si au moins une valeur apparaît exactement deux fois
-        return any(valeurs.count(v) == 2 for v in set(valeurs))
+        """
+        Vérifie si une Paire est présente dans une liste de cartes.
 
-    # Construit un objet Paire à partir d'une liste de cartes
+        Paramètres
+        ----------
+        cartes : list[Carte]
+            Liste d’objets Carte à analyser.
+
+        Renvois
+        -------
+        bool
+            True si au moins une Paire est présente, False sinon.
+        """
+        valeurs = [c.valeur for c in cartes]
+        compteur = Counter(valeurs)
+        return any(count >= 2 for count in compteur.values())
+
     @classmethod
     def from_cartes(cls, cartes: list[Carte]) -> "Paire":
+        """
+        Construit une instance de Paire à partir d’une liste de cartes.
+
+        Paramètres
+        ----------
+        cartes : list[Carte]
+            Liste de cartes à partir de laquelle on cherche une Paire.
+
+        Renvois
+        -------
+        Paire
+            Instance représentant la Paire détectée, avec ses kickers.
+        """
+        cls.verifier_min_cartes(cartes)
         valeurs = [c.valeur for c in cartes]
+        compteur = Counter(valeurs)
+        paires = [v for v, count in compteur.items() if count >= 2]
+        if not paires:
+            raise ValueError("Aucune Paire présente")
+        meilleure_paire = max(paires, key=lambda v: Carte.VALEURS().index(v))
 
-        # Recherche la paire la plus forte
-        paire = max(
-            [v for v in set(valeurs) if valeurs.count(v) == 2],
-            key=lambda x: Carte.VALEURS().index(x),
-        )
+        cartes_restantes = [v for v in valeurs if v != meilleure_paire]
+        kickers = sorted(cartes_restantes, key=lambda v: Carte.VALEURS().index(v), reverse=True)
 
-        # Les kickers = cartes restantes triées par valeur décroissante
-        kicker = tuple(
-            sorted(
-                [v for v in valeurs if v != paire],
-                key=lambda x: Carte.VALEURS().index(x),
-                reverse=True,
-            )
-        )
+        return cls(hauteur=meilleure_paire, kicker=kickers)
 
-        return cls(paire, kicker)
+    def __str__(self) -> str:
+        """
+        Renvoie une représentation textuelle lisible de la Paire.
 
-    # Représentation lisible pour un joueur de poker
-    def __str__(self):
-        # Exemple : "Paire As et Roi" si kicker, sinon "Paire As"
-        return (
-            f"Paire {self.hauteur} et {self.kicker[0]}" if self.kicker else f"Paire {self.hauteur}"
-        )
+        Renvois
+        -------
+        str
+            Exemple : "Paire As et Roi" si kicker, sinon "Paire As".
+        """
+        if self.hauteur == "As":
+            return "Paire d'As"
+        else:
+            return f"Paire {self.hauteur}"
 
-    # Représentation technique pour debug / tests
-    def __repr__(self):
-        # Simplement repr le même que __str__
-        return str(self)
+    def __repr__(self) -> str:
+        """
+        Renvoie une représentation technique de la Paire
+
+        Renvois
+        -------
+
+        """
+        return f"Paire(hauteur={self.hauteur}, kicker={self.kicker})"

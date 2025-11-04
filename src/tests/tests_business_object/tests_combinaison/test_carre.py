@@ -1,83 +1,141 @@
 import pytest
 
-from business_object.carte import Carte
 from business_object.combinaison.carre import Carre
 
 
 class Test_Carre:
-    """Tests unitaires pour la combinaison 'Carré' avec structure Given / When / Then"""
+    """Tests unitaires pour la classe Carre avec GIVEN / WHEN / THEN."""
 
     def test_carre_init_succes(self):
-        # GIVEN : 4 cartes identiques pour former un Carré
-        cartes = [pytest.dame_coeur, pytest.dame_pique, pytest.dame_trefle, pytest.dame_carreau]
+        # GIVEN : 7 cartes formant un Carré
+        cartes = [
+            pytest.roi_coeur,
+            pytest.roi_trefle,
+            pytest.roi_carreau,
+            pytest.roi_pique,  # le Carré
+            pytest.as_coeur,
+            pytest.dame_trefle,
+            pytest.neuf_carreau,
+        ]
 
-        # WHEN : création du Carré à partir des cartes
+        # WHEN : création du Carré
         carre = Carre.from_cartes(cartes)
 
-        # THEN : vérifier la hauteur, la force et les kickers
-        assert carre.hauteur == "Dame"
-        assert all(k in Carte.VALEURS() for k in carre.kicker)
+        # THEN : vérifier hauteur et kicker
+        assert carre.hauteur == "Roi"
+        assert carre.kicker == "As"
         assert Carre.FORCE() == 7
 
-    def test_carre_init_hauteur_invalide(self):
-        # GIVEN : cartes ne formant pas un Carré
-        cartes = [pytest.dame_coeur, pytest.dame_pique, pytest.valet_coeur]
+    def test_carre_init_erreur(self):
+        # GIVEN : cartes sans Carré
+        cartes = [
+            pytest.dame_coeur,
+            pytest.dame_trefle,
+            pytest.dame_carreau,  # juste un brelan
+            pytest.as_pique,
+            pytest.roi_coeur,
+            pytest.neuf_carreau,
+            pytest.deux_trefle,
+        ]
 
-        # WHEN / THEN : la création doit lever une erreur
-        with pytest.raises(ValueError):
+        # WHEN / THEN : création échoue
+        with pytest.raises(ValueError, match="Aucun Carré présent"):
             Carre.from_cartes(cartes)
 
-    def test_carre_comparaison_gt_lt_eq(self):
+    def test_carre_comparaison(self):
         # GIVEN : deux Carrés différents
-        carre_dame = Carre.from_cartes(
-            [pytest.dame_coeur, pytest.dame_pique, pytest.dame_trefle, pytest.dame_carreau]
-        )
         carre_roi = Carre.from_cartes(
-            [pytest.roi_coeur, pytest.roi_pique, pytest.roi_trefle, pytest.roi_carreau]
+            [
+                pytest.roi_coeur,
+                pytest.roi_trefle,
+                pytest.roi_carreau,
+                pytest.roi_pique,
+                pytest.as_coeur,
+                pytest.dame_trefle,
+                pytest.neuf_carreau,
+            ]
+        )
+        carre_dame = Carre.from_cartes(
+            [
+                pytest.dame_coeur,
+                pytest.dame_trefle,
+                pytest.dame_carreau,
+                pytest.dame_pique,
+                pytest.as_coeur,
+                pytest.roi_trefle,
+                pytest.neuf_carreau,
+            ]
         )
 
-        # WHEN / THEN : comparer les Carrés
+        # THEN : comparaison fonctionne
         assert carre_roi > carre_dame
         assert not carre_dame > carre_roi
         assert carre_dame == Carre.from_cartes(
-            [pytest.dame_coeur, pytest.dame_pique, pytest.dame_trefle, pytest.dame_carreau]
+            [
+                pytest.dame_coeur,
+                pytest.dame_trefle,
+                pytest.dame_carreau,
+                pytest.dame_pique,
+                pytest.as_coeur,
+                pytest.roi_trefle,
+                pytest.neuf_carreau,
+            ]
         )
 
-    def test_carre_str(self):
-        # GIVEN : Carré de Dames
-        carre = Carre.from_cartes(
-            [pytest.dame_coeur, pytest.dame_pique, pytest.dame_trefle, pytest.dame_carreau]
-        )
+    def test_carre_str_repr(self):
+        # GIVEN : Carré de Roi
+        cartes = [
+            pytest.roi_coeur,
+            pytest.roi_trefle,
+            pytest.roi_carreau,
+            pytest.roi_pique,
+            pytest.as_coeur,
+            pytest.dame_trefle,
+            pytest.neuf_carreau,
+        ]
+        carre = Carre.from_cartes(cartes)
 
-        # WHEN / THEN : vérifier la représentation __str__
-        assert str(carre) == "Carre de Dame"
+        # THEN : __str__ et __repr__
+        assert str(carre) == "Carre de Roi"
+        assert repr(carre) == f"Carre(hauteur={carre.hauteur}, kicker={carre.kicker})"
 
-    def test_carre_repr(self):
-        # GIVEN : Carré de Dames
-        carre = Carre.from_cartes(
-            [pytest.dame_coeur, pytest.dame_pique, pytest.dame_trefle, pytest.dame_carreau]
-        )
+    def test_carre_str_as(self):
+        # GIVEN : Carré d'As
+        cartes = [
+            pytest.as_coeur,
+            pytest.as_trefle,
+            pytest.as_carreau,
+            pytest.as_pique,
+            pytest.roi_coeur,
+            pytest.dame_trefle,
+            pytest.neuf_carreau,
+        ]
+        carre = Carre.from_cartes(cartes)
 
-        # WHEN / THEN : vérifier la représentation __repr__
-        attendu = "Carre([Dame de Coeur, Dame de Pique, Dame de Trêfle, Dame de Carreau])"
-        assert repr(carre) == attendu
+        # THEN : représentation spéciale pour As
+        assert str(carre) == "Carre d'As"
 
     def test_carre_est_present(self):
-        # GIVEN : une main contenant un Carré
-        cartes = [
+        # GIVEN : cartes avec et sans Carré
+        cartes_ok = [
+            pytest.roi_coeur,
+            pytest.roi_trefle,
+            pytest.roi_carreau,
+            pytest.roi_pique,
+            pytest.as_coeur,
+            pytest.dame_trefle,
+            pytest.neuf_carreau,
+        ]
+        cartes_non = [
             pytest.dame_coeur,
-            pytest.dame_pique,
             pytest.dame_trefle,
             pytest.dame_carreau,
-            pytest.huit_coeur,
+            pytest.as_pique,
+            pytest.roi_coeur,
+            pytest.neuf_carreau,
+            pytest.deux_trefle,
         ]
 
-        # WHEN / THEN : est_present doit retourner True
-        assert Carre.est_present(cartes)
-
-    def test_carre_est_present_faux(self):
-        # GIVEN : une main sans Carré
-        cartes = [pytest.dame_coeur, pytest.dame_pique, pytest.valet_coeur, pytest.huit_coeur]
-
-        # WHEN / THEN : est_present doit retourner False
-        assert not Carre.est_present(cartes)
+        # THEN : est_present correct
+        assert Carre.est_present(cartes_ok)
+        assert not Carre.est_present(cartes_non)
