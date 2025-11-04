@@ -61,7 +61,7 @@ class MancheJoueurDAO(metaclass=Singleton):
             return True
 
         except Exception as e:
-            logging.info(f"[ERREUR DAO] Création manche_joueur : {e}")
+            logging.error(f"[ERREUR DAO] Création manche_joueur : {e}")
             return False
 
     # ---------------------------------------------------------------------
@@ -94,7 +94,7 @@ class MancheJoueurDAO(metaclass=Singleton):
                     res = cursor.fetchall()
 
         except Exception as e:
-            logging.info(f"[ERREUR DAO] Lecture manche_joueur : {e}")
+            logging.error(f"[ERREUR DAO] Lecture manche_joueur : {e}")
             raise
 
         participations = []
@@ -118,30 +118,12 @@ class MancheJoueurDAO(metaclass=Singleton):
         self,
         id_manche: int,
         id_joueur: int,
-        statut: str = None,
-        mise: int = None,
-        tour_couche: int = None,
+        statut: str | None = None,
+        mise: int | None = None,
+        tour_couche: int | None = None,
     ) -> bool:
         """
         Met à jour les informations d'un joueur pour une manche donnée.
-
-        Parameters
-        ----------
-        id_manche : int
-            Identifiant de la manche
-        id_joueur : int
-            Identifiant du joueur
-        statut : str
-            Nouveau statut du joueur (facultatif)
-        mise : int
-            Nouvelle mise du joueur (facultatif)
-        tour_couche : int
-            Nouveau tour de couchage (facultatif)
-
-        Returns
-        -------
-        updated : bool
-            True si la mise à jour a réussi, False sinon
         """
         champs = []
         valeurs = {"id_manche": id_manche, "id_joueur": id_joueur}
@@ -173,7 +155,7 @@ class MancheJoueurDAO(metaclass=Singleton):
                     )
                     res = cursor.rowcount
         except Exception as e:
-            logging.info(f"[ERREUR DAO] Modification manche_joueur : {e}")
+            logging.error(f"[ERREUR DAO] Modification manche_joueur : {e}")
             return False
 
         return res == 1
@@ -183,16 +165,6 @@ class MancheJoueurDAO(metaclass=Singleton):
     def supprimer_par_id_manche(self, id_manche: int) -> bool:
         """
         Supprime toutes les participations liées à une manche.
-
-        Parameters
-        ----------
-        id_manche : int
-            Identifiant de la manche à supprimer
-
-        Returns
-        -------
-        deleted : bool
-            True si au moins une ligne a été supprimée
         """
         try:
             with DBConnection().connection as connection:
@@ -206,7 +178,7 @@ class MancheJoueurDAO(metaclass=Singleton):
                     )
                     res = cursor.rowcount
         except Exception as e:
-            logging.info(f"[ERREUR DAO] Suppression manche_joueur : {e}")
+            logging.error(f"[ERREUR DAO] Suppression manche_joueur : {e}")
             raise
 
         return res > 0
@@ -216,16 +188,6 @@ class MancheJoueurDAO(metaclass=Singleton):
     def supprimer_participation(self, id_manche: int, id_joueur: int) -> bool:
         """
         Supprime la participation d’un joueur spécifique à une manche.
-
-        Parameters
-        ----------
-        id_manche : int
-        id_joueur : int
-
-        Returns
-        -------
-        deleted : bool
-            True si la participation a bien été supprimée
         """
         try:
             with DBConnection().connection as connection:
@@ -240,8 +202,7 @@ class MancheJoueurDAO(metaclass=Singleton):
                     )
                     res = cursor.rowcount
         except Exception as e:
-            logging.info(f"[ERREUR DAO] Suppression participation : {e}")
+            logging.error(f"[ERREUR DAO] Suppression participation : {e}")
             raise
 
         return res == 1
-

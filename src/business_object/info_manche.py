@@ -11,7 +11,7 @@ class InfoManche:
     y compris les joueurs, leurs mains, leurs mises et leur état (couché ou actif).
     """
 
-    STATUTS = ("innactif", "en retard", "à jour", "couché", "all in")
+    __STATUTS = ("innactif", "en retard", "à jour", "couché", "all in")
 
     def __init__(self, joueurs: list[Joueur]):
         """
