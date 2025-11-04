@@ -27,7 +27,7 @@ class Board(AbstractListeCartes):
 
         else:
             super().__init__(cartes)
-    
+
     def ajouter_carte(self, carte: Carte):
         """
         Ajoute une carte dans le board. Et vérifie que le nombre de cartes reste en dessous de 5
@@ -38,7 +38,8 @@ class Board(AbstractListeCartes):
             carte à ajouter au board
         """
         if carte is not None and len(self.cartes) > 4:
-            raise ValueError(f"Le nombre de cartes dans le board est trop grand : {len(self.cartes)+1}")
+            raise ValueError(
+                f"Le nombre de cartes dans le board est trop grand : {len(self.cartes) + 1}"
+            )
         else:
             self.ajouter_carte_base(carte)
-
