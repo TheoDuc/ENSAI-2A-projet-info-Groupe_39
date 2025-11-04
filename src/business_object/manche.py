@@ -13,7 +13,7 @@ class Manche:
     Modélisation d'une manche de poker, depuis la distribution des cartes jusqu'à l'attribution du pot.
     """
 
-    __TOURS = ("preflop", "flop", "turn", "river")
+    TOURS = ("preflop", "flop", "turn", "river")
 
     def __init__(self, info: InfoManche, grosse_blind: int):
         # Vérifications des types
