@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List
 
 from business_object.carte import Carte
 from business_object.combinaison.brelan import Brelan
@@ -15,63 +15,35 @@ from business_object.combinaison.simple import Simple
 
 class EvaluateurCombinaison:
     """
-    Évalue la meilleure combinaison de poker dans une liste de cartes
-    et calcule un score numérique pour la comparer facilement.
+    Évalue la meilleure combinaison d'une main de poker donnée.
+    (Ne compare pas plusieurs mains, juste l'identification.)
     """
+
+    COMBINAISONS = [
+        QuinteFlush,
+        Carre,
+        Full,
+        Couleur,
+        Quinte,
+        Brelan,
+        DoublePaire,
+        Paire,
+        Simple,
+    ]
 
     @staticmethod
     def eval(cartes: List[Carte]) -> AbstractCombinaison:
         """
-        Détermine la meilleure combinaison possible dans une liste de cartes.
+        Détermine la combinaison présente dans la liste de cartes.
+
+        Retourne une instance de la bonne sous-classe de AbstractCombinaison.
         """
         if not cartes or len(cartes) < 5:
             raise ValueError(f"Au moins 5 cartes sont nécessaires, actuellement {len(cartes)}")
 
-        # Liste des combinaisons à tester par ordre de force
-        combinaisons = [
-            QuinteFlush,
-            Carre,
-            Full,
-            Couleur,
-            Quinte,
-            Brelan,
-            DoublePaire,
-            Paire,
-            Simple,
-        ]
-
-        for C in combinaisons:
+        for C in EvaluateurCombinaison.COMBINAISONS:
             if C.est_present(cartes):
                 return C.from_cartes(cartes)
 
-        # Fallback (Simple)
+        # Si aucune combinaison ne correspond (cas théorique)
         return Simple.from_cartes(cartes)
-
-    @staticmethod
-    def score(combi: AbstractCombinaison) -> int:
-        """
-        Transforme une combinaison en score unique pour comparer deux mains.
-        """
-        score = combi.FORCE() * 10**10  # Priorité de la combinaison
-
-        # Hauteur principale
-        hauteurs = combi.hauteur if isinstance(combi.hauteur, list) else [combi.hauteur]
-        for i, h in enumerate(hauteurs):
-            score += (14 - Carte.VALEURS().index(h)) * 10 ** (8 - i * 2)
-
-        # Kicker(s)
-        if combi.kicker:
-            kickers = combi.kicker if isinstance(combi.kicker, list) else [combi.kicker]
-            for i, k in enumerate(kickers):
-                v = k.valeur if isinstance(k, Carte) else k
-                score += (14 - Carte.VALEURS().index(v)) * 10 ** (6 - i * 2)
-
-        return score
-
-    @staticmethod
-    def meilleure_main(cartes: List[Carte]) -> Tuple[AbstractCombinaison, int]:
-        """
-        Retourne la meilleure combinaison et son score pour comparaison rapide.
-        """
-        combi = EvaluateurCombinaison.eval(cartes)
-        return combi, EvaluateurCombinaison.score(combi)
