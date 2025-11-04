@@ -17,24 +17,6 @@ class MancheDAO:
     # Méthodes principales
     # ----------------------------------------------------------
     @classmethod
-    def creer_manche(cls, manche: Manche) -> int:
-        """
-        Enregistre une nouvelle manche dans le fichier JSON.
-        Retourne l'identifiant unique attribué à la manche.
-        """
-        data = cls._charger_donnees()
-
-        # Déterminer le prochain ID disponible
-        id_manche = max((int(k) for k in data.keys()), default=0) + 1
-
-        # Convertir la manche en dictionnaire
-        manche_dict = cls._manche_to_dict(manche)
-        data[str(id_manche)] = manche_dict
-
-        cls._sauver_donnees(data)
-        return id_manche
-
-    @classmethod
     def lire_manche(cls, id_manche: int) -> Optional[Manche]:
         """
         Lit une manche depuis le fichier JSON.
