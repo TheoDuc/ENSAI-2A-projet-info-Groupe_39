@@ -176,9 +176,8 @@ class Manche:
         self.__pot += credit
         return self.pot
 
-    @log
     def distribuer_pot(self):
-         """
+        """
         Distribution du pot aux joueurs encore en lice selon la force de leur main.
 
         Renvois
@@ -188,6 +187,7 @@ class Manche:
         """
         joueurs_en_lice = {}
         board = self.board.cartes
+
 
         # Évaluation des mains des joueurs encore actifs
         for i in range(len(self.info.joueurs)):
