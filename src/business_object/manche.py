@@ -33,7 +33,7 @@ class Manche:
         Valeur de la grosse blind
     """
 
-    TOURS = ("preflop", "flop", "turn", "river")
+    __TOURS = ("preflop", "flop", "turn", "river")
 
     def __init__(self, info: InfoManche, grosse_blind: int):
         """

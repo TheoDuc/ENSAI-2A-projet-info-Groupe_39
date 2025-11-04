@@ -1,18 +1,15 @@
 from typing import List
 from business_object.carte import Carte
-from business_object.combinaison.combinaison import (
-    AbstractCombinaison,
-    QuinteFlush,
-    Carre,
-    Full,
-    Couleur,
-    Quinte,
-    Brelan,
-    DoublePaire,
-    Paire,
-    Simple,
-)
-
+from business_object.combinaison.brelan import Brelan
+from business_object.combinaison.carre import Carre
+from business_object.combinaison.combinaison import AbstractCombinaison
+from business_object.combinaison.couleur import Couleur
+from business_object.combinaison.double_paire import DoublePaire
+from business_object.combinaison.full import Full
+from business_object.combinaison.paire import Paire
+from business_object.combinaison.quinte import Quinte
+from business_object.combinaison.quinte_flush import QuinteFlush
+from business_object.combinaison.simple import Simple
 
 class EvaluateurCombinaison:
     """
