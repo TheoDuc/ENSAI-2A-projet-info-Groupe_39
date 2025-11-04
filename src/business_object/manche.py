@@ -10,13 +10,47 @@ from utils.log_decorator import log
 
 class Manche:
     """
-    Modélisation d'une manche de poker, depuis la distribution des cartes jusqu'à l'attribution du pot.
+    Modélisation d'une manche de poker, depuis la distribution des cartes
+    jusqu'à l'attribution du pot.
+
+    Attributs principaux
+    --------------------
+    TOURS : tuple
+        Les différentes étapes d'une manche de poker.
+    __tour : int
+        Tour actuel de la manche (0=preflop, 1=flop, 2=turn, 3=river)
+    __pot : int
+        Montant total du pot
+    __info : InfoManche
+        Informations sur les joueurs, leurs mains, mises et statuts
+    __reserve : Reserve
+        Pioche de cartes pour la manche
+    __board : Board
+        Cartes communes visibles sur la table
+    __indice_joueur_actuel : int
+        Indice du joueur dont c'est le tour
+    __grosse_blind : int
+        Valeur de la grosse blind
     """
 
     TOURS = ("preflop", "flop", "turn", "river")
 
     def __init__(self, info: InfoManche, grosse_blind: int):
-        # Vérifications des types
+        """
+        Initialise une manche de poker.
+
+        Paramètres
+        ----------
+        info : InfoManche
+            Objet contenant les informations des joueurs et leurs mains
+        grosse_blind : int
+            Montant de la grosse blind, doit être strictement positif
+
+        Exceptions
+        ----------
+        TypeError : Si info n'est pas un InfoManche ou grosse_blind n'est pas un int
+        ValueError : Si grosse_blind <= 0
+        """
         if not isinstance(info, InfoManche):
             raise TypeError(
                 f"Le paramètre 'info' doit être une instance de InfoManche, pas {type(info).__name__}."
@@ -144,9 +178,13 @@ class Manche:
 
     @log
     def distribuer_pot(self):
-        """
+         """
         Distribution du pot aux joueurs encore en lice selon la force de leur main.
-        Retourne la liste des gains pour chaque joueur.
+
+        Renvois
+        -------
+        list[int]
+            Gains attribués à chaque joueur
         """
         joueurs_en_lice = {}
         board = self.board.cartes
