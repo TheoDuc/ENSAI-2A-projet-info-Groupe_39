@@ -211,7 +211,7 @@ class Manche:
         while pot > 0 and c <= n:
             for i in range(n):
                 beneficiaires = []
-                if c = classement[i]:
+                if c == classement[i]:
                     beneficiaires.append(i)
             while beneficiaires != []:
                 min = 0
