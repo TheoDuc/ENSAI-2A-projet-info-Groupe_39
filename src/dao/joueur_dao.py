@@ -241,7 +241,7 @@ class JoueurDao(metaclass=Singleton):
 
 
 joueur1 = Joueur(1, 'paul', 100, 'fr')
-joueur2 = Joueur(1, 'paul2', 1002, 'fr2')
+joueur2 = Joueur(999, 'paul2', 1002, 'fr2')
 
 joueurDao = JoueurDao()
 joueurDao.creer(joueur1)
