@@ -15,11 +15,11 @@ class JoueurService:
     - Gestion des crédits via les méthodes de Joueur
     """
 
-    # dao = JoueurDao()
+    dao = JoueurDao()
 
-    def __init__(self, dao=None):
-        # On peut injecter un mock DAO pour les tests
-        self.dao = dao or JoueurDao()
+    # def __init__(self, dao=None):
+    #     # On peut injecter un mock DAO pour les tests
+    #     self.dao = dao or JoueurDao()
 
     @log
     def se_connecter(self, pseudo: str) -> Joueur | None:
