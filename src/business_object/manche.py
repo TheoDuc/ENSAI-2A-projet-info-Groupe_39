@@ -229,9 +229,12 @@ class Manche:
         """
         Retourne l'indice du joueur suivant qui n'est pas couché ou all in.
         """
-        indice = self.indice_joueur_actuel + 1
+        indice = self.indice_joueur_actuel
         statuts = self.info.statuts
-
+        if indice == len(statuts) - 1:
+            indice = 0
+        else:
+            indice += 1
         if all(s == "couché" for s in statuts):
             raise ValueError("Tous les joueurs ne peuvent être couchés.")
         else:
@@ -240,4 +243,4 @@ class Manche:
                     indice = 0
                 else:
                     indice += 1
-        self.__indice_joueur_actuel += 1
+            self.__indice_joueur_actuel = indice
