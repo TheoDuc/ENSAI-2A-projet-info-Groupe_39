@@ -38,6 +38,7 @@ class MancheJoueurDAO(metaclass=Singleton):
                         # On récupère les cartes du joueur si elles existent
                         carte1 = None
                         carte2 = None
+                        manche = Manche(infomanche, 5)
                         if hasattr(info_manche, "cartes_mains"):
                             try:
                                 carte1, carte2 = info_manche.cartes_mains[i]
