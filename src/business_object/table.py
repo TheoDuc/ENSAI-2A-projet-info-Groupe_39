@@ -162,7 +162,7 @@ class Table:
     @log
     def nouvelle_manche(self) -> None:
         """Lance une manche"""
-        for indice_joueur in len(self.__joueurs):
+        for indice_joueur in range(len(self.__joueurs)):
             if self.__joueurs[indice_joueur].credit < self.__grosse_blind:
                 self.retirer_joueur(indice_joueur)
 

@@ -46,12 +46,7 @@ class JoueurDao(metaclass=Singleton):
 
         created = False
         if res:
-            joueur = Joueur(
-                id_joueur=res["id_joueur"],
-                pseudo=pseudo,
-                credit=2000,
-                pays=pays
-            )
+            joueur = Joueur(id_joueur=res["id_joueur"], pseudo=pseudo, credit=2000, pays=pays)
             created = True
 
         return created
@@ -87,10 +82,7 @@ class JoueurDao(metaclass=Singleton):
         joueur = None
         if res:
             joueur = Joueur(
-                id_joueur=id_joueur,
-                pseudo=res["pseudo"],
-                credit=res["credit"],
-                pays=res["pays"]
+                id_joueur=id_joueur, pseudo=res["pseudo"], credit=res["credit"], pays=res["pays"]
             )
         return joueur
 
@@ -128,7 +120,7 @@ class JoueurDao(metaclass=Singleton):
                     id_joueur=row["id_joueur"],
                     pseudo=row["pseudo"],
                     credit=row["credit"],
-                    pays=row["pays"]
+                    pays=row["pays"],
                 )
 
                 liste_joueurs.append(joueur)
@@ -238,8 +230,8 @@ class JoueurDao(metaclass=Singleton):
                 id_joueur=res["id_joueur"],
                 pseudo=res["pseudo"],
                 credit=res["credit"],
-                pays=res["pays"]
-                )
+                pays=res["pays"],
+            )
 
         return joueur
 
@@ -247,10 +239,9 @@ class JoueurDao(metaclass=Singleton):
 # joueur1 = Joueur(1, 'paul', 100, 'fr')
 # joueur2 = Joueur(1, 'paul2', 1002, 'fr2')
 
-joueurDao = JoueurDao()
+# joueurDao = JoueurDao()
 # print(joueurDao.creer('paul','fr'))
-print(joueurDao.trouver_par_id(1))
+# print(joueurDao.trouver_par_id(1))
 # print(joueurDao.lister_tous())
 # print(joueurDao.modifier(joueur1))
 # joueurDao.supprimer(joueur=joueur1)
-
