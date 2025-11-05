@@ -52,7 +52,7 @@ class JoueurDao(metaclass=Singleton):
                 credit=2000,
                 pays=pays
             )
-            created = joueur
+            created = True
 
         return created
 
@@ -247,9 +247,9 @@ class JoueurDao(metaclass=Singleton):
 # joueur1 = Joueur(1, 'paul', 100, 'fr')
 # joueur2 = Joueur(1, 'paul2', 1002, 'fr2')
 
-# joueurDao = JoueurDao()
+joueurDao = JoueurDao()
 # print(joueurDao.creer('paul','fr'))
-# print(joueurDao.trouver_par_id(2))
+print(joueurDao.trouver_par_id(1))
 # print(joueurDao.lister_tous())
 # print(joueurDao.modifier(joueur1))
 # joueurDao.supprimer(joueur=joueur1)
