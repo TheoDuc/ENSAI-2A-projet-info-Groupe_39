@@ -58,7 +58,9 @@ class TestMancheJoueurDAO(unittest.TestCase):
                 "id_manche_joueur": 1,
                 "id_manche": 1,
                 "id_joueur": 1,
-                "statut": "à jour",
+                "carte_main_1": "As de pique",
+                "carte_main_2": "Roi de coeur",
+                "gain": 200,
                 "mise": 100,
                 "tour_couche": None,
             }

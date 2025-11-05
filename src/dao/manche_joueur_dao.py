@@ -40,14 +40,18 @@ class MancheJoueurDAO(metaclass=Singleton):
                             INSERT INTO manche_joueur (
                                 id_manche,
                                 id_joueur,
-                                statut,
+                                carte_main_1,
+                                carte_main_2,
+                                gain,
                                 mise,
                                 tour_couche
                             )
                             VALUES (
                                 %(id_manche)s,
                                 %(id_joueur)s,
-                                %(statut)s,
+                                %(carte_main_1)s,
+                                %(carte_main_1)s,
+                                %(gain)s,
                                 %(mise)s,
                                 %(tour_couche)s
                             );
@@ -55,8 +59,10 @@ class MancheJoueurDAO(metaclass=Singleton):
                             {
                                 "id_manche": id_manche,
                                 "id_joueur": joueur.id_joueur,
-                                "statut": info_manche.statuts[i],
-                                "mise": info_manche.mises[i],
+                                "carte_main_1": main[1],
+                                "carte_main_1": main[2],
+                                "gain": manche.distribuer_pot[i],
+                                "suivre": info_manche.suivre[i],
                                 "tour_couche": info_manche.tour_couche[i],
                             },
                         )
