@@ -1,83 +1,108 @@
-"""Implémentation de la classe MancheDAO"""
+"""Implémentation de la classe JoueurDAO"""
 
-import json
-import os
-from typing import Optional
+import logging
 
+from business_object.joueur import Joueur
 from business_object.info_manche import InfoManche
 from business_object.manche import Manche
+from dao.db_connection import DBConnection
+from utils.log_decorator import log
+from utils.singleton import Singleton
 
 
-class MancheDAO:
-    """
-    DAO pour la persistance des objets Manche dans un fichier JSON.
-    """
+class MancheDao(metaclass=Singleton):
+    """Classe contenant les méthodes pour accéder aux Manche de la base de données"""
 
-    FILE_PATH = "manches.json"
+    @log
+    def creer(self, manche) -> bool:
+        """Creation d'une manche dans la base de données
 
-    # ----------------------------------------------------------
-    # Méthodes principales
-    # ----------------------------------------------------------
-    @classmethod
-    def lire_manche(cls, id_manche: int) -> Optional[Manche]:
+        Parameters
+        ----------
+        manche : Manche
+
+        Returns
+        -------
+        created : bool
+            True si la création est un succès
+            False sinon
         """
-        Lit une manche depuis le fichier JSON.
-        Retourne un objet Manche ou None si non trouvée.
+
+        res = None
+
+        try:
+            logging.info(f"Valeurs envoyées : {manche.board.cartes}")
+            with DBConnection().connection as connection:
+                with connection.cursor() as cursor:
+                    cursor.execute(
+                        "INSERT INTO manche(carte1, carte2, carte3, carte4, carte5) "
+                        " VALUES (%(carte1)s, %(carte2)s, %(carte3)s, %(carte4)s, %(carte5)s)"
+                        " RETURNING id_manche;                                                ",
+                        {
+                            "carte1": str(manche.board.cartes[0]),
+                            "carte2": str(manche.board.cartes[1]),
+                            "carte3": str(manche.board.cartes[2]),
+                            "carte4": str(manche.board.cartes[3]),
+                            "carte5": str(manche.board.cartes[4])
+                        },
+                    )
+                    res = cursor.fetchone()
+        except Exception as e:
+            logging.info(e)
+
+        created = False
+        if res:
+            created = True
+
+        return created
+
+    @log
+    def supprimer(self, manche) -> bool:
+        """Suppression d'une manche dans la base de données
+
+        Parameters
+        ----------
+        manche : Manche
+            manche à supprimer de la base de données
+
+        Returns
+        -------
+            True si la manche a bien été supprimé
         """
-        data = cls._charger_donnees()
-        manche_dict = data.get(str(id_manche))
 
-        if manche_dict is None:
-            return None
+        try:
+            with DBConnection().connection as connection:
+                with connection.cursor() as cursor:
+                    # Supprimer la manche de la bbd
+                    cursor.execute(
+                        "DELETE FROM manche        "          
+                        "WHERE carte1=%(carte1)s and carte2=%(carte2)s and carte3=%(carte3)s and "
+                        "carte4=%(carte4)s and carte5=%(carte5)s   ",
+                        {
+                        "carte1": str(manche.board.cartes[0]),
+                        "carte2": str(manche.board.cartes[1]),
+                        "carte3": str(manche.board.cartes[2]),
+                        "carte4": str(manche.board.cartes[3]),
+                        "carte5": str(manche.board.cartes[4]),
+                        },
+                    )
+                    res = cursor.rowcount
+        except Exception as e:
+            logging.info(e)
+            raise
 
-        return cls._dict_to_manche(manche_dict)
+        return res > 0
 
-    # ----------------------------------------------------------
-    # Méthodes internes
-    # ----------------------------------------------------------
-    @classmethod
-    def _charger_donnees(cls) -> dict:
-        """Charge les données depuis le fichier JSON."""
-        if not os.path.exists(cls.FILE_PATH):
-            return {}
-        with open(cls.FILE_PATH, "r", encoding="utf-8") as f:
-            return json.load(f)
 
-    @classmethod
-    def _sauver_donnees(cls, data: dict) -> None:
-        """Sauvegarde les données dans le fichier JSON."""
-        with open(cls.FILE_PATH, "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=4, ensure_ascii=False)
+manchedao = MancheDao()
+joueur1 = Joueur(1, 'paul', 100, 'fr')
+joueur2 = Joueur(1, 'paul2', 1002, 'fr2')
+infomanche = InfoManche([joueur1, joueur2])
+manche = Manche(infomanche, 5)
+manche.preflop()
+manche.flop()
+manche.turn()
+manche.river()
+print(manchedao.creer(manche))
+print(manchedao.supprimer(manche))
 
-    @staticmethod
-    def _manche_to_dict(manche: Manche) -> dict:
-        """Convertit une Manche en dictionnaire JSON-sérialisable."""
-        return {
-            "grosse_blind": manche.grosse_blind,
-            "pot": manche.pot,
-            "tour": manche.tour,
-            "indice_joueur_actuel": getattr(manche, "_Manche__indice_joueur_actuel", 0),
-            # InfoManche n’est pas sérialisée en détail ici
-            "info": str(manche.info.__class__.__name__),  # ou manche.info.to_dict() si dispo
-        }
-
-    # Dans manche_dao.py
-    @staticmethod
-    def _dict_to_manche(data: dict) -> Manche:
-        """Recrée une Manche à partir d’un dictionnaire JSON."""
-        grosse_blind = data.get("grosse_blind", 0)
-
-        # On crée deux joueurs factices
-        joueurs_fictifs = [
-            Joueur(id_joueur=1, pseudo="J1", credit=1000, pays="FR"),
-            Joueur(id_joueur=2, pseudo="J2", credit=1000, pays="FR"),
-        ]
-        info = InfoManche(joueurs_fictifs)
-
-        manche = Manche(info, grosse_blind)
-
-        manche._Manche__pot = data.get("pot", 0)
-        manche._Manche__tour = data.get("tour", 0)
-        manche._Manche__indice_joueur_actuel = data.get("indice_joueur_actuel", 0)
-
-        return manche

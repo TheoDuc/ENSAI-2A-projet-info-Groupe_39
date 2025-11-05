@@ -47,25 +47,23 @@ class MancheJoueurDAO(metaclass=Singleton):
                         # Insertion SQL
                         cursor.execute(
                             """
-                            INSERT INTO manche_joueur (
-                                id_manche,
+                            INSERT INTO manche_joueur(
                                 id_joueur,
+                                id_manche,
                                 carte_main_1,
                                 carte_main_2,
-                                gain,
                                 mise,
-                                tour_couche,
-                                statut
+                                gain,
+                                tour_couche
                             )
                             VALUES (
-                                %(id_manche)s,
                                 %(id_joueur)s,
+                                %(id_manche)s,
                                 %(carte_main_1)s,
                                 %(carte_main_2)s,
-                                %(gain)s,
                                 %(mise)s,
-                                %(tour_couche)s,
-                                %(statut)s
+                                %(gain)s,
+                                %(tour_couche)s
                             );
                             """,
                             {
@@ -73,10 +71,9 @@ class MancheJoueurDAO(metaclass=Singleton):
                                 "id_joueur": joueur.id_joueur,
                                 "carte_main_1": carte1,
                                 "carte_main_2": carte2,
-                                "gain": getattr(info_manche, "gains", [0] * len(info_manche.joueurs))[i],
-                                "mise": getattr(info_manche, "mises", [0] * len(info_manche.joueurs))[i],
-                                "tour_couche": getattr(info_manche, "tours_couche", [0] * len(info_manche.joueurs))[i],
-                                "statut": getattr(info_manche, "statuts", ["en cours"] * len(info_manche.joueurs))[i],
+                                "gain": info_manche.gains,
+                                "mise": info_manche.mises,
+                                "tour_couche": info_manche.tour_couche,
                             },
                         )
             return True
@@ -286,3 +283,9 @@ class MancheJoueurDAO(metaclass=Singleton):
         except Exception as e:
             logger.error(f"Erreur lors du retrait de crédits pour {joueur.pseudo} : {e}")
             return False
+
+mjdao = MancheJoueurDAO()    
+joueur1 = Joueur(998, 'a', 500, 'us') 
+joueur2 = Joueur(999, 'admin', 50, 'fr')
+info_manche = InfoManche([joueur1, joueur2])
+print(mjdao.creer_manche_joueur(1, info_manche))
