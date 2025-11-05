@@ -32,7 +32,7 @@ if __name__ == "__main__":
                 "Consultez les logs pour plus d'informations."
             )
 
-    # Lorsque l on quitte l application
+    # Lorsque l'on quitte l'application
     print("----------------------------------")
     print("Au revoir")
 

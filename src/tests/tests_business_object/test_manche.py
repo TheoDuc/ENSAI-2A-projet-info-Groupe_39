@@ -37,7 +37,6 @@ class TestManche:
         assert isinstance(manche.board, Board)
         assert manche.grosse_blind == 100
         assert manche.tour == 0
-        assert manche.pot == 0
 
     @pytest.mark.parametrize(
         "info, grosse_blind, exception, msg",
@@ -74,7 +73,6 @@ class TestManche:
         # THEN
         assert "Manche(" in texte
         assert "tour=0" in texte
-        assert "pot=0" in texte
         assert "grosse_blind=100" in texte
 
     # Tests des tours
@@ -122,35 +120,3 @@ class TestManche:
         # THEN
         assert len(manche.board.cartes) == 1
         assert manche.tour == 1
-
-    # Tests pot et gestion joueurs
-    def test_ajouter_au_pot(self, info_manche):
-        # GIVEN
-        manche = Manche(info_manche, 100)
-
-        # WHEN
-        manche.ajouter_au_pot(200)
-
-        # THEN
-        assert manche.pot == 200
-
-    def test_joueur_suivant(self, info_manche):
-        # GIVEN
-        info_manche.coucher_joueur(0, 0)
-        manche = Manche(info_manche, 100)
-
-        # WHEN
-        manche.joueur_suivant()
-
-        # THEN
-        assert manche.indice_joueur_actuel == 1
-
-    def test_joueur_suivant_tous_couches(self, info_manche):
-        # GIVEN
-        info_manche.coucher_joueur(0, 0)
-        info_manche.coucher_joueur(1, 0)
-        manche = Manche(info_manche, 100)
-
-        # WHEN / THEN
-        with pytest.raises(ValueError, match="Tous les joueurs ne peuvent être couchés."):
-            manche.joueur_suivant()

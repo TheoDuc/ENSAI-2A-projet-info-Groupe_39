@@ -7,6 +7,22 @@ from business_object.carte import Carte
 class AbstractCombinaison(ABC):
     """
     Classe abstraite représentant une combinaison de cartes au poker.
+
+    Paramètres
+    ----------
+    hauteur : str | tuple[str, ...] | list[str]
+        Représente la ou les cartes principales de la combinaison.
+
+    kicker : str | tuple[str, ...] | list[str] | None, optionnel
+        Cartes d’appoint utilisées pour départager deux mains identiques.
+        Si non fourni, le kicker est vide.
+
+    Attributs
+    ----------
+    _hauteur : str | list[str]
+        Hauteur principale de la combinaison (str si une seule valeur, liste sinon).
+    _kicker : tuple[str, ...]
+        Ensemble immuable représentant les cartes de départage.
     """
 
     def __init__(

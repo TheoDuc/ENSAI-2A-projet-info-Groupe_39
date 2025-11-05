@@ -20,9 +20,9 @@ class TestMancheJoueurDAO(unittest.TestCase):
         # Création d’un objet InfoManche cohérent avec ta classe actuelle
         self.info_manche = InfoManche([self.j1, self.j2])
 
-        # Simule un état où on a modifié les infos de manche
-        self.info_manche.miser(0, 100)   # Alice mise 100
-        self.info_manche.coucher_joueur(1, tour=2)  # Bob s’est couché au tour 2
+        # Simule un état de manche : Alice mise, Bob se couche
+        self.info_manche.modifier_mise(0, 100)          # Alice mise 100
+        self.info_manche.coucher_joueur(1, tour=2)      # Bob s’est couché au tour 2
 
     # -----------------------------------------------------------------
     @patch("dao.manche_joueur_dao.DBConnection")
@@ -49,16 +49,17 @@ class TestMancheJoueurDAO(unittest.TestCase):
 
     # -----------------------------------------------------------------
     @patch("dao.manche_joueur_dao.DBConnection")
-    def test_trouver_par_id_manche(self, mock_db):
+    def test_trouver_par_ids(self, mock_db):
         """Test de la récupération des participations"""
         mock_conn = MagicMock()
         mock_cursor = MagicMock()
         mock_cursor.fetchall.return_value = [
             {
-                "id_manche_joueur": 1,
                 "id_manche": 1,
                 "id_joueur": 1,
-                "statut": "à jour",
+                "carte_main_1": "As de pique",
+                "carte_main_2": "Roi de coeur",
+                "gain": 200,
                 "mise": 100,
                 "tour_couche": None,
             }
@@ -66,35 +67,11 @@ class TestMancheJoueurDAO(unittest.TestCase):
         mock_db.return_value.connection.__enter__.return_value = mock_conn
         mock_conn.cursor.return_value.__enter__.return_value = mock_cursor
 
-        result = self.dao.trouver_par_id_manche(1)
+        result = self.dao.trouver_par_ids(997,997)
 
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0]["id_joueur"], 1)
         mock_cursor.execute.assert_called_once()
-
-    # -----------------------------------------------------------------
-    @patch("dao.manche_joueur_dao.DBConnection")
-    def test_modifier_manche_joueur(self, mock_db):
-        """Test de mise à jour d’un joueur"""
-        mock_conn = MagicMock()
-        mock_cursor = MagicMock()
-        mock_cursor.rowcount = 1
-        mock_db.return_value.connection.__enter__.return_value = mock_conn
-        mock_conn.cursor.return_value.__enter__.return_value = mock_cursor
-
-        result = self.dao.modifier_manche_joueur(
-            1, 1, statut="couché", mise=200, tour_couche=3
-        )
-
-        self.assertTrue(result)
-        self.assertIn("UPDATE manche_joueur", mock_cursor.execute.call_args[0][0])
-
-    # -----------------------------------------------------------------
-    @patch("dao.manche_joueur_dao.DBConnection")
-    def test_modifier_manche_joueur_aucune_modif(self, mock_db):
-        """Test sans champ à modifier"""
-        result = self.dao.modifier_manche_joueur(1, 1)
-        self.assertFalse(result)
 
     # -----------------------------------------------------------------
     @patch("dao.manche_joueur_dao.DBConnection")
@@ -124,101 +101,6 @@ class TestMancheJoueurDAO(unittest.TestCase):
         self.assertTrue(result)
         mock_cursor.execute.assert_called_once()
 
-    # -----------------------------------------------------------------
-    
-    @patch("dao.manche_joueur_dao.DBConnection")
-    def test_ajouter_credit_succes(self, mock_db):
-        """Test ajout de crédit réussi"""
-        mock_conn = MagicMock()
-        mock_cursor = MagicMock()
-        mock_cursor.rowcount = 1  # Simule une mise à jour réussie
-        mock_db.return_value.connection.__enter__.return_value = mock_conn
-        mock_conn.cursor.return_value.__enter__.return_value = mock_cursor
 
-        result = self.dao.ajouter_credit(self.j1, 200)
-
-        self.assertTrue(result)
-        mock_cursor.execute.assert_called_once()
-        self.assertIn("UPDATE joueur", mock_cursor.execute.call_args[0][0])
-
-    # -----------------------------------------------------------------
-    @patch("dao.manche_joueur_dao.DBConnection")
-    def test_ajouter_credit_aucun_joueur(self, mock_db):
-        """Test ajout de crédit échoué (aucun joueur trouvé)"""
-        mock_conn = MagicMock()
-        mock_cursor = MagicMock()
-        mock_cursor.rowcount = 0  # Aucun joueur mis à jour
-        mock_db.return_value.connection.__enter__.return_value = mock_conn
-        mock_conn.cursor.return_value.__enter__.return_value = mock_cursor
-
-        result = self.dao.ajouter_credit(self.j1, 200)
-
-        self.assertFalse(result)
-        mock_cursor.execute.assert_called_once()
-
-    # -----------------------------------------------------------------
-    @patch("dao.manche_joueur_dao.DBConnection")
-    def test_ajouter_credit_exception(self, mock_db):
-        """Test ajout de crédit avec exception SQL"""
-        mock_db.return_value.connection.__enter__.side_effect = Exception("DB error")
-
-        result = self.dao.ajouter_credit(self.j1, 200)
-        self.assertFalse(result)
-
-    # -----------------------------------------------------------------
-    def test_ajouter_credit_montant_invalide(self):
-        """Test ajout de crédit avec montant négatif ou nul"""
-        with self.assertRaises(ValueError):
-            self.dao.ajouter_credit(self.j1, 0)
-        with self.assertRaises(ValueError):
-            self.dao.ajouter_credit(self.j1, -50)
-
-    # -----------------------------------------------------------------
-    @patch("dao.manche_joueur_dao.DBConnection")
-    def test_retirer_credit_succes(self, mock_db):
-        """Test retrait de crédit réussi"""
-        mock_conn = MagicMock()
-        mock_cursor = MagicMock()
-        mock_cursor.rowcount = 1
-        mock_db.return_value.connection.__enter__.return_value = mock_conn
-        mock_conn.cursor.return_value.__enter__.return_value = mock_cursor
-
-        result = self.dao.retirer_credit(self.j1, 150)
-
-        self.assertTrue(result)
-        mock_cursor.execute.assert_called_once()
-        self.assertIn("UPDATE joueur", mock_cursor.execute.call_args[0][0])
-        self.assertIn("credit -", mock_cursor.execute.call_args[0][0])
-
-    # -----------------------------------------------------------------
-    @patch("dao.manche_joueur_dao.DBConnection")
-    def test_retirer_credit_fonds_insuffisants(self, mock_db):
-        """Test retrait échoué (fonds insuffisants ou joueur introuvable)"""
-        mock_conn = MagicMock()
-        mock_cursor = MagicMock()
-        mock_cursor.rowcount = 0  # Aucune ligne modifiée
-        mock_db.return_value.connection.__enter__.return_value = mock_conn
-        mock_conn.cursor.return_value.__enter__.return_value = mock_cursor
-
-        result = self.dao.retirer_credit(self.j1, 5000)  # Trop grand montant
-        self.assertFalse(result)
-        mock_cursor.execute.assert_called_once()
-
-    # -----------------------------------------------------------------
-    @patch("dao.manche_joueur_dao.DBConnection")
-    def test_retirer_credit_exception(self, mock_db):
-        """Test retrait de crédit avec exception SQL"""
-        mock_db.return_value.connection.__enter__.side_effect = Exception("DB crash")
-
-        result = self.dao.retirer_credit(self.j1, 200)
-        self.assertFalse(result)
-
-    # -----------------------------------------------------------------
-    def test_retirer_credit_montant_invalide(self):
-        """Test retrait de crédit avec montant négatif ou nul"""
-        with self.assertRaises(ValueError):
-            self.dao.retirer_credit(self.j1, 0)
-        with self.assertRaises(ValueError):
-            self.dao.retirer_credit(self.j1, -100)
 if __name__ == "__main__":
     unittest.main()

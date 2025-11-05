@@ -5,12 +5,10 @@ INSERT INTO manche(id_manche, carte1, carte2, carte3, carte4, carte5) VALUES
 
 INSERT INTO joueur(id_joueur, pseudo, credit, pays) VALUES
 (999, 'admin',       0,       'fr'),
-(998, 'a',           20,      'fr'),
-(997, 'maurice',     20,      'fr'),
-(996, 'batricia',    25,      'fr'),
-(995, 'miguel',      23,      'us'),
-(994, 'gilbert',     21,      'uk'),
-(993, 'junior',      15,      'fr');
+(998, 'a',           20,      'us'),
+(997, 'maurice',     20,      'uk'),
+(996, 'batricia',    25,      'fr');
+
 
 INSERT INTO manche_joueur(id_joueur, id_manche, carte_main_1, carte_main_2, mise, gain, tour_couche) VALUES
 (998, 998, '3 de Pique', 'Dame de Pique', 100, -100, 2),

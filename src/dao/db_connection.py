@@ -11,8 +11,18 @@ from utils.singleton import Singleton
 
 class DBConnection(metaclass=Singleton):
     """
-    Classe de connexion à la base de données
-    Elle permet de n'ouvrir qu'une seule et unique connexion
+    Classe gérant la connexion à la base de données PostgreSQL.
+
+    Attributs
+    ----------
+    __connection : psycopg2.extensions.connection
+        Objet de connexion PostgreSQL (RealDictCursor par défaut).
+
+    Propriétés
+    ----------
+    connection : psycopg2.extensions.connection
+        Retourne la connexion active à la base de données, permettant
+        d’exécuter des requêtes SQL au sein d’un bloc contextuel 
     """
 
     def __init__(self):
