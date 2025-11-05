@@ -1,88 +1,106 @@
-from tabulate import tabulate
-
 from business_object.joueur import Joueur
 from dao.joueur_dao import JoueurDao
 from utils.log_decorator import log
-from utils.securite import hash_password
 
 
 class JoueurService:
-    """Classe contenant les méthodes de service des Joueurs"""
+    """
+    Service métier pour la gestion des joueurs de poker :
+    - CRUD (création, lecture, modification, suppression)
+    - Gestion du rattachement à une table
+    - Consultation des informations d’un joueur
+    """
+
+    dao = JoueurDao()
+
+    # --- CRUD de base ---
 
     @log
-    def creer(self, pseudo, mdp, age, mail, fan_pokemon) -> Joueur:
-        """Création d'un joueur à partir de ses attributs"""
+    def creer(self, pseudo: str, credit: int, pays: str) -> Joueur | None:
+        """
+        Crée un joueur et l’enregistre dans la base de données.
 
+        Paramètres
+        ----------
+        pseudo : str
+            Nom du joueur
+        credit : int
+            Crédits initiaux
+        pays : str
+            Pays du joueur
+
+        Renvoie
+        -------
+        Joueur | None
+            Le joueur créé si succès, None si échec.
+        """
         nouveau_joueur = Joueur(
+            id_joueur=1,
             pseudo=pseudo,
-            mdp=hash_password(mdp, pseudo),
-            age=age,
-            mail=mail,
-            fan_pokemon=fan_pokemon,
+            credit=credit,
+            pays=pays,
         )
-
-        return nouveau_joueur if JoueurDao().creer(nouveau_joueur) else None
+        return nouveau_joueur if self.dao.creer(nouveau_joueur) else None
 
     @log
-    def trouver_par_id(self, id_joueur) -> Joueur:
-        ## Trouve par l'id et renvoie le joueur
-        return JoueurDao().trouver_par_id(id_joueur)
+    def trouver_par_id(self, id_joueur: int) -> Joueur | None:
+        """
+        Recherche un joueur dans la base par son identifiant.
+
+        Paramètres
+        ----------
+        id_joueur : int
+            Identifiant du joueur à rechercher
+
+        Renvoie
+        -------
+        Joueur | None
+            Le joueur correspondant si trouvé, sinon None
+        """
+        return self.dao.trouver_par_id(id_joueur)
 
     @log
     def lister_tous(self) -> list[Joueur]:
-        """Lister tous les joueurs"""
-        joueurs = JoueurDao().lister_tous()
-
-        return joueurs
-
-    @log
-    def modifier(self, joueur) -> Joueur:
-        """Modification d'un joueur"""
-
-        return joueur if JoueurDao().modifier(joueur) else None
-
-    @log
-    def supprimer(self, joueur) -> bool:
-        """Supprimer le compte d'un joueur"""
-        return JoueurDao().supprimer(joueur)
-
-    @log
-    def afficher_tous(self) -> str:
-        """Afficher tous les joueurs
-        Sortie : Une chaine de caractères mise sous forme de tableau
         """
-        entetes = ["pseudo", "age", "mail", "est fan de Pokemon"]
+        Retourne la liste de tous les joueurs enregistrés en base.
 
-        joueurs = JoueurDao().lister_tous()
-
-        for j in joueurs:
-            if j.pseudo == "admin":
-                joueurs.remove(j)
-
-        joueurs_as_list = [j.as_list() for j in joueurs]
-
-        str_joueurs = "-" * 100
-        str_joueurs += "\nListe des joueurs \n"
-        str_joueurs += "-" * 100
-        str_joueurs += "\n"
-        str_joueurs += tabulate(
-            tabular_data=joueurs_as_list,
-            headers=entetes,
-            tablefmt="psql",
-            floatfmt=".2f",
-        )
-        str_joueurs += "\n"
-
-        return str_joueurs
+        Renvoie
+        -------
+        list[Joueur]
+            Liste des joueurs existants
+        """
+        return self.dao.lister_tous()
 
     @log
-    def se_connecter(self, pseudo, mdp) -> Joueur:
-        """Se connecter à partir de pseudo et mdp"""
-        return JoueurDao().se_connecter(pseudo, hash_password(mdp, pseudo))
+    def modifier(self, joueur: Joueur) -> Joueur | None:
+        """
+        Met à jour les informations d’un joueur en base.
+
+        Paramètres
+        ----------
+        joueur : Joueur
+            Objet Joueur à mettre à jour
+
+        Renvoie
+        -------
+        Joueur | None
+            Le joueur modifié si succès, sinon None
+        """
+        return joueur if self.dao.modifier(joueur) else None
 
     @log
-    def pseudo_deja_utilise(self, pseudo) -> bool:
-        """Vérifie si le pseudo est déjà utilisé
-        Retourne True si le pseudo existe déjà en BDD"""
-        joueurs = JoueurDao().lister_tous()
-        return pseudo in [j.pseudo for j in joueurs]
+    def supprimer(self, joueur: Joueur) -> bool:
+        """
+        Supprime un joueur de la base de données.
+
+        Paramètres
+        ----------
+        joueur : Joueur
+            Objet Joueur à supprimer
+
+        Renvoie
+        -------
+        bool
+            True si suppression réussie, False sinon
+        """
+        return self.dao.supprimer(joueur)

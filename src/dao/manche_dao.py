@@ -1,9 +1,11 @@
 """Implémentation de la classe MancheDAO"""
+
 import json
 import os
 from typing import Optional
-from business_object.manche import Manche
+
 from business_object.info_manche import InfoManche
+from business_object.manche import Manche
 
 
 class MancheDAO:
@@ -68,7 +70,7 @@ class MancheDAO:
         # On crée deux joueurs factices
         joueurs_fictifs = [
             Joueur(id_joueur=1, pseudo="J1", credit=1000, pays="FR"),
-            Joueur(id_joueur=2, pseudo="J2", credit=1000, pays="FR")
+            Joueur(id_joueur=2, pseudo="J2", credit=1000, pays="FR"),
         ]
         info = InfoManche(joueurs_fictifs)
 
@@ -78,4 +80,4 @@ class MancheDAO:
         manche._Manche__tour = data.get("tour", 0)
         manche._Manche__indice_joueur_actuel = data.get("indice_joueur_actuel", 0)
 
-        return manche 
+        return manche
