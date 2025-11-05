@@ -32,15 +32,13 @@ class JoueurDao(metaclass=Singleton):
             with DBConnection().connection as connection:
                 with connection.cursor() as cursor:
                     cursor.execute(
-                        "INSERT INTO joueur(pseudo, mdp, age, mail, fan_pokemon) VALUES        "
-                        "(%(pseudo)s, %(mdp)s, %(age)s, %(mail)s, %(fan_pokemon)s)             "
-                        "  RETURNING id_joueur;                                                ",
+                        "INSERT INTO joueur(pseudo, credit, pays) VALUES        "
+                        "(%(pseudo)s, %(credit)s, %(pays)s)                         "
+                        "RETURNING id_joueur;                                                ",
                         {
                             "pseudo": joueur.pseudo,
-                            "mdp": joueur.mdp,
-                            "age": joueur.age,
-                            "mail": joueur.mail,
-                            "fan_pokemon": joueur.fan_pokemon,
+                            "credit": joueur.credit,
+                            "pays": joueur.pays,
                         },
                     )
                     res = cursor.fetchone()
@@ -49,7 +47,7 @@ class JoueurDao(metaclass=Singleton):
 
         created = False
         if res:
-            joueur.id_joueur = res["id_joueur"]
+            joueur.changer_identifiant(res["id_joueur"])
             created = True
 
         return created
@@ -85,13 +83,11 @@ class JoueurDao(metaclass=Singleton):
         joueur = None
         if res:
             joueur = Joueur(
+                id_joueur=id_joueur,
                 pseudo=res["pseudo"],
-                age=res["age"],
-                mail=res["mail"],
-                fan_pokemon=res["fan_pokemon"],
-                id_joueur=res["id_joueur"],
+                credit=res["credit"],
+                pays=res["pays"]
             )
-
         return joueur
 
     @log
@@ -127,10 +123,8 @@ class JoueurDao(metaclass=Singleton):
                 joueur = Joueur(
                     id_joueur=row["id_joueur"],
                     pseudo=row["pseudo"],
-                    mdp=row["mdp"],
-                    age=row["age"],
-                    mail=row["mail"],
-                    fan_pokemon=row["fan_pokemon"],
+                    credit=row["credit"],
+                    pays=row["pays"]
                 )
 
                 liste_joueurs.append(joueur)
@@ -160,17 +154,13 @@ class JoueurDao(metaclass=Singleton):
                     cursor.execute(
                         "UPDATE joueur                                      "
                         "   SET pseudo      = %(pseudo)s,                   "
-                        "       mdp         = %(mdp)s,                      "
-                        "       age         = %(age)s,                      "
-                        "       mail        = %(mail)s,                     "
-                        "       fan_pokemon = %(fan_pokemon)s               "
+                        "       credit      = %(credit)s,                   "
+                        "       pays        = %(pays)s                      "
                         " WHERE id_joueur = %(id_joueur)s;                  ",
                         {
                             "pseudo": joueur.pseudo,
-                            "mdp": joueur.mdp,
-                            "age": joueur.age,
-                            "mail": joueur.mail,
-                            "fan_pokemon": joueur.fan_pokemon,
+                            "credit": joueur.credit,
+                            "pays": joueur.pays,
                             "id_joueur": joueur.id_joueur,
                         },
                     )
@@ -210,15 +200,13 @@ class JoueurDao(metaclass=Singleton):
         return res > 0
 
     @log
-    def se_connecter(self, pseudo, mdp) -> Joueur:
-        """se connecter grâce à son pseudo et son mot de passe
+    def se_connecter(self, pseudo) -> Joueur:
+        """se connecter grâce à son pseudo
 
         Parameters
         ----------
         pseudo : str
             pseudo du joueur que l'on souhaite trouver
-        mdp : str
-            mot de passe du joueur
 
         Returns
         -------
@@ -232,9 +220,8 @@ class JoueurDao(metaclass=Singleton):
                     cursor.execute(
                         "SELECT *                           "
                         "  FROM joueur                      "
-                        " WHERE pseudo = %(pseudo)s         "
-                        "   AND mdp = %(mdp)s;              ",
-                        {"pseudo": pseudo, "mdp": mdp},
+                        " WHERE pseudo = %(pseudo)s         ",
+                        {"pseudo": pseudo},
                     )
                     res = cursor.fetchone()
         except Exception as e:
@@ -244,12 +231,21 @@ class JoueurDao(metaclass=Singleton):
 
         if res:
             joueur = Joueur(
-                pseudo=res["pseudo"],
-                mdp=res["mdp"],
-                age=res["age"],
-                mail=res["mail"],
-                fan_pokemon=res["fan_pokemon"],
                 id_joueur=res["id_joueur"],
-            )
+                pseudo=res["pseudo"],
+                credit=res["credit"],
+                pays=res["pays"]
+                )
 
         return joueur
+
+
+joueur1 = Joueur(1, 'paul', 100, 'fr')
+joueur2 = Joueur(1, 'paul2', 1002, 'fr2')
+
+joueurDao = JoueurDao()
+joueurDao.creer(joueur1)
+print(joueurDao.trouver_par_id(995))
+print(joueurDao.lister_tous())
+joueurDao.supprimer(joueur=joueur1)
+print(joueurDao.modifier(joueur2))
