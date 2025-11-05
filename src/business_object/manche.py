@@ -110,10 +110,10 @@ class Manche:
         """Distribution des cartes initiales et mise des blinds"""
         self.__reserve.melanger()
         self.__info.assignation_mains(self.__reserve.distribuer(len(self.__info.joueurs)))
-        self.__info.suivre(0, self.grosse_blind // 2)
+        self.__info.suivre(self.indice_joueur_actuel, self.grosse_blind // 2)
         self.joueur_suivant()
         self.__info.changer_statut(self.indice_joueur_actuel, 1)
-        self.__info.suivre(1, self.grosse_blind)
+        self.__info.suivre(self.indice_joueur_actuel, self.grosse_blind - (self.grosse_blind // 2))
         self.joueur_suivant()
         self.__info.changer_statut(self.indice_joueur_actuel, 2)
 
@@ -242,15 +242,15 @@ class Manche:
         return indice
 
     def joueur_suivant(self):
-        self.__indice_joueur_actuel = self.indice_joueur_suivant
+        self.__indice_joueur_actuel = self.indice_joueur_suivant()
                 
-    def indice_joueur(self, joueur):
+    def joueur_indice(self, joueur):
         for i in range(len(self.info.joueurs)):
             if self.info.joueurs[i] == joueur:
                 return i
         raise ValueError("Le joueur n'est pas dans cette manche.")
     
     def est_tour(self, joueur):
-        if self.indice_joueur_actuel == self.indice_joueur(joueur):
+        if self.indice_joueur_actuel == self.joueur_indice(joueur):
             return True
         else : return False
