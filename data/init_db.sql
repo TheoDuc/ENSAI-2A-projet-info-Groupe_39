@@ -21,3 +21,17 @@ CREATE TABLE manche(
     carte4       VARCHAR(50),
     carte5       VARCHAR(50)
 );
+
+-----------------------------------------------------
+-- Jeux
+-----------------------------------------------------
+DROP TABLE IF EXISTS manche_joueur CASCADE ;
+CREATE TABLE manche_joueur(
+    id_joueur     INTEGER,
+    id_manche     INTEGER,
+    carte_main_1  VARCHAR(50),
+    carte_main_2  VARCHAR(50),
+    mise          INTEGER,
+    gain          INTEGER,
+    tour_couche   VARCHAR(50)
+);
