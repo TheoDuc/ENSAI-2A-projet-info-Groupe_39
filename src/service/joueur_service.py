@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 class JoueurService:
     """
-    Service pour gérer les joueurs :
+    Service pour la gestion des joueurs :
     - CRUD (création, lecture, modification, suppression)
     - Rattachement à une table
     - Gestion des crédits via les méthodes de Joueur
