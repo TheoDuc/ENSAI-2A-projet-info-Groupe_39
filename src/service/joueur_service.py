@@ -5,7 +5,6 @@ from utils.log_decorator import log
 
 class JoueurService:
     """
-    Service métier pour la gestion des joueurs de poker :
     - CRUD (création, lecture, modification, suppression)
     - Gestion du rattachement à une table
     - Consultation des informations d’un joueur
@@ -42,6 +41,13 @@ class JoueurService:
         )
         return nouveau_joueur if self.dao.creer(nouveau_joueur) else None
 
+        # En ram
+        id_joueur = len(self.joueurs) + 1 if hasattr(self, "joueurs") else 1
+        nouveau_joueur = Joueur(id_joueur=id_joueur, pseudo=pseudo, credit=credit, pays=pays)
+        if not hasattr(self, "joueurs"):
+            self.joueurs = []
+        self.joueurs.append(nouveau_joueur)
+
     @log
     def trouver_par_id(self, id_joueur: int) -> Joueur | None:
         """
@@ -59,6 +65,11 @@ class JoueurService:
         """
         return self.dao.trouver_par_id(id_joueur)
 
+        # En ram
+        for joueur in getattr(self, "joueurs", []):
+            if joueur.id_joueur == id_joueur:
+                return joueur
+
     @log
     def lister_tous(self) -> list[Joueur]:
         """
@@ -70,6 +81,9 @@ class JoueurService:
             Liste des joueurs existants
         """
         return self.dao.lister_tous()
+
+        # En ram
+        return getattr(self, "joueurs", [])
 
     @log
     def modifier(self, joueur: Joueur) -> Joueur | None:
@@ -88,6 +102,12 @@ class JoueurService:
         """
         return joueur if self.dao.modifier(joueur) else None
 
+        # En ram
+        for i, j in enumerate(getattr(self, "joueurs", [])):
+            if j.id_joueur == joueur.id_joueur:
+                self.joueurs[i] = joueur
+                return joueur
+
     @log
     def supprimer(self, joueur: Joueur) -> bool:
         """
@@ -104,3 +124,9 @@ class JoueurService:
             True si suppression réussie, False sinon
         """
         return self.dao.supprimer(joueur)
+
+        # En ram
+        for i, j in enumerate(getattr(self, "joueurs", [])):
+            if j.id_joueur == joueur.id_joueur:
+                del self.joueurs[i]
+                return True

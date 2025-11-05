@@ -13,6 +13,6 @@ INSERT INTO joueur(id_joueur, pseudo, credit, pays) VALUES
 (993, 'junior',      15,      'fr');
 
 INSERT INTO manche_joueur(id_joueur, id_manche, carte_main_1, carte_main_2, mise, gain, tour_couche) VALUES
-(998, 998, '3 de Pique', 'Dame de Pique', 100, -100, 'turn'),
-(997, 997, '10 de Pique', 'Roi de Pique', 100, 300, 'None');
+(998, 998, '3 de Pique', 'Dame de Pique', 100, -100, 2),
+(997, 997, '10 de Pique', 'Roi de Pique', 100, 300, 10);
 
