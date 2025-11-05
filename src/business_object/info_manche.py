@@ -130,7 +130,7 @@ class InfoManche:
         """
         if not isinstance(indice_joueur, int):
             raise TypeError("indice_joueur doit être un entier")
-        if not isinstance(relance, int) or montant < 0:
+        if not isinstance(relance, int) or relance < 0:
             raise ValueError("Le montant doit être un entier positif")
         suivre_montant = max(self.mises)
         if suivre_montant >= self.joueurs[indice_joueur].credit:

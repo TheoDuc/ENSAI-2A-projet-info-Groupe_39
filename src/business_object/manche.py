@@ -100,7 +100,6 @@ class Manche:
     def __str__(self):
         return (
             f"Manche(tour={self.tour}, "
-            f"pot={self.pot}, "
             f"grosse_blind={self.grosse_blind}, "
             f"board={self.board})"
         )
@@ -111,12 +110,12 @@ class Manche:
         """Distribution des cartes initiales et mise des blinds"""
         self.__reserve.melanger()
         self.__info.assignation_mains(self.__reserve.distribuer(len(self.__info.joueurs)))
-        self.__info.miser(0, self.__grosse_blind / 2)
+        self.__info.suivre(0, self.grosse_blind // 2)
         self.joueur_suivant()
-        self.info.changer_statut(self.indice_joueur_actuel, 1)
-        self.__info.miser(1, self.__grosse_blind)
+        self.__info.changer_statut(self.indice_joueur_actuel, 1)
+        self.__info.suivre(1, self.grosse_blind)
         self.joueur_suivant()
-        self.info.changer_statut(self.indice_joueur_actuel, 2)
+        self.__info.changer_statut(self.indice_joueur_actuel, 2)
 
 
     @log
@@ -126,7 +125,7 @@ class Manche:
             self.__reserve.reveler(self.__board)
         self.__tour += 1
         self.__indice_joueur_actuel = 2
-        statuts_nouveau_tour(self.__info)
+        self.__info.statuts_nouveau_tour()
 
     @log
     def turn(self):
@@ -134,8 +133,7 @@ class Manche:
         self.__reserve.reveler(self.__board)
         self.__tour += 1
         self.__indice_joueur_actuel = 2
-        statuts_nouveau_tour(self.__info)
-
+        self.__info.statuts_nouveau_tour()
 
     @log
     def river(self):
@@ -143,7 +141,7 @@ class Manche:
         self.__reserve.reveler(self.__board)
         self.__tour += 1
         self.__indice_joueur_actuel = 2
-        statuts_nouveau_tour(self.__info)
+        self.__info.statuts_nouveau_tour()
 
     def fin_du_tour(self) -> bool:
         """
