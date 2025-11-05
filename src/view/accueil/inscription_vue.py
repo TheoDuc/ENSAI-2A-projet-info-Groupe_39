@@ -1,7 +1,4 @@
-import regex
 from InquirerPy import inquirer
-from InquirerPy.validator import EmptyInputValidator, PasswordValidator
-from prompt_toolkit.validation import ValidationError, Validator
 
 from service.joueur_service import JoueurService
 from view.vue_abstraite import VueAbstraite
@@ -17,33 +14,10 @@ class InscriptionVue(VueAbstraite):
 
             return AccueilVue(f"Le pseudo {pseudo} est déjà utilisé.")
 
-        mdp = inquirer.secret(
-            message="Entrez votre mot de passe : ",
-            validate=PasswordValidator(
-                length=35,
-                cap=True,
-                number=True,
-                message="Au moins 35 caractères, incluant une majuscule et un chiffre",
-            ),
-        ).execute()
-
-        age = inquirer.number(
-            message="Entrez votre age : ",
-            min_allowed=0,
-            max_allowed=120,
-            validate=EmptyInputValidator(),
-        ).execute()
-
-        mail = inquirer.text(message="Entrez votre mail : ", validate=MailValidator()).execute()
-
-        fan_pokemon = inquirer.confirm(
-            message="Etes-vous fan de pokemons : ",
-            confirm_letter="o",
-            reject_letter="n",
-        ).execute()
+        pays = inquirer.text(message="Entrez votre pays : ").execute()
 
         # Appel du service pour créer le joueur
-        joueur = JoueurService().creer(pseudo, mdp, age, mail, fan_pokemon)
+        joueur = JoueurService().creer(pseudo, pays)
 
         # Si le joueur a été créé
         if joueur:
@@ -56,15 +30,3 @@ class InscriptionVue(VueAbstraite):
         from view.accueil.accueil_vue import AccueilVue
 
         return AccueilVue(message)
-
-
-class MailValidator(Validator):
-    """la classe MailValidator verifie si la chaine de caractères
-    que l'on entre correspond au format de l'email"""
-
-    def validate(self, document) -> None:
-        ok = regex.match(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$", document.text)
-        if not ok:
-            raise ValidationError(
-                message="Please enter a valid mail", cursor_position=len(document.text)
-            )
