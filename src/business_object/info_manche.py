@@ -96,7 +96,7 @@ class InfoManche:
         self.__mains = mains
 
     @log
-    def miser(self, indice_joueur: int, montant: int):
+    def suivre(self, indice_joueur: int, relance : int = 0):
         """
         Ajoute une mise pour un joueur.
 
@@ -109,14 +109,23 @@ class InfoManche:
         """
         if not isinstance(indice_joueur, int):
             raise TypeError("indice_joueur doit être un entier")
-        if not isinstance(montant, (int, float)) or montant <= 0:
-            raise ValueError("Le montant doit être un entier strictement positif")
-        if self.joueurs[indice_joueur].credit > self.mises[indice_joueur] + montant:
-            self.__mises[indice_joueur] += montant
-            self.__statuts[indice_joueur] = 2
-        if self.joueurs[indice_joueur].credit <= self.mises[indice_joueur] + montant:
-            self.__mises[indice_joueur] = self.joueurs[indice_joueur].credit
-            self.__statuts[indice_joueur] = 4
+        if not isinstance(relance, int) or montant < 0:
+            raise ValueError("Le montant doit être un entier positif")
+        suivre_montant = max(self.mises)
+        if suivre_montant >= self.joueurs[indice_joueur].credit:
+            raise ValueError("Le joueur doit all-in.")
+        if relance + suivre_montant >= self.joueurs[indice_joueur].credit:
+            raise ValueError("Le joueur ne peut relancer autant.")
+        else:
+            pour_suivre = suivre_montant - self.mises[indice_joueur]
+            self.mises[indice_joueur] += pour_suivre
+            self.statuts[indice_joueur] = 2
+        if relance > 0:
+            self.mises[indice_joueur] += relance
+            for i in range(len(self.statuts)):
+                if self.statuts[i] == 2:
+                    self.statuts[i] = 1
+        return pour_suivre + relance
 
     @log
     def coucher_joueur(self, indice_joueur: int, tour: int):

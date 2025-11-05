@@ -113,6 +113,30 @@ class Joueur:
         return self.__id_joueur == other.id_joueur
 
     @log
+    def changer_identifiant(self, new_id: int):
+        """
+        change l'identifant d'un joueur
+
+        Paramètres
+        ----------
+        new_id : int
+            nouvelle identifiant
+
+        """
+
+        if not isinstance(new_id, int):
+            raise TypeError(f"L'identifiant doit être de type int : {type(new_id)}")
+
+        if new_id < 0:
+            raise ValueError(f"L'identifiant doit être positif : {new_id}")
+
+        self.__id_joueur = new_id
+        logger.info(f"L'identifiant de {self.pseudo} devient {new_id}")
+
+        return
+
+
+    @log
     def ajouter_credits(self, credits: int) -> int:
         """
         Ajoute des crédits à un joueur

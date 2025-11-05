@@ -256,3 +256,14 @@ class Manche:
                 else:
                     indice += 1
             self.__indice_joueur_actuel = indice
+                
+    def indice_joueur(self, joueur):
+        for i in range(len(self.info.joueurs)):
+            if self.info.joueurs[i] == joueur:
+                return i
+        raise ValueError("Le joueur n'est pas dans cette manche.")
+    
+    def est_tour(self, joueur):
+        if self.indice_joueur_actuel == self.indice_joueur(joueur):
+            return True
+        else : return False
