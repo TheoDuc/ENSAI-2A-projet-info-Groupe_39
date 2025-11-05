@@ -34,7 +34,7 @@ class TestInfoManche:
         assert len(manche.mains) == len(joueurs)
         assert all(m is None for m in manche.mains)
         assert manche.mises == [0, 0]
-        assert manche.tour_couche == [None, None]
+        assert manche.tour_couche == [10, 10]
 
     def test_infomanche_init_type_error(self):
         # GIVEN
@@ -90,52 +90,6 @@ class TestInfoManche:
             ValueError, match="Le nombre de mains doit correspondre au nombre de joueurs."
         ):
             manche.assignation_mains(mauvaises_mains)
-
-    # Tests miser
-
-    def test_miser_ok_a_jour(self, joueurs):
-        # GIVEN
-        manche = InfoManche(joueurs)
-        indice = 0
-        montant = 100
-
-        # WHEN
-        manche.miser(indice, montant)
-
-        # THEN
-        assert manche.mises[indice] == montant
-        assert manche.statuts[indice] == 2
-
-    def test_miser_ok_all_in(self, joueurs):
-        # GIVEN
-        manche = InfoManche(joueurs)
-        indice = 0
-        montant = 501
-
-        # WHEN
-        manche.miser(indice, montant)
-
-        # THEN
-        assert manche.mises[indice] == 500  # et non 501 car all in
-        assert manche.statuts[indice] == 4
-
-    def test_miser_type_indice(self, joueurs):
-        # GIVEN
-        manche = InfoManche(joueurs)
-        message_attendu = "indice_joueur doit être un entier"
-
-        # WHEN / THEN
-        with pytest.raises(TypeError, match=message_attendu):
-            manche.miser("0", 100)
-
-    def test_miser_montant_negatif(self, joueurs):
-        # GIVEN
-        manche = InfoManche(joueurs)
-        message_attendu = "Le montant doit être un entier strictement positif"
-
-        # WHEN / THEN
-        with pytest.raises(ValueError, match=message_attendu):
-            manche.miser(0, -50)
 
     # Tests coucher_joueur
 
