@@ -35,6 +35,16 @@ class MancheJoueurDAO(metaclass=Singleton):
             with DBConnection().connection as connection:
                 with connection.cursor() as cursor:
                     for i, joueur in enumerate(info_manche.joueurs):
+                        # On récupère les cartes du joueur si elles existent
+                        carte1 = None
+                        carte2 = None
+                        if hasattr(info_manche, "cartes_mains"):
+                            try:
+                                carte1, carte2 = info_manche.cartes_mains[i]
+                            except (IndexError, TypeError):
+                                pass  # si non défini, reste None
+
+                        # Insertion SQL
                         cursor.execute(
                             """
                             INSERT INTO manche_joueur (
@@ -44,26 +54,29 @@ class MancheJoueurDAO(metaclass=Singleton):
                                 carte_main_2,
                                 gain,
                                 mise,
-                                tour_couche
+                                tour_couche,
+                                statut
                             )
                             VALUES (
                                 %(id_manche)s,
                                 %(id_joueur)s,
                                 %(carte_main_1)s,
-                                %(carte_main_1)s,
+                                %(carte_main_2)s,
                                 %(gain)s,
                                 %(mise)s,
-                                %(tour_couche)s
+                                %(tour_couche)s,
+                                %(statut)s
                             );
                             """,
                             {
                                 "id_manche": id_manche,
                                 "id_joueur": joueur.id_joueur,
-                                "carte_main_1": main[1],
-                                "carte_main_1": main[2],
-                                "gain": manche.distribuer_pot[i],
-                                "suivre": info_manche.suivre[i],
-                                "tour_couche": info_manche.tour_couche[i],
+                                "carte_main_1": carte1,
+                                "carte_main_2": carte2,
+                                "gain": getattr(info_manche, "gains", [0] * len(info_manche.joueurs))[i],
+                                "mise": getattr(info_manche, "mises", [0] * len(info_manche.joueurs))[i],
+                                "tour_couche": getattr(info_manche, "tours_couche", [0] * len(info_manche.joueurs))[i],
+                                "statut": getattr(info_manche, "statuts", ["en cours"] * len(info_manche.joueurs))[i],
                             },
                         )
             return True

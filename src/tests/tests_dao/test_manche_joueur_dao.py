@@ -20,9 +20,9 @@ class TestMancheJoueurDAO(unittest.TestCase):
         # Création d’un objet InfoManche cohérent avec ta classe actuelle
         self.info_manche = InfoManche([self.j1, self.j2])
 
-        # Simule un état où on a modifié les infos de manche
-        self.info_manche.miser(0, 100)   # Alice mise 100
-        self.info_manche.coucher_joueur(1, tour=2)  # Bob s’est couché au tour 2
+        # Simule un état de manche : Alice mise, Bob se couche
+        self.info_manche.modifier_mise(0, 100)          # Alice mise 100
+        self.info_manche.coucher_joueur(1, tour=2)      # Bob s’est couché au tour 2
 
     # -----------------------------------------------------------------
     @patch("dao.manche_joueur_dao.DBConnection")
@@ -127,7 +127,6 @@ class TestMancheJoueurDAO(unittest.TestCase):
         mock_cursor.execute.assert_called_once()
 
     # -----------------------------------------------------------------
-    
     @patch("dao.manche_joueur_dao.DBConnection")
     def test_ajouter_credit_succes(self, mock_db):
         """Test ajout de crédit réussi"""
@@ -222,5 +221,7 @@ class TestMancheJoueurDAO(unittest.TestCase):
             self.dao.retirer_credit(self.j1, 0)
         with self.assertRaises(ValueError):
             self.dao.retirer_credit(self.j1, -100)
+
+
 if __name__ == "__main__":
     unittest.main()
