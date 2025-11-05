@@ -33,5 +33,5 @@ CREATE TABLE manche_joueur(
     carte_main_2  VARCHAR(50),
     mise          INTEGER,
     gain          INTEGER,
-    tour_couche   VARCHAR(50)
+    tour_couche   INTEGER
 );
