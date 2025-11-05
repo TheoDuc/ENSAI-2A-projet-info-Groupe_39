@@ -49,6 +49,7 @@ class Table:
         self.__mode_jeu = mode_jeu
         self.__joueurs = joueurs
         self.__manche = Manche
+        self.dealer_index = 0  # DE la part de cheik pour rotation dealer
 
     # creer une classe property pour joueur_max, grosse_blind, mode_jeu et joueurs
     @property
@@ -171,5 +172,3 @@ class Table:
             )
 
         self.__manche = Manche(info=InfoManche(self.__joueurs), grosse_blind=self.__grosse_blind)
-        self.__manche.jouer()
-        self.rotation_dealer()

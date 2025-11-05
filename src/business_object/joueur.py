@@ -57,6 +57,12 @@ class Joueur:
         self.__pays = pays
         self.__table = table
 
+        # Pour gerer la manche
+        self.est_actif = True  # True si le joueur peut jouer dans la manche
+        self.a_checke = False  # True si le joueur a checké dans le tour actuel
+        self.est_couche = False  # True si le joueur s'est couché
+        self.all_in = False  # True si le joueur a misé tout son crédit
+
     @property
     def id_joueur(self) -> int:
         """Retourne l'identifiant du joueur"""
