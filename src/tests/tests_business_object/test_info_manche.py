@@ -104,7 +104,7 @@ class TestInfoManche:
 
         # THEN
         assert manche.mises[indice] == montant
-        assert manche.statuts[indice] == "à jour"
+        assert manche.statuts[indice] == 2
 
     def test_miser_ok_all_in(self, joueurs):
         # GIVEN
@@ -117,7 +117,7 @@ class TestInfoManche:
 
         # THEN
         assert manche.mises[indice] == 500  # et non 501 car all in
-        assert manche.statuts[indice] == "all in"
+        assert manche.statuts[indice] == 4
 
     def test_miser_type_indice(self, joueurs):
         # GIVEN
@@ -150,7 +150,7 @@ class TestInfoManche:
 
         # THEN
         assert manche.tour_couche[indice] == tour
-        assert manche.statuts[1] == "couché"
+        assert manche.statuts[1] == 3
 
     # Tests __str__
 
