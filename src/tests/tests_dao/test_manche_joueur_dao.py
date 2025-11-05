@@ -124,6 +124,101 @@ class TestMancheJoueurDAO(unittest.TestCase):
         self.assertTrue(result)
         mock_cursor.execute.assert_called_once()
 
+    # -----------------------------------------------------------------
+    
+    @patch("dao.manche_joueur_dao.DBConnection")
+    def test_ajouter_credit_succes(self, mock_db):
+        """Test ajout de crédit réussi"""
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_cursor.rowcount = 1  # Simule une mise à jour réussie
+        mock_db.return_value.connection.__enter__.return_value = mock_conn
+        mock_conn.cursor.return_value.__enter__.return_value = mock_cursor
 
+        result = self.dao.ajouter_credit(self.j1, 200)
+
+        self.assertTrue(result)
+        mock_cursor.execute.assert_called_once()
+        self.assertIn("UPDATE joueur", mock_cursor.execute.call_args[0][0])
+
+    # -----------------------------------------------------------------
+    @patch("dao.manche_joueur_dao.DBConnection")
+    def test_ajouter_credit_aucun_joueur(self, mock_db):
+        """Test ajout de crédit échoué (aucun joueur trouvé)"""
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_cursor.rowcount = 0  # Aucun joueur mis à jour
+        mock_db.return_value.connection.__enter__.return_value = mock_conn
+        mock_conn.cursor.return_value.__enter__.return_value = mock_cursor
+
+        result = self.dao.ajouter_credit(self.j1, 200)
+
+        self.assertFalse(result)
+        mock_cursor.execute.assert_called_once()
+
+    # -----------------------------------------------------------------
+    @patch("dao.manche_joueur_dao.DBConnection")
+    def test_ajouter_credit_exception(self, mock_db):
+        """Test ajout de crédit avec exception SQL"""
+        mock_db.return_value.connection.__enter__.side_effect = Exception("DB error")
+
+        result = self.dao.ajouter_credit(self.j1, 200)
+        self.assertFalse(result)
+
+    # -----------------------------------------------------------------
+    def test_ajouter_credit_montant_invalide(self):
+        """Test ajout de crédit avec montant négatif ou nul"""
+        with self.assertRaises(ValueError):
+            self.dao.ajouter_credit(self.j1, 0)
+        with self.assertRaises(ValueError):
+            self.dao.ajouter_credit(self.j1, -50)
+
+    # -----------------------------------------------------------------
+    @patch("dao.manche_joueur_dao.DBConnection")
+    def test_retirer_credit_succes(self, mock_db):
+        """Test retrait de crédit réussi"""
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_cursor.rowcount = 1
+        mock_db.return_value.connection.__enter__.return_value = mock_conn
+        mock_conn.cursor.return_value.__enter__.return_value = mock_cursor
+
+        result = self.dao.retirer_credit(self.j1, 150)
+
+        self.assertTrue(result)
+        mock_cursor.execute.assert_called_once()
+        self.assertIn("UPDATE joueur", mock_cursor.execute.call_args[0][0])
+        self.assertIn("credit -", mock_cursor.execute.call_args[0][0])
+
+    # -----------------------------------------------------------------
+    @patch("dao.manche_joueur_dao.DBConnection")
+    def test_retirer_credit_fonds_insuffisants(self, mock_db):
+        """Test retrait échoué (fonds insuffisants ou joueur introuvable)"""
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_cursor.rowcount = 0  # Aucune ligne modifiée
+        mock_db.return_value.connection.__enter__.return_value = mock_conn
+        mock_conn.cursor.return_value.__enter__.return_value = mock_cursor
+
+        result = self.dao.retirer_credit(self.j1, 5000)  # Trop grand montant
+        self.assertFalse(result)
+        mock_cursor.execute.assert_called_once()
+
+    # -----------------------------------------------------------------
+    @patch("dao.manche_joueur_dao.DBConnection")
+    def test_retirer_credit_exception(self, mock_db):
+        """Test retrait de crédit avec exception SQL"""
+        mock_db.return_value.connection.__enter__.side_effect = Exception("DB crash")
+
+        result = self.dao.retirer_credit(self.j1, 200)
+        self.assertFalse(result)
+
+    # -----------------------------------------------------------------
+    def test_retirer_credit_montant_invalide(self):
+        """Test retrait de crédit avec montant négatif ou nul"""
+        with self.assertRaises(ValueError):
+            self.dao.retirer_credit(self.j1, 0)
+        with self.assertRaises(ValueError):
+            self.dao.retirer_credit(self.j1, -100)
 if __name__ == "__main__":
     unittest.main()
