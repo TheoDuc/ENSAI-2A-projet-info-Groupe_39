@@ -1,7 +1,5 @@
 """Module de connection à la base de données"""
 
-import os
-
 import dotenv
 import psycopg2
 from psycopg2.extras import RealDictCursor
@@ -22,20 +20,19 @@ class DBConnection(metaclass=Singleton):
     ----------
     connection : psycopg2.extensions.connection
         Retourne la connexion active à la base de données, permettant
-        d’exécuter des requêtes SQL au sein d’un bloc contextuel 
+        d’exécuter des requêtes SQL au sein d’un bloc contextuel
     """
 
     def __init__(self):
         """Ouverture de la connexion"""
         dotenv.load_dotenv()
 
-        self.__connection = psycopg2.connect(
-            host=os.environ["POSTGRES_HOST"],
-            port=os.environ["POSTGRES_PORT"],
-            database=os.environ["POSTGRES_DATABASE"],
-            user=os.environ["POSTGRES_USER"],
-            password=os.environ["POSTGRES_PASSWORD"],
-            options=f"-c search_path={os.environ['POSTGRES_SCHEMA']}",
+        self.connection = psycopg2.connect(
+            host="postgresql-275401.user-id2833",
+            port=5432,
+            user="user-id2833",
+            password="tw1031qej52i6rmu1t8e",
+            database="defaultdb",
             cursor_factory=RealDictCursor,
         )
 

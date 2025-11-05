@@ -50,13 +50,16 @@ class JoueurService:
             logger.warning(f"Pseudo {pseudo} déjà utilisé")
             return None
 
-        nouveau_joueur = Joueur(
-            id_joueur=1,  # L'ID réel peut être géré par le DAO
-            pseudo=pseudo,
-            credit=2000,
-            pays=pays,
-        )
-        return nouveau_joueur if self.dao.creer(nouveau_joueur) else None
+        try:
+            created = self.dao.creer(pseudo, pays)
+            if created:
+                joueur = self.dao.se_connecter(pseudo)
+                logger.info(f"Joueur créé avec succès : {joueur}")
+                return joueur
+        except Exception as e:
+            logger.error(f"Erreur lors de la création du joueur {pseudo} : {e}")
+
+        return None
 
     @log
     def trouver_par_id(self, id_joueur: int) -> Joueur | None:
