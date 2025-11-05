@@ -53,4 +53,3 @@ class ResetDatabase(metaclass=Singleton):
 
 if __name__ == "__main__":
     print(ResetDatabase().lancer())
-    ResetDatabase().lancer(True)
