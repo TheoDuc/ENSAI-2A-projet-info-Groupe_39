@@ -19,8 +19,6 @@ class Manche:
         Les différentes étapes d'une manche de poker.
     __tour : int
         Tour actuel de la manche (0=preflop, 1=flop, 2=turn, 3=river)
-    __pot : int
-        Montant total du pot
     __info : InfoManche
         Informations sur les joueurs, leurs mains, mises et statuts
     __reserve : Reserve
@@ -64,7 +62,6 @@ class Manche:
 
         # Initialisation des attributs
         self.__tour = 0
-        self.__pot = 0
         self.__info = info
         self.__reserve = Reserve(None)
         self.__board = Board([])
@@ -75,10 +72,6 @@ class Manche:
     @property
     def tour(self) -> int:
         return self.__tour
-
-    @property
-    def pot(self) -> int:
-        return self.__pot
 
     @property
     def info(self) -> InfoManche:
@@ -133,9 +126,7 @@ class Manche:
             self.__reserve.reveler(self.__board)
         self.__tour += 1
         self.__indice_joueur_actuel = 2
-        for i in range(len(self.__info.statuts)):
-            if self.__info.statuts[i] not in [3, 4]:
-                self.__info.statuts[i] = 0
+        statuts_nouveau_tour(self.__info)
 
     @log
     def turn(self):
@@ -143,9 +134,8 @@ class Manche:
         self.__reserve.reveler(self.__board)
         self.__tour += 1
         self.__indice_joueur_actuel = 2
-        for i in range(len(self.__info.statuts)):
-            if self.__info.statuts[i] not in [3, 4]:
-                self.__info.statuts[i] = 0
+        statuts_nouveau_tour(self.__info)
+
 
     @log
     def river(self):
@@ -153,9 +143,7 @@ class Manche:
         self.__reserve.reveler(self.__board)
         self.__tour += 1
         self.__indice_joueur_actuel = 2
-        for i in range(len(self.__info.statuts)):
-            if self.__info.statuts[i] not in [3, 4]:
-                self.__info.statuts[i] = 0
+        statuts_nouveau_tour(self.__info)
 
     def fin_du_tour(self) -> bool:
         """
@@ -170,23 +158,21 @@ class Manche:
         bool
             Vrai si tout les joueurs ont égalisé / couché / All in
         """
-
-        for i in range(len(self.info.statuts)):
-            if self.info.statuts[i] in ["en retard", "à jour", "all in"]:
-                dernier_joueur = i
-        if self.__indice_joueur_actuel != dernier_joueur:
-            return False
         for s in self.info.statuts:
-            if s == "en retard":
+            if s in [0, 1]:
                 return False
         return True
 
+    def fin_de_manche(self):
+        n = 0
+        for s in self.info.statuts:
+            if s != 3:
+                n += 1
+        if n == 0:
+            raise ValueError("Les joueurs ne peuvent être tous couchés")
+        return (n == 1)
+
     # Gestion du pot
-    @log
-    def ajouter_au_pot(self, credit) -> int:
-        """Ajoute un montant au pot courant"""
-        self.__pot += credit
-        return self.pot
 
     def distribuer_pot(self):
         """
@@ -237,7 +223,7 @@ class Manche:
         return gains
 
     # Gestion des joueurs
-    def joueur_suivant(self):
+    def indice_joueur_suivant(self):
         """
         Retourne l'indice du joueur suivant qui n'est pas couché ou all in.
         """
@@ -255,7 +241,10 @@ class Manche:
                     indice = 0
                 else:
                     indice += 1
-            self.__indice_joueur_actuel = indice
+        return indice
+
+    def joueur_suivant(self):
+        self.__indice_joueur_actuel = self.indice_joueur_suivant
                 
     def indice_joueur(self, joueur):
         for i in range(len(self.info.joueurs)):

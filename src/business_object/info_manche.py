@@ -46,7 +46,7 @@ class InfoManche:
         self.__statuts = [0 for _ in joueurs]
         self.__mains = [None for _ in joueurs]
         self.__mises = [0 for _ in joueurs]
-        self.__tour_couche = [None for _ in joueurs]
+        self.__tour_couche = [10 for _ in joueurs]
 
     # Propriétés
     @property
@@ -78,6 +78,27 @@ class InfoManche:
 
     def changer_statut(self, indice_joueur, statut : int):
         self.__statuts[indice_joueur] = statut
+
+    def modifier_mise(self, indice_joueur, nouveau_montant : int):
+        self.mises[indice_joueur] = nouveau_montant
+
+    def statuts_nouveau_tour(self):
+        for i in range(len(self.statuts)):
+            if self.__statuts[i] not in [3, 4]:
+                self.__statuts[i] = 0
+
+    def valeur_pot(self):
+        pot = 0
+        for m in self.__mises:
+            pot += m
+        return pot
+
+    def joueurs_en_lice(self):
+        l = []
+        for i in range(len(self.__joueurs)):
+            if self.__statuts[i] != 3:
+                l.append(i)
+        return l
 
     def assignation_mains(self, mains: list[Main]):
         """
@@ -116,16 +137,28 @@ class InfoManche:
             raise ValueError("Le joueur doit all-in.")
         if relance + suivre_montant >= self.joueurs[indice_joueur].credit:
             raise ValueError("Le joueur ne peut relancer autant.")
-        else:
-            pour_suivre = suivre_montant - self.mises[indice_joueur]
-            self.mises[indice_joueur] += pour_suivre
-            self.statuts[indice_joueur] = 2
+        pour_suivre = suivre_montant - self.mises[indice_joueur]
+        self.mises[indice_joueur] += pour_suivre
+        self.statuts[indice_joueur] = 2
         if relance > 0:
             self.mises[indice_joueur] += relance
             for i in range(len(self.statuts)):
                 if self.statuts[i] == 2:
                     self.statuts[i] = 1
         return pour_suivre + relance
+
+    def all_in(self, indice_joueur):
+        if self.__statut[indice_joueur] in [3,4]:
+            raise ValueError("Le joueur ne peut plus all-in.")
+        montant = self.joueurs[indice_joueur].credit - self.mises[indice_joueur]
+        pour_suivre = max(self.mises) - self.mises[indice_joueur]
+        self.mises[indice_joueur] += montant
+        self.statuts[indice_joueur] = 4
+        if montant > pour_suivre:
+            for i in range(len(self.statuts)):
+                if self.statuts[i] == 2:
+                    self.statuts[i] = 1
+        return montant
 
     @log
     def coucher_joueur(self, indice_joueur: int, tour: int):
