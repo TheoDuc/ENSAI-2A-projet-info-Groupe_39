@@ -96,6 +96,34 @@ class TestJoueur:
         # WHEN / THEN
         assert (joueur1 == joueur2) is resultat
 
+    def test_joueur_changer_identifiant(self, joueur):
+        # GIVEN
+        new_id = 50
+
+        # WHEN
+        joueur.changer_identifiant(new_id)
+
+        # THEN
+        assert joueur.id_joueur == 50
+    
+    def test_joueur_changer_id_TypeError(self, joueur):
+        # GIVEN
+        new_id = '50'
+        message_attendu = f"L'identifiant doit être de type int : {type(new_id)}"
+
+        # WHEN
+        with pytest.raises(TypeError, match=message_attendu):
+            joueur.changer_identifiant(new_id)
+
+    def test_joueur_changer_id_ValueError(self, joueur):
+        # GIVEN
+        new_id = -31
+        message_attendu = f"L'identifiant doit être positif : {new_id}"
+
+        # WHEN
+        with pytest.raises(ValueError, match=message_attendu):
+            joueur.changer_identifiant(new_id)
+
     def test_joueur_ajouter_credits_succes(self, joueur):
         # GIVEN
         credits = 50
