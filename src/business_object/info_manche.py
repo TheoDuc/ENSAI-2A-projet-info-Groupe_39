@@ -75,6 +75,10 @@ class InfoManche:
         return self.__tour_couche
 
     # Méthodes d'instance
+
+    def changer_statut(self, indice_joueur, statut : int):
+        self.__statuts[indice_joueur] = statut
+
     def assignation_mains(self, mains: list[Main]):
         """
         Assigne les mains distribuées aux joueurs.
@@ -109,10 +113,10 @@ class InfoManche:
             raise ValueError("Le montant doit être un entier strictement positif")
         if self.joueurs[indice_joueur].credit > self.mises[indice_joueur] + montant:
             self.__mises[indice_joueur] += montant
-            self.__statuts[indice_joueur] = "à jour"
+            self.__statuts[indice_joueur] = 2
         if self.joueurs[indice_joueur].credit <= self.mises[indice_joueur] + montant:
             self.__mises[indice_joueur] = self.joueurs[indice_joueur].credit
-            self.__statuts[indice_joueur] = "all in"
+            self.__statuts[indice_joueur] = 4
 
     @log
     def coucher_joueur(self, indice_joueur: int, tour: int):
@@ -125,7 +129,7 @@ class InfoManche:
             Indice du joueur dans la liste
         """
         self.__tour_couche[indice_joueur] = tour
-        self.__statuts[indice_joueur] = "couché"
+        self.__statuts[indice_joueur] = 3
 
     # Représentation
     def __str__(self):

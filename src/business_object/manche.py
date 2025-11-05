@@ -119,9 +119,12 @@ class Manche:
         self.__reserve.melanger()
         self.__info.assignation_mains(self.__reserve.distribuer(len(self.__info.joueurs)))
         self.__info.miser(0, self.__grosse_blind / 2)
-        self.__indice_joueur_actuel = 1
+        self.joueur_suivant()
+        self.info.changer_statut(self.indice_joueur_actuel, 1)
         self.__info.miser(1, self.__grosse_blind)
-        self.__indice_joueur_actuel = 2
+        self.joueur_suivant()
+        self.info.changer_statut(self.indice_joueur_actuel, 2)
+
 
     @log
     def flop(self):
@@ -130,6 +133,9 @@ class Manche:
             self.__reserve.reveler(self.__board)
         self.__tour += 1
         self.__indice_joueur_actuel = 2
+        for i in range(len(self.__info.statuts)):
+            if self.__info.statuts[i] not in [3, 4]:
+                self.__info.statuts[i] = 0
 
     @log
     def turn(self):
@@ -137,6 +143,9 @@ class Manche:
         self.__reserve.reveler(self.__board)
         self.__tour += 1
         self.__indice_joueur_actuel = 2
+        for i in range(len(self.__info.statuts)):
+            if self.__info.statuts[i] not in [3, 4]:
+                self.__info.statuts[i] = 0
 
     @log
     def river(self):
@@ -144,6 +153,9 @@ class Manche:
         self.__reserve.reveler(self.__board)
         self.__tour += 1
         self.__indice_joueur_actuel = 2
+        for i in range(len(self.__info.statuts)):
+            if self.__info.statuts[i] not in [3, 4]:
+                self.__info.statuts[i] = 0
 
     def fin_du_tour(self) -> bool:
         """
@@ -229,10 +241,13 @@ class Manche:
         """
         Retourne l'indice du joueur suivant qui n'est pas couché ou all in.
         """
-        indice = self.indice_joueur_actuel + 1
+        indice = self.indice_joueur_actuel
         statuts = self.info.statuts
-
-        if all(s == "couché" for s in statuts):
+        if indice == len(statuts) - 1:
+            indice = 0
+        else:
+            indice += 1
+        if all(s == 3 for s in statuts):
             raise ValueError("Tous les joueurs ne peuvent être couchés.")
         else:
             while statuts[indice] in ["couché", "all in"]:
@@ -240,4 +255,4 @@ class Manche:
                     indice = 0
                 else:
                     indice += 1
-        self.__indice_joueur_actuel += 1
+            self.__indice_joueur_actuel = indice
