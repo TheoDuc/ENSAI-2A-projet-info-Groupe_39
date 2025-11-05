@@ -245,7 +245,7 @@ joueur2 = Joueur(1, 'paul2', 1002, 'fr2')
 
 joueurDao = JoueurDao()
 joueurDao.creer(joueur1)
-print(joueurDao.trouver_par_id(995))
+print(joueurDao.trouver_par_id(2))
 print(joueurDao.lister_tous())
 print(joueurDao.modifier(joueur1))
 joueurDao.supprimer(joueur=joueur1)
