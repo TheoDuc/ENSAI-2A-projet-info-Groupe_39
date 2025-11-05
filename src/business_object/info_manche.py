@@ -132,12 +132,11 @@ class InfoManche:
             raise TypeError("indice_joueur doit être un entier")
         if not isinstance(relance, int) or relance < 0:
             raise ValueError("Le montant doit être un entier positif")
-        suivre_montant = max(self.mises)
-        if suivre_montant >= self.joueurs[indice_joueur].credit:
+        pour_suivre = max(self.mises) - self.mises[indice_joueur]
+        if pour_suivre >= self.joueurs[indice_joueur].credit:
             raise ValueError("Le joueur doit all-in.")
-        if relance + suivre_montant >= self.joueurs[indice_joueur].credit:
+        if relance + pour_suivre >= self.joueurs[indice_joueur].credit:
             raise ValueError("Le joueur ne peut relancer autant.")
-        pour_suivre = suivre_montant - self.mises[indice_joueur]
         self.mises[indice_joueur] += pour_suivre
         self.statuts[indice_joueur] = 2
         if relance > 0:
@@ -150,7 +149,7 @@ class InfoManche:
     def all_in(self, indice_joueur):
         if self.__statut[indice_joueur] in [3,4]:
             raise ValueError("Le joueur ne peut plus all-in.")
-        montant = self.joueurs[indice_joueur].credit - self.mises[indice_joueur]
+        montant = self.joueurs[indice_joueur].credit
         pour_suivre = max(self.mises) - self.mises[indice_joueur]
         self.mises[indice_joueur] += montant
         self.statuts[indice_joueur] = 4
