@@ -256,7 +256,6 @@ class Manche:
                 else:
                     indice += 1
             self.__indice_joueur_actuel = indice
-            if self.info.statuts[self.indice_joueur_actuel] == 0:
                 
     def indice_joueur(self, joueur):
         for i in range(len(self.info.joueurs)):
