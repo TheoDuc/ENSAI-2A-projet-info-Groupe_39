@@ -1,58 +1,79 @@
+import logging
+
 from business_object.joueur import Joueur
 from dao.joueur_dao import JoueurDao
 from utils.log_decorator import log
 
+logger = logging.getLogger(__name__)
+
 
 class JoueurService:
     """
-    Service métier pour la gestion des joueurs :
+    Service pour gérer les joueurs :
     - CRUD (création, lecture, modification, suppression)
-    - Gestion du rattachement à une table
-    - Consultation des informations d’un joueur
+    - Rattachement à une table
+    - Gestion des crédits via les méthodes de Joueur
     """
 
-    dao = JoueurDao()
+    # dao = JoueurDao()
 
-    # --- CRUD de base ---
+    def __init__(self, dao=None):
+        # On peut injecter un mock DAO pour les tests
+        self.dao = dao or JoueurDao()
 
     @log
-    def creer(self, pseudo: str, credit: int, pays: str) -> Joueur | None:
+    def se_connecter(self, pseudo: str) -> Joueur | None:
+        """Simule la connexion d’un joueur via son pseudo"""
+        return self.dao.se_connecter(pseudo)
+
+    @log
+    def pseudo_deja_utilise(self, pseudo: str) -> bool:
         """
-        Crée un joueur et l’enregistre via le DAO.
+        Vérifie si un pseudo existe déjà dans la base
+
+        Paramètres
+        ----------
+        pseudo : str
+            Pseudo à vérifier
+
+        Renvois
+        -------
+        bool
+            True si le pseudo existe, False sinon
         """
-        # Génération d'un id temporaire, réel id géré par le DAO
+        return self.dao.se_connecter(pseudo) is not None
+
+    @log
+    def creer(self, pseudo: str, pays: str) -> Joueur | None:
+        """Crée un joueur avec 2000 crédits par défaut si le pseudo n’existe pas déjà"""
+        if self.pseudo_deja_utilise(pseudo):  # vérifie si le pseudo existe
+            logger.warning(f"Pseudo {pseudo} déjà utilisé")
+            return None
+
         nouveau_joueur = Joueur(
-            id_joueur=0,
+            id_joueur=1,  # L'ID réel peut être géré par le DAO
             pseudo=pseudo,
-            credit=credit,
+            credit=2000,
             pays=pays,
         )
         return nouveau_joueur if self.dao.creer(nouveau_joueur) else None
 
     @log
     def trouver_par_id(self, id_joueur: int) -> Joueur | None:
-        """
-        Recherche un joueur dans la base par son identifiant.
-        """
+        """Récupère un joueur par ID"""
         return self.dao.trouver_par_id(id_joueur)
 
     @log
     def lister_tous(self) -> list[Joueur]:
-        """
-        Retourne tous les joueurs enregistrés.
-        """
+        """Liste tous les joueurs"""
         return self.dao.lister_tous()
 
     @log
     def modifier(self, joueur: Joueur) -> Joueur | None:
-        """
-        Met à jour un joueur via le DAO.
-        """
+        """Met à jour les informations d’un joueur via DAO"""
         return joueur if self.dao.modifier(joueur) else None
 
     @log
     def supprimer(self, joueur: Joueur) -> bool:
-        """
-        Supprime un joueur via le DAO.
-        """
+        """Supprime un joueur via DAO"""
         return self.dao.supprimer(joueur)
