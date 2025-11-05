@@ -7,6 +7,8 @@ from utils.singleton import Singleton
 from business_object.joueur import Joueur
 from business_object.info_manche import InfoManche
 
+logger = logging.getLogger(__name__)
+
 
 class MancheJoueurDAO(metaclass=Singleton):
     """Classe contenant les méthodes pour accéder à la table manche_joueur"""
@@ -206,3 +208,62 @@ class MancheJoueurDAO(metaclass=Singleton):
             raise
 
         return res == 1
+    @log
+    def ajouter_credit(self, joueur, montant: int) -> bool:
+        """
+        Ajoute un crédit à un joueur dans la table 'joueur'.
+        Renvoie True si la mise à jour SQL a bien eu lieu, False sinon.
+        """
+        if montant <= 0:
+            raise ValueError("Le montant à créditer doit être positif.")
+
+        try:
+            with DBConnection().connection as conn:
+                with conn.cursor() as cursor:
+                    query = """
+                        UPDATE joueur
+                        SET credit = credit + %s
+                        WHERE id_joueur = %s
+                    """
+                    cursor.execute(query, (montant, joueur.id_joueur))
+                    if cursor.rowcount == 1:
+                        return True
+                    else:
+                        logger.warning(f"Aucun joueur trouvé pour id {joueur.id_joueur}")
+                        return False
+
+        except Exception as e:
+            logger.error(f"Erreur lors de l’ajout de crédits pour {joueur.pseudo} : {e}")
+            return False
+
+    # -----------------------------------------------------------------
+    @log
+    def retirer_credit(self, joueur, montant: int) -> bool:
+        """
+        Retire un crédit à un joueur dans la table 'joueur'.
+        Renvoie True si la mise à jour SQL a bien eu lieu, False sinon.
+        """
+        if montant <= 0:
+            raise ValueError("Le montant à débiter doit être positif.")
+
+        try:
+            with DBConnection().connection as conn:
+                with conn.cursor() as cursor:
+                    query = """
+                        UPDATE joueur
+                        SET credit = credit - %s
+                        WHERE id_joueur = %s AND credit >= %s
+                    """
+                    cursor.execute(query, (montant, joueur.id_joueur, montant))
+                    if cursor.rowcount == 1:
+                        return True
+                    else:
+                        logger.warning(
+                            f"Impossible de retirer {montant} crédits à {joueur.pseudo} "
+                            f"(fonds insuffisants ou joueur introuvable)"
+                        )
+                        return False
+
+        except Exception as e:
+            logger.error(f"Erreur lors du retrait de crédits pour {joueur.pseudo} : {e}")
+            return False
