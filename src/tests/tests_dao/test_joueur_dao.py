@@ -64,12 +64,7 @@ class TestJoueurDao():
         if ResetDatabase().lancer(True):
             # GIVEN
             joueurDao = JoueurDao()
-            liste = [
-                Joueur(999, 'admin', 0, 'fr'),
-                Joueur(998, 'a', 20, 'us'),
-                Joueur(997, 'maurice', 20, 'uk'),
-                Joueur(996, 'batricia', 25, 'fr')
-                ]
+            liste = "[admin : 0 crédits, a : 20 crédits, maurice : 20 crédits, batricia : 25 crédits]"
 
             # WHEN
             resultat = joueurDao.lister_tous()

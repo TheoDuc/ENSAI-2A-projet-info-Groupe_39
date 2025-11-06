@@ -52,10 +52,18 @@ class MenuJoueurVue(VueAbstraite):
                 return MenuJoueurVue(Session().afficher())
 
             case "Afficher les joueurs de la base de données":
-                joueurs_str = JoueurService().afficher_tous()
+                joueurs_str = JoueurService().lister_tous()
                 return MenuJoueurVue(joueurs_str)
 
-            case "Afficher des pokemons (par appel à un Webservice)":
-                from view.pokemon_vue import PokemonVue
+            case "Lire les regles":
+                return "les regles"
 
-                return PokemonVue()
+            case "Changer ses informations":
+
+                return
+
+            case "tables":
+                from view.menu_table import MenuTable
+
+                return MenuTable()
+                

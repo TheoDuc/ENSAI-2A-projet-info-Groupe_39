@@ -124,8 +124,12 @@ class JoueurDao(metaclass=Singleton):
                 )
 
                 liste_joueurs.append(joueur)
+                texte = "["
+            for joueur in liste_joueurs:
+                texte += f"{joueur}, "
+            texte[:-2] + "]"
 
-        return liste_joueurs
+        return texte[:-2] + "]"
 
     @log
     def modifier(self, joueur) -> bool:
@@ -236,12 +240,12 @@ class JoueurDao(metaclass=Singleton):
         return joueur
 
 
-# joueur1 = Joueur(1, 'paul', 100, 'fr')
-# joueur2 = Joueur(1, 'paul2', 1002, 'fr2')
+joueur1 = Joueur(1, 'paul', 100, 'fr')
+joueur2 = Joueur(1, 'paul2', 1002, 'fr2')
 
-# joueurDao = JoueurDao()
-# print(joueurDao.creer('paul','fr'))
-# print(joueurDao.trouver_par_id(1))
-# print(joueurDao.lister_tous())
+joueurDao = JoueurDao()
+print(joueurDao.creer('paul','fr'))
+print(joueurDao.trouver_par_id(1))
+print(joueurDao.lister_tous())
 # print(joueurDao.modifier(joueur1))
 # joueurDao.supprimer(joueur=joueur1)
