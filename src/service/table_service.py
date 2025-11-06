@@ -69,9 +69,8 @@ class TableService:
         print("Aucun joueur actif trouvé pour devenir dealer.")
 
     @log
-    @classmethod
-    def affichages_tables(cls) -> list[str]:
-        return [str(table) for table in cls.tables]
+    def affichages_tables(self) -> list[str]:
+        return [str(table) for table in self.tables]
 
     @log
     def liste_tables(self) -> list[Table]:
