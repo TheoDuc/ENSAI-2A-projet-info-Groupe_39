@@ -37,11 +37,11 @@ class MenuJoueurVue(VueAbstraite):
             message="Faites votre choix : ",
             choices=[
                 "Tables",
-                "Afficher les joueurs de la base de données",
-                "Lire les regles",
-                "Infos de session",
-                "Changer ses informations",
                 "Se créditer",
+                "Infos de session",
+                "Afficher les joueurs de la base de données",
+                "Changer ses informations",
+                "Lire les regles",
                 "Se déconnecter",
             ],
         ).execute()
