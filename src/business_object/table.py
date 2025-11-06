@@ -17,9 +17,10 @@ class Table:
         self,
         joueur_max: int,
         grosse_blind: int,
+        numero_table: int = 0,
         mode_jeu: int = 1,
         joueurs: list = [],
-        manche: Manche = None,
+        manche: Manche = None
     ):
         """
         Instanciation de la table de jeu
@@ -46,6 +47,7 @@ class Table:
         """
         self.__joueur_max = joueur_max
         self.__grosse_blind = grosse_blind
+        self.__numero_table = numero_table
         self.__mode_jeu = mode_jeu
         self.__joueurs = joueurs
         self.__manche = Manche
@@ -61,6 +63,11 @@ class Table:
     def grosse_blind(self):
         """Retourne l'attribut 'grosse_blind'"""
         return self.__grosse_blind
+
+    @property
+    def numero_table(self):
+        """Retourne l'attribut 'numero_table'"""
+        return self.__numero_table
 
     @property
     def mode_jeu(self):
