@@ -1,5 +1,7 @@
 from InquirerPy import inquirer
 
+from service.table_service import TableService
+from view.session import Session
 from view.vue_abstraite import VueAbstraite
 
 
@@ -7,7 +9,9 @@ class MenuTable(VueAbstraite):
     """Vue qui affiche les tables"""
 
     def choisir_menu(self):
-        action_table = ("Retour au Menu Joueur", "Créer une Table", "Les tables")
+        action_table = ["Retour au Menu Joueur", "Créer une Table"] 
+        boutons_tables = TableService().affichages_tables()
+        action_table += boutons_tables
 
         choix = inquirer.select(
             message="Choisissez votre action : ",
@@ -24,20 +28,11 @@ class MenuTable(VueAbstraite):
 
             return MenuCreationTable()
 
-        if choix == "Les tables":
-            from view.menu_creation_table import InfosTable
+        if choix in boutons_tables:
+            indice_table = boutons_tables.index(choix)
 
-            infos_vue = InfosTable()  # Instancie la vue
-            service = TableService()  # Accède aux tables existantes
+            TableService().ajouter_joueur(TableService.tables[indice_table], Session().joueur)
 
-            if not service.tables:
-                print("Aucune table créée pour le moment.")
-            else:
-                for table in service.tables:
-                    infos_vue.infos_table(table)
-            input("\nAppuyez sur Entrée pour revenir au menu principal...")
-            return self
+            from view.game_menu_view import GameMenu
 
-        from view.menu_joueur_vue import MenuJoueurVue
-
-        return MenuJoueurVue(pokemons_str)
+            return GameMenu()
