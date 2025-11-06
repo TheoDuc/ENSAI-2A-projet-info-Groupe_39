@@ -156,7 +156,7 @@ class TableService:
                     print(f"Le board est : {manche.board}")
 
                     action = self.demander_action(joueur, table)
-                    montant = self.demander_montant_si_necessaire(action, joueur, table)
+                    montant = self.demander_montant(action, joueur, table)
 
                     try:
                         self.action_joueur(table, joueur, action, montant)

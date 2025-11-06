@@ -15,9 +15,11 @@ class MenuCreationTable(VueAbstraite):
             min_allowed=2,
             max_allowed=10,
         ).execute()
+        joueur_max = int(joueur_max)
         grosse_blind = inquirer.number(
             message="Saisissez la valeur de la grosse blind", min_allowed=2
         ).execute()
+        grosse_blind = int(grosse_blind)
 
         # Appel du service pour créer la table
         table = TableService().creer_table(joueur_max, grosse_blind)
