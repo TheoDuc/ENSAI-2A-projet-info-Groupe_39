@@ -8,6 +8,26 @@ class MancheJoueurService:
     dao = MancheJoueurDAO()
 
     @log
+    def trouver_par_ids(self, id_manche: int, id_joueur: int) -> list[dict]:
+        """Récupère les participations d’un joueur spécifique à une manche."""
+        return self.dao.trouver_par_ids(id_manche, id_joueur)
+
+    @log
+    def creer_manche_joueur(self, id_manche: int, info_manche) -> bool:
+        """Crée les participations des joueurs à une manche."""
+        return self.dao.creer_manche_joueur(id_manche, info_manche)
+
+    @log
+    def trouver_joueur_par_manche(self, id_manche: int, id_joueur: int) -> dict | None:
+        participations = self.trouver_par_ids(id_manche, id_joueur)
+        return participations[0] if participations else None
+
+    @log
+    def supprimer_par_id_manche(self, id_manche: int) -> bool:
+        """Supprime toutes les participations liées à une manche."""
+        return self.dao.supprimer_par_id_manche(id_manche)
+
+    @log
     def ajouter_joueur(self, manche_id: int, joueur: Joueur) -> bool:
         """Ajoute un joueur à une manche"""
         return self.dao.ajouter_joueur_a_manche(manche_id, joueur.id_joueur)

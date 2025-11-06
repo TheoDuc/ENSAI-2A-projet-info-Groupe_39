@@ -1,9 +1,9 @@
 from business_object.manche import Manche
-from dao.manche_dao import MancheDAO
+from dao.manche_dao import MancheDao
 
 
 class MancheService:
-    dao_manche = MancheDAO()
+    dao_manche = MancheDao()
 
     def creer_manche(self, manche: Manche) -> None:
         """Crée une manche et l’enregistre via le DAO."""
