@@ -69,6 +69,13 @@ class TableService:
         print("Aucun joueur actif trouvé pour devenir dealer.")
 
     @log
+    def statut_table_complet(self, table: Table) -> str:
+        nb_joueurs_present = len(table.joueurs)
+        nb_max = table.joueur_max
+        pseudos = [joueur.pseudo for joueur in table.joueurs]
+        return f"Table n°{table.numero_table} : {nb_joueurs_present}/{nb_max} joueurs présents — {', '.join(pseudos)}"
+
+    @log
     def action_joueur(self, table: Table, joueur: Joueur, action: str, montant: int = 0) -> None:
         action_service = ActionService()
         if action == "all_in":
