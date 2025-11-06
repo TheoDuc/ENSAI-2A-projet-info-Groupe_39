@@ -4,6 +4,7 @@ from view.vue_abstraite import VueAbstraite
 from view.session import Session
 
 from service.joueur_service import JoueurService
+from business_object.joueur import Joueur
 
 
 class MenuJoueurVue(VueAbstraite):
@@ -34,12 +35,12 @@ class MenuJoueurVue(VueAbstraite):
         choix = inquirer.select(
             message="Faites votre choix : ",
             choices=[
+                "tables",
                 "Afficher les joueurs de la base de données",
                 "Lire les regles",
                 "Infos de session",
-                "Se déconnecter",
                 "Changer ses informations",
-                "tables",
+                "Se déconnecter",
             ],
         ).execute()
 
@@ -68,7 +69,7 @@ class MenuJoueurVue(VueAbstraite):
                 nouveau_pseudo = inquirer.text(message="Entrez votre  nouveau pseudo : ").execute()
                 nouveau_pays = inquirer.text(message="Entrez votre nouveau pays : ").execute()
 
-                joueur_new = Joueur(joueur.id_joueur, nouveau_pseudo, credits, nouveau_pays)
+                joueur_new = Joueur(joueur.id_joueur, nouveau_pseudo, joueur.credit, nouveau_pays)
                 joueur_n = JoueurService().modifier(joueur_new)
                 return MenuJoueurVue(joueur_n)
 
