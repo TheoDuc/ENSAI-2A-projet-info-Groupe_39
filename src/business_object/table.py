@@ -84,6 +84,10 @@ class Table:
         """retourne l'attribut 'manche'"""
         return self.__manche
 
+    def __str__(self):
+        """Représentation d'une table"""
+        return f"Table {self.numero_table}, grosse blind : {self.grosse_blind} ({len(self)}/{self.joueur_max})"
+
     def __len__(self) -> int:
         """Retourne le nombre de joueurs à la table"""
         return len(self.__joueurs)
