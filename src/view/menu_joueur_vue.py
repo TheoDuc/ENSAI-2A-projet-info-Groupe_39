@@ -114,11 +114,11 @@ class MenuJoueurVue(VueAbstraite):
 
 5. Gagner la partie :
    - À l'Abattage, le joueur avec la meilleure main gagne le pot.
-   - Si un joueur mise tout son argent et que personne ne le suit, il remporte le pot immédiatement, sans devoir montrer ses cartes.
+   - Si un joueur mise de l'argent et que personne ne le suit, il remporte le pot immédiatement, sans devoir montrer ses cartes.
 
 6. Quelques notions supplémentaires :
    - Blinds : Des mises forcées (petite blind et grande blind) sont placées avant que les cartes ne soient distribuées pour garantir qu'il y ait toujours de l'argent dans le pot.
-   - Position : La position d'un joueur (l'ordre dans lequel il agit) est cruciale. Être derrière permet de voir les actions des autres joueurs avant de prendre sa décision.
+   - dealer : Chaque tour sera initié par le joueur après le dealer 
 
 Le but du poker est d'obtenir la meilleure main possible ou de convaincre les autres joueurs que vous avez la meilleure main pour les amener à se coucher.
 """
