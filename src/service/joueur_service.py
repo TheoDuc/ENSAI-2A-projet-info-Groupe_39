@@ -67,6 +67,11 @@ class JoueurService:
         return self.dao.trouver_par_id(id_joueur)
 
     @log
+    def trouver_par_pseudo(self, pseudo: str) -> Joueur | None:
+        """Récupère un joueur par pseudo"""
+        return self.dao.trouver_par_pseudo(pseudo) 
+
+    @log
     def lister_tous(self) -> list[Joueur]:
         """Liste tous les joueurs"""
         return self.dao.lister_tous()

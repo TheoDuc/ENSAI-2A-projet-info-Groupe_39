@@ -87,6 +87,42 @@ class JoueurDao(metaclass=Singleton):
         return joueur
 
     @log
+    def trouver_par_pseudo(self, pseudo) -> Joueur:
+        """trouver un joueur grace à son pseudo
+
+        Parameters
+        ----------
+        pseudo : int
+            pseudo du joueur que l'on souhaite trouver
+
+        Returns
+        -------
+        joueur : Joueur
+            renvoie le joueur que l'on cherche par pseudo
+        """
+        try:
+            with DBConnection().connection as connection:
+                with connection.cursor() as cursor:
+                    cursor.execute(
+                        "SELECT *                           "
+                        "  FROM joueur                      "
+                        " WHERE pseudo = %(pseudo)s;  ",
+                        {"pseudo": pseudo},
+                    )
+                    res = cursor.fetchone()
+        except Exception as e:
+            logging.info(e)
+            raise
+
+        joueur = None
+        if res:
+            joueur = Joueur(
+                id_joueur=res["id_joueur"], pseudo=pseudo, credit=res["credit"], pays=res["pays"]
+            )
+        return joueur
+
+
+    @log
     def lister_tous(self) -> list[Joueur]:
         """lister tous les joueurs
 
@@ -240,12 +276,11 @@ class JoueurDao(metaclass=Singleton):
         return joueur
 
 
-joueur1 = Joueur(1, 'paul', 100, 'fr')
-joueur2 = Joueur(1, 'paul2', 1002, 'fr2')
-
-joueurDao = JoueurDao()
-print(joueurDao.creer('paul','fr'))
-print(joueurDao.trouver_par_id(1))
-print(joueurDao.lister_tous())
+# joueur1 = Joueur(1, 'paul', 100, 'fr')
+# joueur2 = Joueur(1, 'paul2', 1002, 'fr2')
+# joueurDao = JoueurDao()
+# print(joueurDao.creer('paul','fr'))
+# print(joueurDao.trouver_par_pseudo('marine'))
+# print(joueurDao.lister_tous())
 # print(joueurDao.modifier(joueur1))
 # joueurDao.supprimer(joueur=joueur1)

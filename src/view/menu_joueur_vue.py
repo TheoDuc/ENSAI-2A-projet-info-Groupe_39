@@ -35,9 +35,11 @@ class MenuJoueurVue(VueAbstraite):
             message="Faites votre choix : ",
             choices=[
                 "Afficher les joueurs de la base de données",
-                "Afficher des pokemons (par appel à un Webservice)",
+                "Lire les regles",
                 "Infos de session",
                 "Se déconnecter",
+                "Changer ses informations",
+                "tables",
             ],
         ).execute()
 
@@ -56,14 +58,21 @@ class MenuJoueurVue(VueAbstraite):
                 return MenuJoueurVue(joueurs_str)
 
             case "Lire les regles":
-                return "les regles"
+                texte = "les regles"
+                return MenuJoueurVue(texte)
 
             case "Changer ses informations":
+                pseudo = inquirer.text(message="Entrez votre pseudo : ").execute()
+                joueur = JoueurService().trouver_par_pseudo(pseudo)
+                
+                nouveau_pseudo = inquirer.text(message="Entrez votre  nouveau pseudo : ").execute()
+                nouveau_pays = inquirer.text(message="Entrez votre nouveau pays : ").execute()
 
-                return
+                joueur_new = Joueur(joueur.id_joueur, nouveau_pseudo, credits, nouveau_pays)
+                joueur_n = JoueurService().modifier(joueur_new)
+                return MenuJoueurVue(joueur_n)
 
             case "tables":
                 from view.menu_table import MenuTable
-
                 return MenuTable()
                 
