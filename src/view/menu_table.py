@@ -1,3 +1,5 @@
+"""Menu des tables"""
+
 from InquirerPy import inquirer
 
 from service.table_service import TableService
@@ -23,7 +25,7 @@ class MenuTable(VueAbstraite):
 
             return MenuJoueurVue()
 
-        if choix == "Créer une Tables":
+        if choix == "Créer une Table":
             from view.menu_creation_table import MenuCreationTable
 
             return MenuCreationTable()
