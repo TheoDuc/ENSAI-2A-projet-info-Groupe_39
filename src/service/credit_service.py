@@ -22,7 +22,7 @@ class CreditService:
         try:
             joueur.ajouter_credits(montant)
             ram_modif = True
-            JoueurDao.modifier(joueur)
+            JoueurDao().modifier(joueur)
         except Exception as e:
             if ram_modif:
                 joueur.retirer_credits(montant)
@@ -43,7 +43,7 @@ class CreditService:
         try:
             joueur.retirer_credits(montant)
             ram_modif = True
-            JoueurDao.modifier(joueur, montant)
+            JoueurDao().modifier(joueur)
         except Exception as e:
             if ram_modif:
                 joueur.ajouter_credits(montant)
