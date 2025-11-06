@@ -23,7 +23,7 @@ class MenuTable(VueAbstraite):
 
             return MenuJoueurVue()
 
-        if choix == "Créer une Table":
+        if choix == "Créer une Tables":
             from view.menu_creation_table import MenuCreationTable
 
             return MenuCreationTable()
