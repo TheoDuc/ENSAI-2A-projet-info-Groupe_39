@@ -148,9 +148,12 @@ class TableService:
 
             # Boucle sur les joueurs actifs
             while not manche.fin_du_tour():
-                for joueur in table.joueurs:
+                for i in range(len(table.joueurs)):
                     if not joueur.est_actif:
                         continue  # Passe les joueurs couchés ou all-in
+                    
+                    print(f"Votre main est : {manche.info.mains[i]}")
+                    print(f"Le board est : {manche.board}")
 
                     action = self.demander_action(joueur, table)
                     montant = self.demander_montant_si_necessaire(action, joueur, table)
