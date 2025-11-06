@@ -18,16 +18,25 @@ class MenuTable(VueAbstraite):
             from view.menu_joueur_vue import MenuJoueurVue
 
             return MenuJoueurVue()
-        
+
         if choix == "Créer une Table":
             from view.menu_creation_table import MenuCreationTable
 
             return MenuCreationTable()
-        
-        if choix == "Les tables":
-            from view.menu_creation_table import MenuCreationTable
-            return 
 
+        if choix == "Les tables":
+            from view.menu_creation_table import InfosTable
+
+            infos_vue = InfosTable()  # Instancie la vue
+            service = TableService()  # Accède aux tables existantes
+
+            if not service.tables:
+                print("Aucune table créée pour le moment.")
+            else:
+                for table in service.tables:
+                    infos_vue.infos_table(table)
+            input("\nAppuyez sur Entrée pour revenir au menu principal...")
+            return self
 
         from view.menu_joueur_vue import MenuJoueurVue
 
