@@ -14,10 +14,21 @@ class TableService:
     """
 
     tables: list[Table] = []
+    compteur_tables: int = 0
 
     @log
     def creer_table(self, joueur_max: int, grosse_blind: int, mode_jeu: int = 1) -> Table:
-        table = Table(joueur_max=joueur_max, grosse_blind=grosse_blind, mode_jeu=mode_jeu)
+        TableService.compteur_tables += 1
+        numero = TableService.compteur_tables
+
+        table = Table(
+            numero_table=numero,
+            joueur_max=joueur_max,
+            grosse_blind=grosse_blind,
+            mode_jeu=mode_jeu,
+        )
+
+        TableService.tables.append(table)
         return table
 
     @log
