@@ -17,9 +17,10 @@ class Table:
         self,
         joueur_max: int,
         grosse_blind: int,
+        numero_table: int = 0,
         mode_jeu: int = 1,
         joueurs: list = [],
-        manche: Manche = None,
+        manche: Manche = None
     ):
         """
         Instanciation de la table de jeu
@@ -46,6 +47,7 @@ class Table:
         """
         self.__joueur_max = joueur_max
         self.__grosse_blind = grosse_blind
+        self.__numero_table = numero_table
         self.__mode_jeu = mode_jeu
         self.__joueurs = joueurs
         self.__manche = Manche
@@ -63,6 +65,11 @@ class Table:
         return self.__grosse_blind
 
     @property
+    def numero_table(self):
+        """Retourne l'attribut 'numero_table'"""
+        return self.__numero_table
+
+    @property
     def mode_jeu(self):
         """Retourne l'attribut 'mode_jeu'"""
         return self.__mode_jeu
@@ -76,6 +83,10 @@ class Table:
     def manche(self):
         """retourne l'attribut 'manche'"""
         return self.__manche
+
+    def __str__(self):
+        """Représentation d'une table"""
+        return f"Table {self.numero_table}, grosse blind : {self.grosse_blind} ({len(self)}/{self.joueur_max})"
 
     def __len__(self) -> int:
         """Retourne le nombre de joueurs à la table"""
@@ -162,7 +173,7 @@ class Table:
     @log
     def nouvelle_manche(self) -> None:
         """Lance une manche"""
-        for indice_joueur in len(self.__joueurs):
+        for indice_joueur in range(len(self.__joueurs)):
             if self.__joueurs[indice_joueur].credit < self.__grosse_blind:
                 self.retirer_joueur(indice_joueur)
 

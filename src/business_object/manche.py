@@ -1,7 +1,6 @@
 """Implémentation de la classe Manche"""
 
 from business_object.board import Board
-from business_object.combinaison.combinaison import AbstractCombinaison
 from business_object.evaluateur_combinaison import EvaluateurCombinaison
 from business_object.info_manche import InfoManche
 from business_object.reserve import Reserve
@@ -98,13 +97,14 @@ class Manche:
         return cls.__TOURS
 
     def __str__(self):
-        return (
-            f"Manche(tour={self.tour}, "
-            f"grosse_blind={self.grosse_blind}, "
-            f"board={self.board})"
-        )
+        return f"Manche(tour={self.tour}, grosse_blind={self.grosse_blind}, board={self.board})"
 
     # Déroulement des tours
+
+    def reset_indice_nouveau_tour(self):
+        self.__indice_joueur_actuel = 1
+        self.joueur_suivant()
+
     @log
     def preflop(self):
         """Distribution des cartes initiales et mise des blinds"""
@@ -117,14 +117,13 @@ class Manche:
         self.joueur_suivant()
         self.__info.changer_statut(self.indice_joueur_actuel, 2)
 
-
     @log
     def flop(self):
         """Révélation des 3 premières cartes communes"""
         for _ in range(3):
             self.__reserve.reveler(self.__board)
         self.__tour += 1
-        self.__indice_joueur_actuel = 2
+        self.reset_indice_nouveau_tour()
         self.__info.statuts_nouveau_tour()
 
     @log
@@ -132,7 +131,7 @@ class Manche:
         """Révélation de la quatrième carte commune"""
         self.__reserve.reveler(self.__board)
         self.__tour += 1
-        self.__indice_joueur_actuel = 2
+        self.reset_indice_nouveau_tour()
         self.__info.statuts_nouveau_tour()
 
     @log
@@ -140,7 +139,7 @@ class Manche:
         """Révélation de la cinquième carte commune"""
         self.__reserve.reveler(self.__board)
         self.__tour += 1
-        self.__indice_joueur_actuel = 2
+        self.reset_indice_nouveau_tour()
         self.__info.statuts_nouveau_tour()
 
     def fin_du_tour(self) -> bool:
@@ -168,9 +167,62 @@ class Manche:
                 n += 1
         if n == 0:
             raise ValueError("Les joueurs ne peuvent être tous couchés")
-        return (n == 1)
+        return n == 1
 
-    # Gestion du pot
+    # Gestion du pot*
+
+    def classement(self):
+        if self.tour < 3:
+            raise RuntimeError("Impossible de classer les joueurs : la board n'est pas dévoilé.")
+
+        n = len(self.info.joueurs)
+        joueurs_en_lice = self.info.joueurs_en_lice()
+        board = self.board
+
+        for i in range(n):
+            Combinaison[i] = EvaluateurCombinaison.eval(self.info.mains[i].cartes + board.cartes)
+
+        classement = [0] * n
+        for i in joueurs_en_lice:
+            c = 0
+            for j in joueurs_en_lice:
+                if Combinaison[j] >= Combinaison[i]:
+                    c += 1
+            classement[i] = c
+
+    def gains(self):
+        if self.tour < 3:
+            raise RuntimeError("Impossible de classer les joueurs : la board n'est pas dévoilé.")
+
+        a_distribuer = self.info.mises.copy()
+        pot = self.info.valeur_pot()
+        n = len(a_distribuer)
+        classement = self.classement()
+        gains = [0] * n
+        c = 1
+
+        while pot > 0 and c <= n:
+            for i in range(n):
+                beneficiaires = []
+                if c == classement[i]:
+                    beneficiaires.append(i)
+            while beneficiaires != []:
+                min = 0
+                p = len(beneficiaires)
+                for b in range(p):
+                    if a_distribuer[beneficiaires[p]] < a_distribuer[beneficiaires[min]]:
+                        min = b
+                for i in range(n):
+                    d = min(a_distribuer[beneficiaires[min]], a_distribuer[i])
+                    for j in beneficiaires:
+                        gains[j] += d / p
+                    a_distribuer[i] -= d
+                del beneficiaires[min]
+            c += 1
+            pot = 0
+            for i in a_distribuer:
+                pot += i
+        return gains
 
     def distribuer_pot(self):
         """
@@ -181,42 +233,21 @@ class Manche:
         list[int]
             Gains attribués à chaque joueur
         """
-        joueurs_en_lice = {}
-        board = self.board.cartes
+        if not self.fin_de_manche():
+            raise RuntimeError("Impossible de distribuer le pot : la manche n'est pas terminée.")
 
+        if len(joueurs_en_lice) == 0:
+            raise RuntimeError("Tous les joueurs ne peuvent être couchés.")
 
-        # Évaluation des mains des joueurs encore actifs
-        for i in range(len(self.info.joueurs)):
-            if self.info.statuts[i] in ["à jour", "all in"]:
-                main = self.info.mains[i]
-                joueurs_en_lice[i] = EvaluateurCombinaison.eval(main.cartes + board)
+        n = len(self.info.joueurs)
 
-        # Tri par insertion selon la force des combinaisons
-        classement = [i for i in joueurs_en_lice]
-        for i in range(1, len(classement)):
-            j = i - 1
-            while j >= 0 and AbstractCombinaison.gt(
-                joueurs_en_lice[classement[j]], joueurs_en_lice[classement[i]]
-            ):
-                classement[j + 1] = classement[j]
-                j -= 1
-            classement[j + 1] = classement[i]
+        if self.tour < 3:
+            gains = [0] * n
+            i = self.info.joueurs_en_lice[0]
+            gains[i] = self.info.valeur_pot()
 
-        # Calcul des gains
-        mises = self.info.mises.copy()
-        gains = [0] * len(mises)
-        for i in classement:
-            for j in range(len(mises)):
-                gains[i] += max(mises[i], mises[j])
-                mises[j] = max(0, mises[j] - mises[i])
-
-        mises = self.info.mises.copy()
-
-        # Attribution des crédits aux joueurs
-        for i in range(len(gains)):
-            joueur = self.__info.joueurs[i]
-            joueur.ajouter_credits(gains[i])
-            joueur.retirer_credits(mises[i])
+        else:
+            gains = self.gains()
 
         return gains
 
@@ -234,7 +265,7 @@ class Manche:
         if all(s == 3 for s in statuts):
             raise ValueError("Tous les joueurs ne peuvent être couchés.")
         else:
-            while statuts[indice] in ["couché", "all in"]:
+            while statuts[indice] in [3, 4]:
                 if indice == len(statuts) - 1:
                     indice = 0
                 else:
@@ -243,14 +274,15 @@ class Manche:
 
     def joueur_suivant(self):
         self.__indice_joueur_actuel = self.indice_joueur_suivant()
-                
+
     def joueur_indice(self, joueur):
         for i in range(len(self.info.joueurs)):
             if self.info.joueurs[i] == joueur:
                 return i
         raise ValueError("Le joueur n'est pas dans cette manche.")
-    
+
     def est_tour(self, joueur):
         if self.indice_joueur_actuel == self.joueur_indice(joueur):
             return True
-        else : return False
+        else:
+            return False

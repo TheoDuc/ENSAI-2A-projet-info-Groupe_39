@@ -4,6 +4,8 @@ from view.vue_abstraite import VueAbstraite
 from view.session import Session
 
 from service.joueur_service import JoueurService
+from service.credit_service import CreditService
+from business_object.joueur import Joueur
 
 
 class MenuJoueurVue(VueAbstraite):
@@ -34,9 +36,12 @@ class MenuJoueurVue(VueAbstraite):
         choix = inquirer.select(
             message="Faites votre choix : ",
             choices=[
-                "Afficher les joueurs de la base de données",
-                "Afficher des pokemons (par appel à un Webservice)",
+                "Tables",
+                "Se créditer",
                 "Infos de session",
+                "Afficher les joueurs de la base de données",
+                "Changer ses informations",
+                "Lire les regles",
                 "Se déconnecter",
             ],
         ).execute()
@@ -52,10 +57,69 @@ class MenuJoueurVue(VueAbstraite):
                 return MenuJoueurVue(Session().afficher())
 
             case "Afficher les joueurs de la base de données":
-                joueurs_str = JoueurService().afficher_tous()
+                joueurs_str = JoueurService().lister_tous()
                 return MenuJoueurVue(joueurs_str)
 
-            case "Afficher des pokemons (par appel à un Webservice)":
-                from view.pokemon_vue import PokemonVue
+            case "Changer ses informations":
+                joueur = Session().joueur
+                
+                nouveau_pseudo = inquirer.text(message="Entrez votre  nouveau pseudo : ").execute()
+                nouveau_pays = inquirer.text(message="Entrez votre nouveau pays : ").execute()
 
-                return PokemonVue()
+                nouveau_joueur = Joueur(joueur.id_joueur, nouveau_pseudo, joueur.credit, nouveau_pays)
+                joueur_n = JoueurService().modifier(nouveau_joueur)
+                
+                return MenuJoueurVue(joueur_n)
+
+            case "Tables":
+                from view.menu_table import MenuTable
+                return MenuTable()
+
+            case "Se créditer":
+                joueur = Session().joueur
+                credit = inquirer.text(message="Entrez votre montant à ajouter : ").execute()
+                nouveau_credit = CreditService().crediter(joueur, int(credit))
+                return MenuJoueurVue(Session().joueur)
+                
+            case "Lire les regles":
+                texte = """
+1. Les cartes :
+   - Chaque joueur reçoit 2 cartes cachées (cartes privatives).
+   - 5 cartes communes sont placées face visible au centre de la table, partagées par tous les joueurs.
+
+2. Les étapes du jeu :
+   - Pré-flop : Chaque joueur reçoit ses 2 cartes privatives. La première ronde d'enchères commence.
+   - Le Flop : Trois cartes communes sont révélées. Nouvelle ronde d'enchères.
+   - Le Turn : Une quatrième carte commune est révélée. Nouvelle ronde d'enchères.
+   - La River : La cinquième et dernière carte commune est révélée. Dernière ronde d'enchères.
+   - L'Abattage (Showdown) : Les joueurs restants montrent leurs cartes. Le joueur avec la meilleure main gagne.
+
+3. Les enchères :
+   - Suivre (Call) : Miser la même somme que le joueur précédent.
+   - Relancer (Raise) : Miser plus que le joueur précédent.
+   - Se coucher (Fold) : Abandonner la main et perdre les cartes.
+   - Vérifier (Check) : Ne pas miser mais rester dans la partie, si personne n’a relancé avant.
+
+4. Les combinaisons de mains (de la plus faible à la plus forte) :
+   - Carte haute : La carte la plus élevée.
+   - Paire : Deux cartes de même valeur (par exemple, deux rois).
+   - Double paire : Deux paires de cartes de même valeur (par exemple, deux rois et deux 10).
+   - Brelan : Trois cartes de même valeur (par exemple, trois 8).
+   - Suite : Cinq cartes consécutives (par exemple, 7, 8, 9, 10, Valet).
+   - Couleur (Flush) : Cinq cartes de la même couleur (pique, cœur, carreau, trèfle) mais pas nécessairement consécutives.
+   - Full : Un brelan et une paire (par exemple, trois 7 et deux rois).
+   - Carré : Quatre cartes de même valeur (par exemple, quatre dames).
+   - Quinte Flush : Cinq cartes consécutives de la même couleur (par exemple, 5, 6, 7, 8, 9 de cœur).
+   - Quinte Flush Royale : La meilleure main possible, c’est une quinte flush de l'As au 10 de la même couleur (par exemple, 10, Valet, Dame, Roi, As de cœur).
+
+5. Gagner la partie :
+   - À l'Abattage, le joueur avec la meilleure main gagne le pot.
+   - Si un joueur mise de l'argent et que personne ne le suit, il remporte le pot immédiatement, sans devoir montrer ses cartes.
+
+6. Quelques notions supplémentaires :
+   - Blinds : Des mises forcées (petite blind et grande blind) sont placées avant que les cartes ne soient distribuées pour garantir qu'il y ait toujours de l'argent dans le pot.
+   - dealer : Chaque tour sera initié par le joueur après le dealer 
+
+Le but du poker est d'obtenir la meilleure main possible ou de convaincre les autres joueurs que vous avez la meilleure main pour les amener à se coucher.
+"""
+                return MenuJoueurVue(texte)

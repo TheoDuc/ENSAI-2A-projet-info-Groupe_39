@@ -6,6 +6,7 @@ from utils.log_decorator import log
 from utils.singleton import Singleton
 from business_object.joueur import Joueur
 from business_object.info_manche import InfoManche
+from business_object.manche import Manche
 
 logger = logging.getLogger(__name__)
 
@@ -34,11 +35,13 @@ class MancheJoueurDAO(metaclass=Singleton):
         try:
             with DBConnection().connection as connection:
                 with connection.cursor() as cursor:
+                    manche = Manche(info_manche, 5)
+                    gains = manche.distribuer_pot()
                     for i, joueur in enumerate(info_manche.joueurs):
                         # On récupère les cartes du joueur si elles existent
                         carte1 = None
                         carte2 = None
-                        manche = Manche(infomanche, 5)
+                        gain = gains[i]
                         if hasattr(info_manche, "cartes_mains"):
                             try:
                                 carte1, carte2 = info_manche.cartes_mains[i]
@@ -72,9 +75,9 @@ class MancheJoueurDAO(metaclass=Singleton):
                                 "id_joueur": joueur.id_joueur,
                                 "carte_main_1": carte1,
                                 "carte_main_2": carte2,
-                                "gain": info_manche.gains,
-                                "mise": info_manche.mises,
-                                "tour_couche": info_manche.tour_couche,
+                                "gain": gains[i],
+                                "mise": info_manche.mises[i],
+                                "tour_couche": info_manche.tour_couche[i],
                             },
                         )
             return True
@@ -85,14 +88,16 @@ class MancheJoueurDAO(metaclass=Singleton):
 
     # ---------------------------------------------------------------------
     @log
-    def trouver_par_id_manche(self, id_manche: int) -> list[dict]:
+    def trouver_par_ids(self, id_manche: int, id_joueur: int) -> list[dict]:
         """
         Récupère toutes les lignes de la table manche_joueur associées à une manche donnée.
 
         Parameters
         ----------
         id_manche : int
-            Identifiant unique de la manche concernée
+            Identifiant de la manche concernée
+        id_joueur : int
+            Identifiant du joueur concernée
 
         Returns
         -------
@@ -106,9 +111,10 @@ class MancheJoueurDAO(metaclass=Singleton):
                         """
                         SELECT *
                           FROM manche_joueur
-                         WHERE id_manche = %(id_manche)s;
+                         WHERE id_manche = %(id_manche)s and id_joueur = %(id_joueur)s;
                         """,
-                        {"id_manche": id_manche},
+                        {"id_manche": id_manche,
+                        "id_joueur": id_joueur},
                     )
                     res = cursor.fetchall()
 
@@ -121,63 +127,17 @@ class MancheJoueurDAO(metaclass=Singleton):
             for row in res:
                 participations.append(
                     {
-                        "id_manche_joueur": row["id_manche_joueur"],
                         "id_manche": row["id_manche"],
                         "id_joueur": row["id_joueur"],
-                        "statut": row["statut"],
+                        "carte_main_1": row["carte_main_1"],
+                        "carte_main_2": row["carte_main_2"],
+                        "gain": row["gain"],
                         "mise": row["mise"],
                         "tour_couche": row["tour_couche"],
                     }
                 )
         return participations
 
-    # ---------------------------------------------------------------------
-    @log
-    def modifier_manche_joueur(
-        self,
-        id_manche: int,
-        id_joueur: int,
-        statut: str | None = None,
-        mise: int | None = None,
-        tour_couche: int | None = None,
-    ) -> bool:
-        """
-        Met à jour les informations d'un joueur pour une manche donnée.
-        """
-        champs = []
-        valeurs = {"id_manche": id_manche, "id_joueur": id_joueur}
-
-        if statut is not None:
-            champs.append("statut = %(statut)s")
-            valeurs["statut"] = statut
-        if mise is not None:
-            champs.append("mise = %(mise)s")
-            valeurs["mise"] = mise
-        if tour_couche is not None:
-            champs.append("tour_couche = %(tour_couche)s")
-            valeurs["tour_couche"] = tour_couche
-
-        if not champs:
-            return False  # rien à modifier
-
-        try:
-            with DBConnection().connection as connection:
-                with connection.cursor() as cursor:
-                    cursor.execute(
-                        f"""
-                        UPDATE manche_joueur
-                           SET {', '.join(champs)}
-                         WHERE id_manche = %(id_manche)s
-                           AND id_joueur = %(id_joueur)s;
-                        """,
-                        valeurs,
-                    )
-                    res = cursor.rowcount
-        except Exception as e:
-            logging.error(f"[ERREUR DAO] Modification manche_joueur : {e}")
-            return False
-
-        return res == 1
 
     # ---------------------------------------------------------------------
     @log
@@ -225,68 +185,11 @@ class MancheJoueurDAO(metaclass=Singleton):
             raise
 
         return res == 1
-    @log
-    def ajouter_credit(self, joueur, montant: int) -> bool:
-        """
-        Ajoute un crédit à un joueur dans la table 'joueur'.
-        Renvoie True si la mise à jour SQL a bien eu lieu, False sinon.
-        """
-        if montant <= 0:
-            raise ValueError("Le montant à créditer doit être positif.")
 
-        try:
-            with DBConnection().connection as conn:
-                with conn.cursor() as cursor:
-                    query = """
-                        UPDATE joueur
-                        SET credit = credit + %s
-                        WHERE id_joueur = %s
-                    """
-                    cursor.execute(query, (montant, joueur.id_joueur))
-                    if cursor.rowcount == 1:
-                        return True
-                    else:
-                        logger.warning(f"Aucun joueur trouvé pour id {joueur.id_joueur}")
-                        return False
-
-        except Exception as e:
-            logger.error(f"Erreur lors de l’ajout de crédits pour {joueur.pseudo} : {e}")
-            return False
-
-    # -----------------------------------------------------------------
-    @log
-    def retirer_credit(self, joueur, montant: int) -> bool:
-        """
-        Retire un crédit à un joueur dans la table 'joueur'.
-        Renvoie True si la mise à jour SQL a bien eu lieu, False sinon.
-        """
-        if montant <= 0:
-            raise ValueError("Le montant à débiter doit être positif.")
-
-        try:
-            with DBConnection().connection as conn:
-                with conn.cursor() as cursor:
-                    query = """
-                        UPDATE joueur
-                        SET credit = credit - %s
-                        WHERE id_joueur = %s AND credit >= %s
-                    """
-                    cursor.execute(query, (montant, joueur.id_joueur, montant))
-                    if cursor.rowcount == 1:
-                        return True
-                    else:
-                        logger.warning(
-                            f"Impossible de retirer {montant} crédits à {joueur.pseudo} "
-                            f"(fonds insuffisants ou joueur introuvable)"
-                        )
-                        return False
-
-        except Exception as e:
-            logger.error(f"Erreur lors du retrait de crédits pour {joueur.pseudo} : {e}")
-            return False
 
 mjdao = MancheJoueurDAO()    
 joueur1 = Joueur(998, 'a', 500, 'us') 
 joueur2 = Joueur(999, 'admin', 50, 'fr')
 info_manche = InfoManche([joueur1, joueur2])
 print(mjdao.creer_manche_joueur(1, info_manche))
+print(mjdao.trouver_par_ids(997,997))

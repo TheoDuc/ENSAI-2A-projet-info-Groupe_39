@@ -1,5 +1,7 @@
 from datetime import datetime
 
+import pytz
+
 from utils.singleton import Singleton
 
 
@@ -18,7 +20,7 @@ class Session(metaclass=Singleton):
     def connexion(self, joueur):
         """Enregistement des données en session"""
         self.joueur = joueur
-        self.debut_connexion = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        self.debut_connexion = datetime.now(pytz.timezone('Europe/Paris')).strftime("%d/%m/%Y %H:%M:%S")
 
     def deconnexion(self):
         """Suppression des données de la session"""

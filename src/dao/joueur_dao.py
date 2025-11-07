@@ -46,12 +46,7 @@ class JoueurDao(metaclass=Singleton):
 
         created = False
         if res:
-            joueur = Joueur(
-                id_joueur=res["id_joueur"],
-                pseudo=pseudo,
-                credit=2000,
-                pays=pays
-            )
+            joueur = Joueur(id_joueur=res["id_joueur"], pseudo=pseudo, credit=2000, pays=pays)
             created = True
 
         return created
@@ -87,12 +82,45 @@ class JoueurDao(metaclass=Singleton):
         joueur = None
         if res:
             joueur = Joueur(
-                id_joueur=id_joueur,
-                pseudo=res["pseudo"],
-                credit=res["credit"],
-                pays=res["pays"]
+                id_joueur=id_joueur, pseudo=res["pseudo"], credit=res["credit"], pays=res["pays"]
             )
         return joueur
+
+    @log
+    def trouver_par_pseudo(self, pseudo) -> Joueur:
+        """trouver un joueur grace à son pseudo
+
+        Parameters
+        ----------
+        pseudo : int
+            pseudo du joueur que l'on souhaite trouver
+
+        Returns
+        -------
+        joueur : Joueur
+            renvoie le joueur que l'on cherche par pseudo
+        """
+        try:
+            with DBConnection().connection as connection:
+                with connection.cursor() as cursor:
+                    cursor.execute(
+                        "SELECT *                           "
+                        "  FROM joueur                      "
+                        " WHERE pseudo = %(pseudo)s;  ",
+                        {"pseudo": pseudo},
+                    )
+                    res = cursor.fetchone()
+        except Exception as e:
+            logging.info(e)
+            raise
+
+        joueur = None
+        if res:
+            joueur = Joueur(
+                id_joueur=res["id_joueur"], pseudo=pseudo, credit=res["credit"], pays=res["pays"]
+            )
+        return joueur
+
 
     @log
     def lister_tous(self) -> list[Joueur]:
@@ -128,12 +156,16 @@ class JoueurDao(metaclass=Singleton):
                     id_joueur=row["id_joueur"],
                     pseudo=row["pseudo"],
                     credit=row["credit"],
-                    pays=row["pays"]
+                    pays=row["pays"],
                 )
 
                 liste_joueurs.append(joueur)
+                texte = "["
+            for joueur in liste_joueurs:
+                texte += f"{joueur}, "
+            texte[:-2] + "]"
 
-        return liste_joueurs
+        return texte[:-2] + "]"
 
     @log
     def modifier(self, joueur) -> bool:
@@ -238,19 +270,17 @@ class JoueurDao(metaclass=Singleton):
                 id_joueur=res["id_joueur"],
                 pseudo=res["pseudo"],
                 credit=res["credit"],
-                pays=res["pays"]
-                )
+                pays=res["pays"],
+            )
 
         return joueur
 
 
 # joueur1 = Joueur(1, 'paul', 100, 'fr')
 # joueur2 = Joueur(1, 'paul2', 1002, 'fr2')
-
-joueurDao = JoueurDao()
+# joueurDao = JoueurDao()
 # print(joueurDao.creer('paul','fr'))
-print(joueurDao.trouver_par_id(1))
+# print(joueurDao.trouver_par_pseudo('marine'))
 # print(joueurDao.lister_tous())
 # print(joueurDao.modifier(joueur1))
 # joueurDao.supprimer(joueur=joueur1)
-

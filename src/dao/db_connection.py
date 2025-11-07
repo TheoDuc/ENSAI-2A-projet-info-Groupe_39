@@ -22,7 +22,7 @@ class DBConnection(metaclass=Singleton):
     ----------
     connection : psycopg2.extensions.connection
         Retourne la connexion active à la base de données, permettant
-        d’exécuter des requêtes SQL au sein d’un bloc contextuel 
+        d’exécuter des requêtes SQL au sein d’un bloc contextuel
     """
 
     def __init__(self):
