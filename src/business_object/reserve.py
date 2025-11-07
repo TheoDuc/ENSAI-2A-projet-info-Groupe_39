@@ -35,8 +35,8 @@ class Reserve(AbstractListeCartes):
         carte : Carte
             carte à ajouter à la reserve
         """
-        self.ajouter_carte_base(carte)
 
+        self.ajouter_carte_base(carte)
 
     def bruler(self):
         """
@@ -95,13 +95,13 @@ class Reserve(AbstractListeCartes):
 
         distribution = [[] for i in range(n_joueurs)]
 
-        # Distribution des cartes dans des listes
+        # Distribution des cartes dans des listes de cartes
         for _ in range(0, 2):
             for joueur in range(0, n_joueurs):
                 carte = self.retirer_carte()
                 distribution[joueur].append(carte)
 
-        # Converson des listes de cartes en mains
+        # Transformation des listes de cartes en mains
         for main in range(len(distribution)):
             distribution[main] = Main(distribution[main])
 

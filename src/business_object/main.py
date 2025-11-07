@@ -27,7 +27,7 @@ class Main(AbstractListeCartes):
 
         else:
             super().__init__(cartes)
-        
+
     def ajouter_carte(self, carte: Carte):
         """
         Ajoute une carte dans la main. Et vérifie que le nombre de cartes reste en dessous de 2
@@ -37,11 +37,13 @@ class Main(AbstractListeCartes):
         carte : Carte
             carte à ajouter à la main
         """
+
         if carte is not None and len(self.cartes) > 1:
-            raise ValueError(f"Le nombre de cartes dans la main est trop grand : {len(self.cartes)+1}")
+            raise ValueError(
+                f"Le nombre de cartes dans la main est trop grand : {len(self.cartes) + 1}"
+            )
         else:
             self.ajouter_carte_base(carte)
-
 
     def intervertir_cartes(self):
         """
@@ -58,5 +60,3 @@ class Main(AbstractListeCartes):
         """
 
         self.ajouter_carte(self.retirer_carte())
-
-

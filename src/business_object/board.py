@@ -37,6 +37,7 @@ class Board(AbstractListeCartes):
         carte : Carte
             carte à ajouter au board
         """
+
         if carte is not None and len(self.cartes) > 4:
             raise ValueError(
                 f"Le nombre de cartes dans le board est trop grand : {len(self.cartes) + 1}"

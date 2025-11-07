@@ -24,9 +24,11 @@ class AbstractListeCartes(ABC):
         _ListeCartes
             Instance de '_ListeCartes'
         """
+
         if not isinstance(cartes, list) and cartes is not None:
             raise TypeError(f"cartes n'est pas list ou None : {type(cartes)}")
 
+        # Vérifie que toutes les cartes de la liste sont de type 'Carte'
         if cartes is not None:
             for carte in cartes:
                 if not isinstance(carte, Carte):
@@ -36,6 +38,8 @@ class AbstractListeCartes(ABC):
 
         if cartes is not None:
             self.__cartes = cartes
+
+        # Créer un jeu de cartes complet
         else:
             self.__cartes = [
                 Carte(valeur, couleur) for valeur in Carte.VALEURS() for couleur in Carte.COULEURS()
@@ -48,7 +52,6 @@ class AbstractListeCartes(ABC):
 
     def __str__(self) -> str:
         """Représentation informelle d'un objet de type _ListeCartes"""
-
         if len(self.__cartes) == 0:
             return "[]"
 
