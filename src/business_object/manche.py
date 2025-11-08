@@ -48,16 +48,19 @@ class Manche:
         TypeError : Si info n'est pas un InfoManche ou grosse_blind n'est pas un int
         ValueError : Si grosse_blind <= 0
         """
+
         if not isinstance(info, InfoManche):
             raise TypeError(
                 f"Le paramètre 'info' doit être une instance de InfoManche, pas {type(info).__name__}."
             )
+
         if not isinstance(grosse_blind, int):
             raise TypeError(
                 f"Le paramètre 'grosse_blind' doit être un entier, pas {type(grosse_blind).__name__}."
             )
-        if grosse_blind <= 0:
-            raise ValueError("Le montant de la grosse blind doit être strictement positif.")
+
+        if grosse_blind < 2:
+            raise ValueError("Le montant de la grosse blind doit être supérieur à 2")
 
         # Initialisation des attributs
         self.__tour = 0
@@ -67,55 +70,127 @@ class Manche:
         self.__indice_joueur_actuel = 0
         self.__grosse_blind = grosse_blind
 
-    # Propriétés
+    # ---------------------------------------
+    # Property
+    # ---------------------------------------
+
     @property
     def tour(self) -> int:
+        """Tour de jeu actuel"""
         return self.__tour
 
     @property
     def info(self) -> InfoManche:
+        """Informations des joueurs dans la partie"""
         return self.__info
 
     @property
     def reserve(self) -> Reserve:
+        """Paquet de carte constituant la pioche"""
         return self.__reserve
 
     @property
     def board(self) -> Board:
+        """Cartes communes à chaque joueurs"""
         return self.__board
 
     @property
     def indice_joueur_actuel(self) -> int:
+        """Indice du joueur à qui c'est le tour"""
         return self.__indice_joueur_actuel
 
     @property
     def grosse_blind(self) -> int:
+        """Valeur de la grosse blind"""
         return self.__grosse_blind
+
+    # ---------------------------------------
+    # Classmethod
+    # ---------------------------------------
 
     @classmethod
     def TOURS(cls) -> tuple:
+        """Liste des phases de jeu d'une manche"""
         return cls.__TOURS
 
-    def __str__(self):
-        return f"Manche(tour={self.tour}, grosse_blind={self.grosse_blind}, board={self.board})"
+    # ---------------------------------------
+    # Affichage
+    # ---------------------------------------
 
-    # Déroulement des tours
+    def __str__(self) -> str:
+        """Représentation informelle d'un objet de type 'Manche'"""
+        return f"Manche(tour={self.TOURS(self.tour)}, grosse_blind={self.grosse_blind}, board={self.board})"
 
-    def reset_indice_nouveau_tour(self):
-        self.__indice_joueur_actuel = 1
+    # ---------------------------------------
+    # Tours des joueurs et joueurs
+    # ---------------------------------------
+
+    def joueur_indice(self, joueur) -> int:
+        """Retourne l'indice du joueur si il est présent dans la manche"""
+        for i in range(len(self.info.joueurs)):
+            if self.info.joueurs[i] == joueur:
+                return i
+
+        raise ValueError("Le joueur n'est pas dans cette manche")
+
+    def est_tour(self, joueur):
+        """Vérifie si c'est au tour du joueur"""
+        if self.indice_joueur_actuel == self.joueur_indice(joueur):
+            return True
+        else:
+            return False
+
+    def indice_joueur_suivant(self):
+        """
+        Retourne l'indice du joueur suivant à qui c'est le tour de jouer
+        """
+
+        if all(s == 3 for s in statuts):
+            raise ValueError("Tous les joueurs ne peuvent être couchés")
+
+        indice = self.indice_joueur_actuel
+        statuts = self.info.statuts
+
+        if indice == len(statuts) - 1:
+            indice = 0
+        else:
+            indice += 1
+
+        while statuts[indice] in [3, 4]:
+            if indice == len(statuts) - 1:
+                indice = 0
+            else:
+                indice += 1
+
+        return indice
+
+    def joueur_suivant(self):
+        self.__indice_joueur_actuel = self.indice_joueur_suivant()
+
+    # ---------------------------------------
+    # Phases de la manche
+    # ---------------------------------------
+
+    def indices_nouveau_tour(self):
+        """Donne la main au joueur après le dealer encore en jeu"""
+        self.__indice_joueur_actuel = len(self.info.joueurs)
         self.joueur_suivant()
+
+    def statuts_nouveau_tour(self):
+        """Modifie le statut des joueurs à jour en innactif"""
+        for i in range(len(self.info.statuts)):
+            if self.info.statuts[i] not in [3, 4]:
+                self.info.modifier_statut(i, 0)
 
     @log
     def preflop(self):
         """Distribution des cartes initiales et mise des blinds"""
-        self.__reserve.melanger()
-        self.__info.assignation_mains(self.__reserve.distribuer(len(self.__info.joueurs)))
-        self.__info.suivre(self.indice_joueur_actuel, self.grosse_blind // 2)
+        self.reserve.melanger()
+        self.info.assignation_mains(self.reserve.distribuer(len(self.info.joueurs)))
+        self.suivre(self.indice_joueur_actuel, self.grosse_blind // 2)
         self.joueur_suivant()
-        self.__info.changer_statut(self.indice_joueur_actuel, 1)
-        self.__info.suivre(self.indice_joueur_actuel, self.grosse_blind - (self.grosse_blind // 2))
+        self.info.suivre(self.indice_joueur_actuel, self.grosse_blind - (self.grosse_blind // 2))
         self.joueur_suivant()
-        self.__info.changer_statut(self.indice_joueur_actuel, 2)
 
     @log
     def flop(self):
@@ -123,24 +198,24 @@ class Manche:
         for _ in range(3):
             self.__reserve.reveler(self.__board)
         self.__tour += 1
-        self.reset_indice_nouveau_tour()
-        self.__info.statuts_nouveau_tour()
+        self.indices_nouveau_tour()
+        self.statuts_nouveau_tour()
 
     @log
     def turn(self):
         """Révélation de la quatrième carte commune"""
         self.__reserve.reveler(self.__board)
         self.__tour += 1
-        self.reset_indice_nouveau_tour()
-        self.__info.statuts_nouveau_tour()
+        self.indices_nouveau_tour()
+        self.statuts_nouveau_tour()
 
     @log
     def river(self):
         """Révélation de la cinquième carte commune"""
         self.__reserve.reveler(self.__board)
         self.__tour += 1
-        self.reset_indice_nouveau_tour()
-        self.__info.statuts_nouveau_tour()
+        self.indices_nouveau_tour()
+        self.statuts_nouveau_tour()
 
     def fin_du_tour(self) -> bool:
         """
@@ -160,7 +235,7 @@ class Manche:
                 return False
         return True
 
-    def fin_de_manche(self):
+    def fin_de_manche(self) -> bool:
         n = 0
         for s in self.info.statuts:
             if s != 3:
@@ -169,7 +244,118 @@ class Manche:
             raise ValueError("Les joueurs ne peuvent être tous couchés")
         return n == 1
 
-    # Gestion du pot*
+    # ---------------------------------------
+    # Actions d'un joueur
+    # ---------------------------------------
+
+    @log
+    def checker(self, indice_joueur):
+        pass
+
+    @log
+    def suivre(self, indice_joueur: int, relance : int = 0) -> int:
+        """
+        Ajoute une mise pour un joueur.
+
+        Paramètres
+        ----------
+        indice_joueur : int
+            Indice du joueur dans la liste
+        montant : int
+            Montant à miser
+        """
+
+        if not isinstance(indice_joueur, int):
+            raise TypeError("indice_joueur doit être un entier")
+
+        if not isinstance(relance, int) or relance < 0:
+            raise ValueError("Le montant doit être un entier positif")
+
+        pour_suivre = max(self.info.mises) - self.info.mises[indice_joueur]
+
+        # Si le joueur n'a pas assez de crédits pour suivre
+        if pour_suivre >= self.info.joueurs[indice_joueur].credit:
+            raise ValueError("Le joueur doit all-in")
+
+        # Si le joueur n'a pas assez de crédits pour relancer autant
+        if relance + pour_suivre >= self.info.joueurs[indice_joueur].credit:
+            raise ValueError("Le joueur ne peut relancer autant")
+
+        # Calcule et mise à jour de la mise
+        ancienne_mise = self.info.mises[indice_joueur]
+        nouvelle_mise = pour_suivre + relance + ancienne_mise
+        self.info.modifier_mise(indice_joueur, nouvelle_mise)
+
+        self.info.modifier_statut[indice_joueur, 2]
+
+        # Cas où le joueur relance
+        if relance > 0:
+            # Met à jour le statut des autres joueurs innactifs ou à jour
+            for i in range(len(self.info.statuts)):
+                if self.info.statuts[i] in [0, 2]:
+                    self.info.statuts[i] = 1
+
+        return pour_suivre + relance
+
+    @log
+    def all_in(self, indice_joueur: int) -> int:
+        """Mise tout les crédits d'un joueur"""
+
+        if self.info.statut[indice_joueur] in [3,4]:
+            raise ValueError("Le joueur ne peut plus all-in")
+
+        # Le montant total du all-in
+        montant = self.info.joueurs[indice_joueur].credit
+        # Le montant nécessaire pour atteindre la mise actuelle
+        pour_suivre = max(self.info.mises) - self.info.mises[indice_joueur]
+
+        ancienne_mise = self.info.mises[indice_joueur]
+        nouvelle_mise = montant + ancienne_mise
+        self.info.modifier_statut(indice_joueur, 4)
+
+        # Cas où le joueur all-in dépasse la mise la plus haute
+        if montant > pour_suivre:
+            # Réinitialise le statut des
+            for i in range(len(self.info.statuts)):
+                if self.info.statuts[i] in (0, 2):
+                    self.info.statuts[i] = 1
+
+        return montant
+
+    @log
+    def se_coucher(self, indice_joueur: int):
+        """
+        Marque un joueur comme couché.
+
+        Paramètres
+        ----------
+        indice_joueur : int
+            Indice du joueur dans la liste
+        """
+
+        self.info.modifier_tour_couche(indice_joueur, self.tour)
+        self.info.modifier_statut(indice_joueur, 3)
+
+    # ---------------------------------------
+    # Fin de partie et allocation des gains
+    # ---------------------------------------
+
+    def valeur_pot(self):
+        """Retourne la valer du pot"""
+        pot = 0
+
+        for mise in self.info.mises:
+            pot += mise
+        
+        return pot
+
+    def joueurs_en_lice(self):
+        """Renvoie la liste d'indices des joueurs qui ne sont pas couchés"""
+        liste_indices = []
+        for i in range(len(self.info.joueurs)):
+            if self.info.statuts[i] != 3:
+                liste_indices.append(i)
+        return liste_indices
 
     def classement(self):
         if self.tour < 3:
@@ -192,7 +378,7 @@ class Manche:
 
     def gains(self):
         if self.tour < 3:
-            raise RuntimeError("Impossible de classer les joueurs : la board n'est pas dévoilé.")
+            raise RuntimeError("Impossible de classer les joueurs : la board n'est pas dévoilé entièrement")
 
         a_distribuer = self.info.mises.copy()
         pot = self.info.valeur_pot()
@@ -250,39 +436,3 @@ class Manche:
             gains = self.gains()
 
         return gains
-
-    # Gestion des joueurs
-    def indice_joueur_suivant(self):
-        """
-        Retourne l'indice du joueur suivant qui n'est pas couché ou all in.
-        """
-        indice = self.indice_joueur_actuel
-        statuts = self.info.statuts
-        if indice == len(statuts) - 1:
-            indice = 0
-        else:
-            indice += 1
-        if all(s == 3 for s in statuts):
-            raise ValueError("Tous les joueurs ne peuvent être couchés.")
-        else:
-            while statuts[indice] in [3, 4]:
-                if indice == len(statuts) - 1:
-                    indice = 0
-                else:
-                    indice += 1
-        return indice
-
-    def joueur_suivant(self):
-        self.__indice_joueur_actuel = self.indice_joueur_suivant()
-
-    def joueur_indice(self, joueur):
-        for i in range(len(self.info.joueurs)):
-            if self.info.joueurs[i] == joueur:
-                return i
-        raise ValueError("Le joueur n'est pas dans cette manche.")
-
-    def est_tour(self, joueur):
-        if self.indice_joueur_actuel == self.joueur_indice(joueur):
-            return True
-        else:
-            return False

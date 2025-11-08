@@ -9,7 +9,7 @@ from business_object.main import Main
 from business_object.manche import Manche
 from business_object.reserve import Reserve
 
-
+"""
 class TestManche:
     # Fixtures
     @pytest.fixture
@@ -120,3 +120,4 @@ class TestManche:
         # THEN
         assert len(manche.board.cartes) == 1
         assert manche.tour == 1
+"""

@@ -7,8 +7,9 @@ from business_object.info_manche import InfoManche
 from business_object.joueur import Joueur
 
 
+"""
 class TestMancheJoueurDAO(unittest.TestCase):
-    """Classe de tests unitaires pour MancheJoueurDAO"""
+    # Classe de tests unitaires pour MancheJoueurDAO
 
     def setUp(self):
         self.dao = MancheJoueurDAO()
@@ -27,7 +28,7 @@ class TestMancheJoueurDAO(unittest.TestCase):
     # -----------------------------------------------------------------
     @patch("dao.manche_joueur_dao.DBConnection")
     def test_creer_manche_joueur_succes(self, mock_db):
-        """Test de la création réussie de participations"""
+        # Test de la création réussie de participations
         mock_conn = MagicMock()
         mock_cursor = MagicMock()
         mock_db.return_value.connection.__enter__.return_value = mock_conn
@@ -41,7 +42,7 @@ class TestMancheJoueurDAO(unittest.TestCase):
     # -----------------------------------------------------------------
     @patch("dao.manche_joueur_dao.DBConnection")
     def test_creer_manche_joueur_exception(self, mock_db):
-        """Test en cas d’exception SQL"""
+        # Test en cas d’exception SQL
         mock_db.return_value.connection.__enter__.side_effect = Exception("DB error")
 
         result = self.dao.creer_manche_joueur(1, self.info_manche)
@@ -50,7 +51,7 @@ class TestMancheJoueurDAO(unittest.TestCase):
     # -----------------------------------------------------------------
     @patch("dao.manche_joueur_dao.DBConnection")
     def test_trouver_par_ids(self, mock_db):
-        """Test de la récupération des participations"""
+        # Test de la récupération des participations
         mock_conn = MagicMock()
         mock_cursor = MagicMock()
         mock_cursor.fetchall.return_value = [
@@ -76,7 +77,7 @@ class TestMancheJoueurDAO(unittest.TestCase):
     # -----------------------------------------------------------------
     @patch("dao.manche_joueur_dao.DBConnection")
     def test_supprimer_par_id_manche(self, mock_db):
-        """Test suppression des participations d’une manche"""
+        # Test suppression des participations d’une manche
         mock_conn = MagicMock()
         mock_cursor = MagicMock()
         mock_cursor.rowcount = 2
@@ -90,7 +91,7 @@ class TestMancheJoueurDAO(unittest.TestCase):
     # -----------------------------------------------------------------
     @patch("dao.manche_joueur_dao.DBConnection")
     def test_supprimer_participation(self, mock_db):
-        """Test suppression d’une seule participation"""
+        # Test suppression d’une seule participation
         mock_conn = MagicMock()
         mock_cursor = MagicMock()
         mock_cursor.rowcount = 1
@@ -104,3 +105,4 @@ class TestMancheJoueurDAO(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+"""

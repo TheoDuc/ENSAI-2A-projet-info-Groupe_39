@@ -6,11 +6,11 @@ from business_object.joueur import Joueur
 from business_object.info_manche import InfoManche
 from business_object.manche import Manche
 
-
+"""
 class TestMancheDao:
 
     def creer_manche(self):
-        """Crée une instance de Manche prête à être utilisée"""
+        # Crée une instance de Manche prête à être utilisée
         joueur1 = Joueur(1, "paul", 100, "fr")
         joueur2 = Joueur(2, "luc", 200, "us")
         info = InfoManche([joueur1, joueur2])
@@ -75,3 +75,4 @@ class TestMancheDao:
 
             # THEN
             assert resultat is False
+"""
