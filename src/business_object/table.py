@@ -49,7 +49,7 @@ class Table:
         self.__grosse_blind = grosse_blind
         self.__numero_table = numero_table
         self.__mode_jeu = mode_jeu
-        self.__joueurs = joueurs
+        self.__joueurs = list(joueurs)
         self.__manche = Manche
         self.dealer_index = 0  # DE la part de cheik pour rotation dealer
 
@@ -90,7 +90,7 @@ class Table:
 
     def __len__(self) -> int:
         """Retourne le nombre de joueurs à la table"""
-        return len(self.__joueurs)
+        return len(self.joueurs)
 
     @log
     def ajouter_joueur(self, joueur) -> None:

@@ -32,11 +32,11 @@ class InfoManche:
         
         if not isinstance(joueurs, list):
             raise TypeError(
-                f"Le paramètre 'joueurs' doit être une liste, pas {type(joueurs).__name__}."
+                f"Le paramètre 'joueurs' doit être une liste, pas {type(joueurs).__name__}"
             )
 
         if not all(isinstance(j, Joueur) for j in joueurs):
-            raise TypeError("Tous les éléments de 'joueurs' doivent être des instances de Joueur.")
+            raise TypeError("Tous les éléments de 'joueurs' doivent être des instances de Joueur")
 
         if len(joueurs) < 2:
             raise ValueError(
@@ -107,9 +107,9 @@ class InfoManche:
         """
 
         if not isinstance(mains, list) or not all(isinstance(m, Main) for m in mains):
-            raise TypeError("Le paramètre 'mains' doit être une liste de Main.")
+            raise TypeError("Le paramètre 'mains' doit être une liste de Main")
 
         if len(mains) != len(self.joueurs):
-            raise ValueError("Le nombre de mains doit correspondre au nombre de joueurs.")
+            raise ValueError("Le nombre de mains doit correspondre au nombre de joueurs")
 
         self.__mains = mains

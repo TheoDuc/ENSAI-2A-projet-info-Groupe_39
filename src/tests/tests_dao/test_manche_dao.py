@@ -6,7 +6,6 @@ from business_object.joueur import Joueur
 from business_object.info_manche import InfoManche
 from business_object.manche import Manche
 
-"""
 class TestMancheDao:
 
     def creer_manche(self):
@@ -75,4 +74,3 @@ class TestMancheDao:
 
             # THEN
             assert resultat is False
-"""

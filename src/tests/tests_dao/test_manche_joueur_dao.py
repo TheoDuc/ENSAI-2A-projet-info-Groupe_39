@@ -1,11 +1,11 @@
 """Tests unitaires pour la classe MancheJoueurDAO"""
 
 import unittest
+
 from unittest.mock import MagicMock, patch
 from dao.manche_joueur_dao import MancheJoueurDAO
 from business_object.info_manche import InfoManche
 from business_object.joueur import Joueur
-
 
 """
 class TestMancheJoueurDAO(unittest.TestCase):

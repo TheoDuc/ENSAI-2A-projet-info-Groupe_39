@@ -17,7 +17,7 @@ class TestTable:
 
     def test_table_len_succes(self):
         # GIVEN
-        table = Table(10, 10, 1, [])
+        table = Table(8, 40)
         taille_attendu = 0
 
         # WHEN
@@ -28,16 +28,16 @@ class TestTable:
 
     def test_table_ajoute_joueur_succes(self, alice):
         # GIVEN
-        table = Table(10, 10, 1, [])
+        table = Table(10, 10)
         joueur = alice
-        table_attendu = Table(10, 10, 1, [joueur])
+        liste_joueurs = [alice]
 
         # WHEN
         table.ajouter_joueur(joueur)
 
         # THEN
-        assert len(table) == len(table_attendu)
-        assert table.joueurs == table_attendu.joueurs
+        assert len(table) == 1
+        assert table.joueurs == liste_joueurs
 
     def test_table_ajouter_joueur_type_incorrecte(self):
         # GIVEN
@@ -52,7 +52,7 @@ class TestTable:
     def test_table_ajouter_joueur_valeur_incorrecte(self, alice):
         # GIVEN
         joueur = alice
-        table = Table(1, 10, 1, [joueur])
+        table = Table(2, 10, joueurs=[alice, alice])
         message_attendu = "Nombre maximum de joueurs atteint"
 
         # WHEN / THEN
@@ -62,17 +62,17 @@ class TestTable:
     def test_table_retirer_joueur_succes(self, alice):
         # GIVEN
         joueur = alice
-        table = Table(10, 10, 1, [joueur])
+        table = Table(10, 10, joueurs=[alice])
         table_attendu = Table(10, 10, 1, [])
         indice = 0
 
         # WHEN
-        joueur_supprimer = table.retirer_joueur(indice)
+        joueur_supprime = table.retirer_joueur(indice)
 
         # THEN
         assert len(table) == len(table_attendu)
         assert table.joueurs == table_attendu.joueurs
-        assert joueur_supprimer == joueur
+        assert joueur_supprime == joueur
 
     def test_table_retirer_joueur_valeur_incorrecte(self):
         # GIVEN
@@ -130,8 +130,8 @@ class TestTable:
         # GIVEN
         joueur1 = alice
         joueur2 = bernard
-        table = Table(10, 10, 1, [joueur1, joueur2])
-        table_attendue = Table(10, 10, 1, [joueur2, joueur1])
+        table = Table(10, 10, joueurs=[joueur1, joueur2])
+        table_attendue = Table(10, 10, joueurs=[joueur2, joueur1])
 
         # WHEN
         table.rotation_dealer()

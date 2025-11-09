@@ -119,7 +119,7 @@ class Manche:
 
     def __str__(self) -> str:
         """Représentation informelle d'un objet de type 'Manche'"""
-        return f"Manche(tour={self.TOURS(self.tour)}, grosse_blind={self.grosse_blind}, board={self.board})"
+        return f"Manche(tour={self.TOURS()[self.tour]}, grosse_blind={self.grosse_blind}, board={self.board})"
 
     # ---------------------------------------
     # Tours des joueurs et joueurs
@@ -145,7 +145,7 @@ class Manche:
         Retourne l'indice du joueur suivant à qui c'est le tour de jouer
         """
 
-        if all(s == 3 for s in statuts):
+        if all(s == 3 for s in self.info.statuts):
             raise ValueError("Tous les joueurs ne peuvent être couchés")
 
         indice = self.indice_joueur_actuel
@@ -165,15 +165,19 @@ class Manche:
         return indice
 
     def joueur_suivant(self):
+        """
+        Blabla
+        """
+
         self.__indice_joueur_actuel = self.indice_joueur_suivant()
 
     # ---------------------------------------
     # Phases de la manche
     # ---------------------------------------
 
-    def indices_nouveau_tour(self):
+    def indice_nouveau_tour(self):
         """Donne la main au joueur après le dealer encore en jeu"""
-        self.__indice_joueur_actuel = len(self.info.joueurs)
+        self.__indice_joueur_actuel = len(self.info.joueurs) - 1
         self.joueur_suivant()
 
     def statuts_nouveau_tour(self):
@@ -189,7 +193,7 @@ class Manche:
         self.info.assignation_mains(self.reserve.distribuer(len(self.info.joueurs)))
         self.suivre(self.indice_joueur_actuel, self.grosse_blind // 2)
         self.joueur_suivant()
-        self.info.suivre(self.indice_joueur_actuel, self.grosse_blind - (self.grosse_blind // 2))
+        self.suivre(self.indice_joueur_actuel, self.grosse_blind - (self.grosse_blind // 2))
         self.joueur_suivant()
 
     @log
@@ -198,7 +202,7 @@ class Manche:
         for _ in range(3):
             self.__reserve.reveler(self.__board)
         self.__tour += 1
-        self.indices_nouveau_tour()
+        self.indice_nouveau_tour()
         self.statuts_nouveau_tour()
 
     @log
@@ -206,7 +210,7 @@ class Manche:
         """Révélation de la quatrième carte commune"""
         self.__reserve.reveler(self.__board)
         self.__tour += 1
-        self.indices_nouveau_tour()
+        self.indice_nouveau_tour()
         self.statuts_nouveau_tour()
 
     @log
@@ -214,7 +218,7 @@ class Manche:
         """Révélation de la cinquième carte commune"""
         self.__reserve.reveler(self.__board)
         self.__tour += 1
-        self.indices_nouveau_tour()
+        self.indice_nouveau_tour()
         self.statuts_nouveau_tour()
 
     def fin_du_tour(self) -> bool:
@@ -250,12 +254,24 @@ class Manche:
 
     @log
     def checker(self, indice_joueur):
-        pass
+        """
+        Le joueur temporise si il en a la possibilité
+        """
+
+        if not isinstance(indice_joueur, int):
+            raise TypeError("indice_joueur doit être un entier")
+
+        # Si le joueur n'est pas innactif, relever une erreur
+        if self.info.statuts[indice_joueur] != 0:
+            raise ValueError(f"Le joueur doit avoir le statut d'innactif pour checker")
+        
+        self.info.modifier_statut[indice_joueur, 2]
+
 
     @log
     def suivre(self, indice_joueur: int, relance : int = 0) -> int:
         """
-        Ajoute une mise pour un joueur.
+        Ajoute une mise pour un joueur
 
         Paramètres
         ----------
@@ -286,7 +302,7 @@ class Manche:
         nouvelle_mise = pour_suivre + relance + ancienne_mise
         self.info.modifier_mise(indice_joueur, nouvelle_mise)
 
-        self.info.modifier_statut[indice_joueur, 2]
+        self.info.modifier_statut(indice_joueur, 2)
 
         # Cas où le joueur relance
         if relance > 0:
@@ -381,7 +397,7 @@ class Manche:
             raise RuntimeError("Impossible de classer les joueurs : la board n'est pas dévoilé entièrement")
 
         a_distribuer = self.info.mises.copy()
-        pot = self.info.valeur_pot()
+        pot = self.valeur_pot()
         n = len(a_distribuer)
         classement = self.classement()
         gains = [0] * n
