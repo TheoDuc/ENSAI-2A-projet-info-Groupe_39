@@ -2,9 +2,12 @@ import pytest
 from combinaison.combinaison import AbstractCombinaison
 
 
-# --- Classe factice pour tests ---
+# --- Classe factice corrigée pour tests ---
 class CombinaisonTest(AbstractCombinaison):
-    FORCE = 1
+    @classmethod
+    def FORCE(cls) -> int:
+        # force fixe pour cette combinaison factice
+        return 1
 
     @classmethod
     def est_present(cls, cartes):
@@ -19,21 +22,13 @@ class CombinaisonTest(AbstractCombinaison):
 @pytest.mark.parametrize(
     "hauteur,kicker,expected_hauteur,expected_kicker",
     [
-        # Hauteur str, kicker None
         ("As", None, "As", None),
-        # Hauteur list avec un élément, kicker None
         (["Roi"], None, "Roi", None),
-        # Hauteur tuple avec un élément, kicker None
         (("Dame",), None, "Dame", None),
-        # Hauteur list avec plusieurs éléments, kicker list 1 élément
         (["10", "9"], ["8"], ["10", "9"], "8"),
-        # Hauteur str, kicker list plusieurs éléments
         ("Valet", ["2", "3"], "Valet", ("2", "3")),
-        # Hauteur str, kicker str
         ("As", "Roi", "As", "Roi"),
-        # Hauteur list un élément, kicker tuple un élément
         (["7"], ("6",), "7", "6"),
-        # Hauteur tuple plusieurs éléments, kicker tuple plusieurs éléments
         (("5", "4"), ("3", "2"), ["5", "4"], ("3", "2")),
     ],
 )
@@ -56,7 +51,7 @@ def test_init_et_properties_exhaustif(hauteur, kicker, expected_hauteur, expecte
 def test_valeur_comparaison_exhaustif(hauteur, kicker):
     c = CombinaisonTest(hauteur, kicker)
     valeur = c._valeur_comparaison()
-    assert valeur[0] == CombinaisonTest.FORCE
+    assert valeur[0] == CombinaisonTest.FORCE()  # <-- note les parenthèses
     assert all(isinstance(v, int) for v in valeur[1])
     assert all(isinstance(k, int) for k in valeur[2])
 
@@ -88,7 +83,6 @@ def test_repr_str_exhaustif(hauteur, kicker):
     c = CombinaisonTest(hauteur, kicker)
     s = str(c)
     r = repr(c)
-    # Hauteur doit apparaître
     if isinstance(hauteur, (list, tuple)) and len(hauteur) > 1:
         for h in hauteur:
             assert h in s or " et " in s
@@ -97,7 +91,6 @@ def test_repr_str_exhaustif(hauteur, kicker):
             assert "d'As" in s
         else:
             assert hauteur in s
-    # kicker doit apparaître dans repr si présent
     if kicker is not None:
         if isinstance(kicker, (list, tuple)):
             for k in kicker:
