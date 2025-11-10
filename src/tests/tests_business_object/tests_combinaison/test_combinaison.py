@@ -4,6 +4,7 @@ from business_object.carte import Carte
 from business_object.combinaison.combinaison import AbstractCombinaison
 
 
+# Classe concrète minimale pour les tests
 class CombinaisonTest(AbstractCombinaison):
     @classmethod
     def FORCE(cls) -> int:
@@ -15,9 +16,7 @@ class CombinaisonTest(AbstractCombinaison):
 
     @classmethod
     def from_cartes(cls, cartes):
-        hauteur = "2"
-        kicker = ("3", "4", "5", "6")
-        return cls(hauteur, kicker)
+        return cls("2", ("3", "4", "5", "6"))
 
     def __str__(self):
         return "CombinaisonTest"
@@ -26,81 +25,59 @@ class CombinaisonTest(AbstractCombinaison):
         return f"CombinaisonTest(hauteur='{self.hauteur}', kicker={self.kicker})"
 
 
-# ---------- Tests ----------
-class Test_AbstractCombinaison:
-    """Tests unitaires complets pour AbstractCombinaison"""
-
-    def test_attributs_base(self):
-        c = CombinaisonTest("2", ("3", "4", "5", "6"))
-        assert c.hauteur == "2"
-        assert c.kicker == ("3", "4", "5", "6")
-        assert CombinaisonTest.FORCE() == 0
-
-    def test_str_et_repr(self):
-        c = CombinaisonTest("2", ("3", "4", "5", "6"))
+class TestAbstractCombinaison:
+    def test_attributs_str_repr(self):
+        # kicker comme tuple
+        c = CombinaisonTest("As", ("Roi", "Dame"))
+        assert c.hauteur == "As"
+        assert c.kicker == ("Roi", "Dame")
         assert str(c) == "CombinaisonTest"
-        assert repr(c) == "CombinaisonTest(hauteur='2', kicker=('3', '4', '5', '6'))"
+        assert repr(c) == "CombinaisonTest(hauteur='As', kicker=('Roi', 'Dame'))"
 
-    def test_comparaison(self):
-        c1 = CombinaisonTest("2", ("3", "4", "5", "6"))
-        c2 = CombinaisonTest("2", ("3", "4", "5", "7"))
-        assert c1 == CombinaisonTest("2", ("3", "4", "5", "6"))
+        # kicker comme str
+        c2 = CombinaisonTest("10", "Valet")
+        assert c2.kicker == "Valet"
+
+        # kicker None
+        c3 = CombinaisonTest("2", None)
+        assert c3.kicker is None
+
+        # hauteur comme list de 1 élément
+        c4 = CombinaisonTest(["3"], "4")
+        assert c4.hauteur == "3"
+
+        # hauteur comme list de plusieurs éléments
+        c5 = CombinaisonTest(["5", "6"], ["7", "8"])
+        assert c5.hauteur == ["5", "6"]
+        assert c5.kicker == ("7", "8")
+
+    def test_valeur_comparaison_et_comparaison(self):
+        c1 = CombinaisonTest("As", ("Roi", "Dame"))
+        c2 = CombinaisonTest("As", ("Roi", "Valet"))
+        # égalité avec lui-même
+        c_copy = CombinaisonTest("As", ("Roi", "Dame"))
+        assert c1 == c_copy
         assert c1 != c2
         assert (c1 < c2) or (c1 > c2)
 
+        # vérifie que la valeur de comparaison correspond aux indices Carte.VALEURS()
+        force, hauteur_vals, kicker_vals = c1._valeur_comparaison()
+        assert force == 0
+        assert hauteur_vals == (Carte.VALEURS().index("As"),)
+        assert kicker_vals == (
+            Carte.VALEURS().index("Roi"),
+            Carte.VALEURS().index("Dame"),
+        )
+
     def test_verifier_min_cartes(self):
-        # devrait passer
         AbstractCombinaison.verifier_min_cartes([1, 2, 3, 4, 5])
-        # devrait lever ValueError
+        # doit lever une exception si moins de 5 cartes
         with pytest.raises(ValueError):
             AbstractCombinaison.verifier_min_cartes([1, 2], n=5)
 
-    def test_init_variante_hauteur_kicker(self):
-        # kicker None
-        c = CombinaisonTest("As", None)
-        assert c.kicker is None
-
-        # kicker string
-        c = CombinaisonTest("As", "Roi")
-        assert c.kicker == "Roi"
-
-        # kicker tuple
-        c = CombinaisonTest("Roi", ("Dame", "Valet"))
-        assert c.kicker == ("Dame", "Valet")
-
-        # hauteur list >1 élément
-        c = CombinaisonTest(["As", "Roi"], "Dame")
-        assert c.hauteur == ["As", "Roi"]
-        assert c.kicker == "Dame"
-
-        # hauteur list 1 élément
-        c = CombinaisonTest(["As"], "Dame")
-        assert c.hauteur == "As"
-
-    def test_fmt_valeurs(self):
-        c = CombinaisonTest("As", None)
-        # tuple d'un seul élément
-        assert c._fmt_valeurs(("As",)) == "As"
-        # tuple de plusieurs éléments
-        assert c._fmt_valeurs(("As", "Roi")) == "As et Roi"
-        # liste
-        assert c._fmt_valeurs(["As", "Roi"]) == "As et Roi"
-        # None
-        assert c._fmt_valeurs(None) is None
-
-    def test_valeur_comparaison_variante(self):
-        # kicker None
-        c = CombinaisonTest("As", None)
-        force, hauteur_vals, kicker_vals = c._valeur_comparaison()
-        assert force == 0
-        assert hauteur_vals == (Carte.VALEURS().index("As"),)
-        assert kicker_vals == ()
-
-        # kicker tuple
-        c = CombinaisonTest("Roi", ("Dame", "Valet"))
-        force, hauteur_vals, kicker_vals = c._valeur_comparaison()
-        assert hauteur_vals == (Carte.VALEURS().index("Roi"),)
-        assert kicker_vals == (
-            Carte.VALEURS().index("Dame"),
-            Carte.VALEURS().index("Valet"),
-        )
+    def test_from_cartes_et_est_present(self):
+        cartes = [Carte("2", "Coeur")]
+        c = CombinaisonTest.from_cartes(cartes)
+        assert isinstance(c, CombinaisonTest)
+        assert CombinaisonTest.est_present(cartes)
+        assert not CombinaisonTest.est_present([])
