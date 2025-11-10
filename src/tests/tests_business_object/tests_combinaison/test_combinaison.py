@@ -1,5 +1,5 @@
 import pytest
-from combinaison.abstract_combinaison import AbstractCombinaison
+from combinaison.combinaison import AbstractCombinaison
 
 
 # --- Classe factice pour tests ---
