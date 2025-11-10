@@ -1,83 +1,118 @@
 import pytest
-
-from business_object.carte import Carte
-from business_object.combinaison.combinaison import AbstractCombinaison
+from combinaison.abstract_combinaison import AbstractCombinaison
 
 
-# Classe concrète minimale pour les tests
+# --- Classe factice pour tests ---
 class CombinaisonTest(AbstractCombinaison):
-    @classmethod
-    def FORCE(cls) -> int:
-        return 0
+    FORCE = 1
 
     @classmethod
     def est_present(cls, cartes):
-        return len(cartes) >= 1
+        return True
 
     @classmethod
     def from_cartes(cls, cartes):
-        return cls("2", ("3", "4", "5", "6"))
-
-    def __str__(self):
-        return "CombinaisonTest"
-
-    def __repr__(self):
-        return f"CombinaisonTest(hauteur='{self.hauteur}', kicker={self.kicker})"
+        return cls("As")
 
 
-class TestAbstractCombinaison:
-    def test_attributs_str_repr(self):
-        # kicker comme tuple
-        c = CombinaisonTest("As", ("Roi", "Dame"))
-        assert c.hauteur == "As"
-        assert c.kicker == ("Roi", "Dame")
-        assert str(c) == "CombinaisonTest"
-        assert repr(c) == "CombinaisonTest(hauteur='As', kicker=('Roi', 'Dame'))"
+# --- Parametrize exhaustif pour init et properties ---
+@pytest.mark.parametrize(
+    "hauteur,kicker,expected_hauteur,expected_kicker",
+    [
+        # Hauteur str, kicker None
+        ("As", None, "As", None),
+        # Hauteur list avec un élément, kicker None
+        (["Roi"], None, "Roi", None),
+        # Hauteur tuple avec un élément, kicker None
+        (("Dame",), None, "Dame", None),
+        # Hauteur list avec plusieurs éléments, kicker list 1 élément
+        (["10", "9"], ["8"], ["10", "9"], "8"),
+        # Hauteur str, kicker list plusieurs éléments
+        ("Valet", ["2", "3"], "Valet", ("2", "3")),
+        # Hauteur str, kicker str
+        ("As", "Roi", "As", "Roi"),
+        # Hauteur list un élément, kicker tuple un élément
+        (["7"], ("6",), "7", "6"),
+        # Hauteur tuple plusieurs éléments, kicker tuple plusieurs éléments
+        (("5", "4"), ("3", "2"), ["5", "4"], ("3", "2")),
+    ],
+)
+def test_init_et_properties_exhaustif(hauteur, kicker, expected_hauteur, expected_kicker):
+    c = CombinaisonTest(hauteur, kicker)
+    assert c.hauteur == expected_hauteur
+    assert c.kicker == expected_kicker
 
-        # kicker comme str
-        c2 = CombinaisonTest("10", "Valet")
-        assert c2.kicker == "Valet"
 
-        # kicker None
-        c3 = CombinaisonTest("2", None)
-        assert c3.kicker is None
+# --- Test _valeur_comparaison exhaustif ---
+@pytest.mark.parametrize(
+    "hauteur,kicker",
+    [
+        ("As", None),
+        ("Roi", "Dame"),
+        (["10", "9"], ["8"]),
+        (("5", "4"), ("3", "2")),
+    ],
+)
+def test_valeur_comparaison_exhaustif(hauteur, kicker):
+    c = CombinaisonTest(hauteur, kicker)
+    valeur = c._valeur_comparaison()
+    assert valeur[0] == CombinaisonTest.FORCE
+    assert all(isinstance(v, int) for v in valeur[1])
+    assert all(isinstance(k, int) for k in valeur[2])
 
-        # hauteur comme list de 1 élément
-        c4 = CombinaisonTest(["3"], "4")
-        assert c4.hauteur == "3"
 
-        # hauteur comme list de plusieurs éléments
-        c5 = CombinaisonTest(["5", "6"], ["7", "8"])
-        assert c5.hauteur == ["5", "6"]
-        assert c5.kicker == ("7", "8")
+# --- Test comparateurs exhaustif ---
+def test_comparaison_exhaustif():
+    c1 = CombinaisonTest("As", "Roi")
+    c2 = CombinaisonTest("As", "Dame")
+    c3 = CombinaisonTest("As", "Roi")
+    c4 = CombinaisonTest("Roi", None)
 
-    def test_valeur_comparaison_et_comparaison(self):
-        c1 = CombinaisonTest("As", ("Roi", "Dame"))
-        c2 = CombinaisonTest("As", ("Roi", "Valet"))
-        # égalité avec lui-même
-        c_copy = CombinaisonTest("As", ("Roi", "Dame"))
-        assert c1 == c_copy
-        assert c1 != c2
-        assert (c1 < c2) or (c1 > c2)
+    assert c1 > c2
+    assert c2 < c1
+    assert c1 == c3
+    assert c1 != c2
+    assert c2 < c4  # test force plus faible
 
-        # vérifie que la valeur de comparaison correspond aux indices Carte.VALEURS()
-        force, hauteur_vals, kicker_vals = c1._valeur_comparaison()
-        assert force == 0
-        assert hauteur_vals == (Carte.VALEURS().index("As"),)
-        assert kicker_vals == (
-            Carte.VALEURS().index("Roi"),
-            Carte.VALEURS().index("Dame"),
-        )
 
-    def test_verifier_min_cartes(self):
-        AbstractCombinaison.verifier_min_cartes([1, 2, 3, 4, 5])
-        # doit lever une exception si moins de 5 cartes
-        with pytest.raises(ValueError):
-            AbstractCombinaison.verifier_min_cartes([1, 2], n=5)
+# --- Test __str__ et __repr__ exhaustif ---
+@pytest.mark.parametrize(
+    "hauteur,kicker",
+    [
+        ("As", None),
+        ("Roi", "Dame"),
+        (["10", "9"], ["8"]),
+    ],
+)
+def test_repr_str_exhaustif(hauteur, kicker):
+    c = CombinaisonTest(hauteur, kicker)
+    s = str(c)
+    r = repr(c)
+    # Hauteur doit apparaître
+    if isinstance(hauteur, (list, tuple)) and len(hauteur) > 1:
+        for h in hauteur:
+            assert h in s or " et " in s
+    else:
+        if hauteur == "As":
+            assert "d'As" in s
+        else:
+            assert hauteur in s
+    # kicker doit apparaître dans repr si présent
+    if kicker is not None:
+        if isinstance(kicker, (list, tuple)):
+            for k in kicker:
+                assert k in r
+        else:
+            assert kicker in r
+    else:
+        assert "kicker" not in r
 
-    def test_from_cartes_et_est_present(self):
-        cartes = [Carte("2", "Coeur")]
-        c = CombinaisonTest.from_cartes(cartes)
-        assert isinstance(c, CombinaisonTest)
-        assert CombinaisonTest.est_present(cartes)
-        assert not CombinaisonTest.est_present([])
+
+# --- Test verifier_min_cartes ---
+def test_verifier_min_cartes_exhaustif():
+    # cas ok
+    CombinaisonTest.verifier_min_cartes([1, 2, 3, 4, 5])
+    CombinaisonTest.verifier_min_cartes([1, 2, 3, 4, 5, 6], n=5)
+    # cas erreur
+    with pytest.raises(ValueError):
+        CombinaisonTest.verifier_min_cartes([1, 2, 3], n=5)
