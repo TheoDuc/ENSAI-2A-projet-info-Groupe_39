@@ -1,8 +1,9 @@
 import pytest
-from business_object.combinaison.combinaison import AbstractCombinaison
-from business_object.carte import Carte
 
-# ---------- Classe concrète pour les tests ----------
+from business_object.carte import Carte
+from business_object.combinaison.combinaison import AbstractCombinaison
+
+
 class CombinaisonTest(AbstractCombinaison):
     @classmethod
     def FORCE(cls) -> int:
@@ -23,6 +24,7 @@ class CombinaisonTest(AbstractCombinaison):
 
     def __repr__(self):
         return f"CombinaisonTest(hauteur='{self.hauteur}', kicker={self.kicker})"
+
 
 # ---------- Tests ----------
 class Test_AbstractCombinaison:
