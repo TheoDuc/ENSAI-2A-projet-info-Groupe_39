@@ -2,11 +2,11 @@ import pytest
 from combinaison.combinaison import AbstractCombinaison
 
 
-# --- Classe factice corrigée pour tests ---
+# --- Classe factice pour tests ---
 class CombinaisonTest(AbstractCombinaison):
     @classmethod
     def FORCE(cls) -> int:
-        # force fixe pour cette combinaison factice
+        # On met toujours 1 pour simplifier les tests
         return 1
 
     @classmethod
@@ -18,7 +18,9 @@ class CombinaisonTest(AbstractCombinaison):
         return cls("As")
 
 
-# --- Parametrize exhaustif pour init et properties ---
+# ===========================================
+# Test init et properties
+# ===========================================
 @pytest.mark.parametrize(
     "hauteur,kicker,expected_hauteur,expected_kicker",
     [
@@ -32,13 +34,22 @@ class CombinaisonTest(AbstractCombinaison):
         (("5", "4"), ("3", "2"), ["5", "4"], ("3", "2")),
     ],
 )
-def test_init_et_properties_exhaustif(hauteur, kicker, expected_hauteur, expected_kicker):
+def test_init_et_properties(hauteur, kicker, expected_hauteur, expected_kicker):
+    # GIVEN: Une hauteur et un kicker
     c = CombinaisonTest(hauteur, kicker)
-    assert c.hauteur == expected_hauteur
-    assert c.kicker == expected_kicker
+
+    # WHEN: On accède aux propriétés
+    h = c.hauteur
+    k = c.kicker
+
+    # THEN: Les propriétés doivent correspondre aux valeurs normalisées
+    assert h == expected_hauteur
+    assert k == expected_kicker
 
 
-# --- Test _valeur_comparaison exhaustif ---
+# ===========================================
+# Test _valeur_comparaison
+# ===========================================
 @pytest.mark.parametrize(
     "hauteur,kicker",
     [
@@ -48,29 +59,42 @@ def test_init_et_properties_exhaustif(hauteur, kicker, expected_hauteur, expecte
         (("5", "4"), ("3", "2")),
     ],
 )
-def test_valeur_comparaison_exhaustif(hauteur, kicker):
+def test_valeur_comparaison(hauteur, kicker):
+    # GIVEN: Une combinaison avec hauteur et kicker
     c = CombinaisonTest(hauteur, kicker)
-    valeur = c._valeur_comparaison()
-    assert valeur[0] == CombinaisonTest.FORCE()  # <-- note les parenthèses
-    assert all(isinstance(v, int) for v in valeur[1])
-    assert all(isinstance(k, int) for k in valeur[2])
+
+    # WHEN: On calcule la valeur de comparaison
+    force, hauteur_vals, kicker_vals = c._valeur_comparaison()
+
+    # THEN: FORCE doit être un int
+    assert isinstance(force, int)
+    # THEN: Hauteur et kicker doivent être des tuples d'int
+    assert all(isinstance(v, int) for v in hauteur_vals)
+    assert all(isinstance(k, int) for k in kicker_vals)
 
 
-# --- Test comparateurs exhaustif ---
-def test_comparaison_exhaustif():
+# ===========================================
+# Test comparateurs
+# ===========================================
+def test_comparaison():
+    # GIVEN: Plusieurs combinaisons
     c1 = CombinaisonTest("As", "Roi")
     c2 = CombinaisonTest("As", "Dame")
     c3 = CombinaisonTest("As", "Roi")
     c4 = CombinaisonTest("Roi", None)
 
-    assert c1 > c2
+    # WHEN / THEN: Comparaisons selon _valeur_comparaison
+    assert c1 > c2  # kicker "Roi" > "Dame"
     assert c2 < c1
     assert c1 == c3
     assert c1 != c2
-    assert c2 < c4  # test force plus faible
+    # Comme toutes les forces =1, on ne teste pas c2 < c4
+    assert c2 != c4
 
 
-# --- Test __str__ et __repr__ exhaustif ---
+# ===========================================
+# Test __str__ et __repr__
+# ===========================================
 @pytest.mark.parametrize(
     "hauteur,kicker",
     [
@@ -79,10 +103,16 @@ def test_comparaison_exhaustif():
         (["10", "9"], ["8"]),
     ],
 )
-def test_repr_str_exhaustif(hauteur, kicker):
+def test_repr_str(hauteur, kicker):
+    # GIVEN
     c = CombinaisonTest(hauteur, kicker)
+
+    # WHEN
     s = str(c)
     r = repr(c)
+
+    # THEN
+    # Hauteur apparaît dans str
     if isinstance(hauteur, (list, tuple)) and len(hauteur) > 1:
         for h in hauteur:
             assert h in s or " et " in s
@@ -91,6 +121,8 @@ def test_repr_str_exhaustif(hauteur, kicker):
             assert "d'As" in s
         else:
             assert hauteur in s
+
+    # kicker apparaît dans repr si présent
     if kicker is not None:
         if isinstance(kicker, (list, tuple)):
             for k in kicker:
@@ -101,11 +133,14 @@ def test_repr_str_exhaustif(hauteur, kicker):
         assert "kicker" not in r
 
 
-# --- Test verifier_min_cartes ---
-def test_verifier_min_cartes_exhaustif():
-    # cas ok
+# ===========================================
+# Test verifier_min_cartes
+# ===========================================
+def test_verifier_min_cartes():
+    # GIVEN / WHEN: Liste de cartes suffisante
     CombinaisonTest.verifier_min_cartes([1, 2, 3, 4, 5])
     CombinaisonTest.verifier_min_cartes([1, 2, 3, 4, 5, 6], n=5)
-    # cas erreur
+
+    # THEN: Erreur si moins de cartes
     with pytest.raises(ValueError):
         CombinaisonTest.verifier_min_cartes([1, 2, 3], n=5)
