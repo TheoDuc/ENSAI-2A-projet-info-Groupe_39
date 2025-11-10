@@ -4,8 +4,6 @@ from business_object.combinaison.double_paire import DoublePaire
 
 
 class Test_DoublePaire7Cartes:
-    """Tests unitaires pour DoublePaire avec 7 cartes."""
-
     def test_double_paire_init_succes(self):
         # GIVEN : 7 cartes formant une Double Paire
         cartes = [

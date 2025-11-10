@@ -4,8 +4,6 @@ from business_object.combinaison.simple import Simple
 
 
 class Test_Simple:
-    """Tests unitaires pour la combinaison Simple avec GIVEN / WHEN / THEN"""
-
     def test_simple_creation_simple(self):
         # GIVEN : un jeu de 7 cartes
         cartes = [

@@ -36,7 +36,7 @@ def test_force_full():
         ),
     ],
 )
-def test_est_present(cartes, expected):
+def test_est_present_full(cartes, expected):
     # GIVEN: Une liste de cartes
     # WHEN: On teste la présence d'un Full
     result = Full.est_present(cartes)
@@ -44,7 +44,7 @@ def test_est_present(cartes, expected):
     assert result is expected
 
 
-def test_from_cartes_valide():
+def test_from_cartes_valide_full():
     # GIVEN: 7 cartes formant un Full
     cartes = [
         pytest.dame_coeur,
@@ -62,7 +62,7 @@ def test_from_cartes_valide():
     assert full.kicker is None
 
 
-def test_from_cartes_invalide():
+def test_from_cartes_invalide_full():
     # GIVEN: cartes ne formant pas un Full
     cartes = [
         pytest.dame_coeur,

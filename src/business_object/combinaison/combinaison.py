@@ -30,8 +30,6 @@ class AbstractCombinaison(ABC):
         hauteur: Union[str, Tuple[str, ...], list[str]],
         kicker: Optional[Union[str, Tuple[str, ...], list[str]]] = None,
     ) -> None:
-        # --- Normalisation de la hauteur ---
-
         if isinstance(hauteur, (list, tuple)):
             if len(hauteur) == 1:
                 hauteur = hauteur[0]

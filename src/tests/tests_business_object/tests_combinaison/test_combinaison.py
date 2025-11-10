@@ -2,11 +2,9 @@ import pytest
 from combinaison.combinaison import AbstractCombinaison
 
 
-# --- Classe factice pour tests ---
 class CombinaisonTest(AbstractCombinaison):
     @classmethod
     def FORCE(cls) -> int:
-        # On met toujours 1 pour simplifier les tests
         return 1
 
     @classmethod
@@ -18,9 +16,6 @@ class CombinaisonTest(AbstractCombinaison):
         return cls("As")
 
 
-# ===========================================
-# Test init et properties
-# ===========================================
 @pytest.mark.parametrize(
     "hauteur,kicker,expected_hauteur,expected_kicker",
     [
@@ -34,7 +29,7 @@ class CombinaisonTest(AbstractCombinaison):
         (("5", "4"), ("3", "2"), ["5", "4"], ("3", "2")),
     ],
 )
-def test_init_et_properties(hauteur, kicker, expected_hauteur, expected_kicker):
+def test_combinaison_init_et_properties(hauteur, kicker, expected_hauteur, expected_kicker):
     # GIVEN: Une hauteur et un kicker
     c = CombinaisonTest(hauteur, kicker)
 
@@ -59,7 +54,7 @@ def test_init_et_properties(hauteur, kicker, expected_hauteur, expected_kicker):
         (("5", "4"), ("3", "2")),
     ],
 )
-def test_valeur_comparaison(hauteur, kicker):
+def test_combinaison_valeur_comparaison(hauteur, kicker):
     # GIVEN: Une combinaison avec hauteur et kicker
     c = CombinaisonTest(hauteur, kicker)
 
@@ -76,7 +71,7 @@ def test_valeur_comparaison(hauteur, kicker):
 # ===========================================
 # Test comparateurs
 # ===========================================
-def test_comparaison():
+def test_combinaison_comparaison():
     # GIVEN: Plusieurs combinaisons
     c1 = CombinaisonTest("As", "Roi")
     c2 = CombinaisonTest("As", "Dame")
@@ -103,7 +98,7 @@ def test_comparaison():
         (["10", "9"], ["8"]),
     ],
 )
-def test_repr_str(hauteur, kicker):
+def test_combinaison_repr_str(hauteur, kicker):
     # GIVEN
     c = CombinaisonTest(hauteur, kicker)
 
@@ -136,7 +131,7 @@ def test_repr_str(hauteur, kicker):
 # ===========================================
 # Test verifier_min_cartes
 # ===========================================
-def test_verifier_min_cartes():
+def test_combinaison_verifier_min_cartes():
     # GIVEN / WHEN: Liste de cartes suffisante
     CombinaisonTest.verifier_min_cartes([1, 2, 3, 4, 5])
     CombinaisonTest.verifier_min_cartes([1, 2, 3, 4, 5, 6], n=5)

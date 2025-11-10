@@ -11,7 +11,7 @@ class DoublePaire(AbstractCombinaison):
 
     La combinaison est caractérisée par :
     - la hauteur de la paire la plus forte,
-    - la hauteur de la deuxième paire (utilisée comme kicker),
+    - la hauteur de la deuxième paire ,
     - et éventuellement la carte restante servant de kicker supplémentaire.
     """
 
@@ -21,8 +21,7 @@ class DoublePaire(AbstractCombinaison):
 
         Paramètres
         ----------
-        hauteur : list[str]
-        Liste des deux valeurs des paires (ex. ['Roi', 'Valet']), triée de la plus haute à la plus basse.
+        hauteur : tuple[str]
         kicker : str
         La carte restante servant de kicker.
         """

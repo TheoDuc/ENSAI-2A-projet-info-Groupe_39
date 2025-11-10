@@ -20,8 +20,8 @@ class Couleur(AbstractCombinaison):
 
         Paramètres
         ----------
-        hauteur : str
-            Valeur de la carte la plus haute de la couleur (ex. 'As').
+        hauteur : tuple[str]
+            Valeur de la carte la plus haute de la couleur .
         kicker: None
         """
         super().__init__(hauteur, kicker=None)
@@ -35,7 +35,7 @@ class Couleur(AbstractCombinaison):
         -------
         int
             Valeur entière représentant la force de la combinaison.
-            (Ici, 5 selon la hiérarchie classique du poker.)
+
         """
         return 5
 

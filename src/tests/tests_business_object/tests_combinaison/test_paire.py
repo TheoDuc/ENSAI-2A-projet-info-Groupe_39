@@ -7,8 +7,6 @@ from business_object.combinaison.paire import Paire
 
 
 class Test_Paire:
-    """Tests unitaires pour la combinaison Paire avec GIVEN / WHEN / THEN"""
-
     def test_paire_init_succes(self):
         # GIVEN : cartes formant une Paire
         cartes = [

@@ -7,7 +7,7 @@ class Test_Carre:
     """Tests unitaires pour la classe Carre avec GIVEN / WHEN / THEN."""
 
     def test_carre_init_succes(self):
-        # GIVEN : 7 cartes formant un Carré
+        # GIVEN
         cartes = [
             pytest.roi_coeur,
             pytest.roi_trefle,

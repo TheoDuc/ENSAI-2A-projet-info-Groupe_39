@@ -12,9 +12,9 @@ class QuinteFlush(AbstractCombinaison):
 
         Paramètres
         ----------
-        hauteur : list[str]
-            Liste des valeurs des cartes formant la Quinte Flush, de la plus haute à la plus basse.
-
+        hauteur : str
+            Valeur de la carte la plus haute de la Quinte Flush.
+        kicker: None
 
         """
 

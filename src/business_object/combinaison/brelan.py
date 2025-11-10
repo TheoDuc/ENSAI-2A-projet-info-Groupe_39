@@ -7,22 +7,20 @@ from business_object.combinaison.combinaison import AbstractCombinaison
 class Brelan(AbstractCombinaison):
     """
     Représente un Brelan (trois cartes de même valeur).
-
-    Un Brelan est une combinaison de poker composée de trois cartes de même valeur
-    et de deux cartes supplémentaires appelées "kickers" servant à départager les égalités.
     """
 
     def __init__(self, hauteur: str, kicker: tuple[str, ...] = ()) -> None:
         """
-        Initialise un objet Brelan avec une hauteur donnée et la liste de ses cartes.
+        Initialise un objet Brelan avec une hauteur donnée et la liste de ses kickers.
 
         Paramètres
         ----------
         hauteur : str
-            Valeur principale du Brelan (ex. 'Roi', '10', 'As').
+            Valeur principale du Brelan.
 
-        kicker : tuple[str], optionnel
+        kicker : tuple[str] | None, optionnel
             Valeurs des cartes restantes servant à départager les égalités.
+            Seuls les deux kickers les plus forts sont retenus.
 
         Renvois
         -------
@@ -34,10 +32,6 @@ class Brelan(AbstractCombinaison):
     def FORCE(cls) -> int:
         """
         Renvoie la force relative de la combinaison.
-
-        Paramètres
-        ----------
-        Aucun
 
         Renvois
         -------

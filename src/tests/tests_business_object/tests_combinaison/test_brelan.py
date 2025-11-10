@@ -5,8 +5,6 @@ from business_object.combinaison.brelan import Brelan
 
 
 class Test_Brelan:
-    """Tests unitaires complets pour la classe Brelan avec GIVEN / WHEN / THEN."""
-
     def test_brelan_init_succes(self):
         # GIVEN : 7 cartes formant un brelan
         cartes = [

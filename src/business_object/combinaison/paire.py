@@ -16,7 +16,7 @@ class Paire(AbstractCombinaison):
         ----------
         hauteur : str
             Valeur de la Paire.
-        kicker : list[str]
+        kicker : tuple[str]
             Cartes restantes servant de kickers pour comparaison.
         """
         super().__init__(hauteur, kicker)

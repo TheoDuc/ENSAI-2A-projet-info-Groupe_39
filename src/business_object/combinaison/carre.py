@@ -10,8 +10,6 @@ class Carre(AbstractCombinaison):
     """
     Représente un Carré (quatre cartes de même valeur).
 
-    Un Carré est une combinaison de poker composée de quatre cartes identiques et d'une carte supplémentaire
-    appelée "kicker" servant à départager les égalités.
     """
 
     def __init__(self, hauteur: str, kicker: str) -> None:
@@ -21,10 +19,9 @@ class Carre(AbstractCombinaison):
         Paramètres
         ----------
         hauteur : str
-            Valeur des cartes formant le Carré (ex. 'Roi').
-        kicker : str, optionnel
-            Cartes restantes servant à départager les égalités, triées de la plus forte à la plus faible.
-
+            Valeur des cartes formant le Carré.
+        kicker : str
+            Valeur de la carte restante servant à départager les égalités.
         Renvois
         -------
         None
