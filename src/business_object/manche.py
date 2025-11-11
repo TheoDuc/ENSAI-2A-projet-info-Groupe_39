@@ -69,6 +69,7 @@ class Manche:
         self.__board = Board([])
         self.__indice_joueur_actuel = 0
         self.__grosse_blind = grosse_blind
+        self.__fin = False
 
     # ---------------------------------------
     # Property
@@ -103,6 +104,11 @@ class Manche:
     def grosse_blind(self) -> int:
         """Valeur de la grosse blind"""
         return self.__grosse_blind
+
+    @property
+    def fin(self) -> bool:
+        """Indique si la mance est terminée ou non"""
+        return self.__fin
 
     # ---------------------------------------
     # Classmethod
@@ -433,71 +439,72 @@ class Manche:
 
         return classement
 
+    def recuperer(self, mise: int, montant_a_recupere: int) -> list[int]:
+        """Récupère une certaine quantité d'un entier"""
+        if montant_a_recupere >= mise:
+            return [0, mise]
+        
+        return [mise-montant_a_recupere, montant_a_recupere]
+
     def gains(self) -> dict:
-        """Blabla"""
+        """Calcule les gains des joueurs en fin de manche."""
 
-        joueurs_en_lice = self.joueurs_en_lice()
-
-        if len(joueurs_en_lice) == 1:
-            joueur = self.info.joueurs[self.joueurs_en_lice[0]]
-
-            return {joueur : self.valeur_pot}
-
-        # Partie à revoir
-        a_distribuer = self.info.mises.copy()
-        pot = self.valeur_pot()
-        n = len(a_distribuer)
+        joueurs = self.info.joueurs
+        mises = self.info.mises.copy()
         classement = self.classement()
-        gains = [0] * n
-        c = 1
+        en_lice = self.joueurs_en_lice()
 
-        while pot > 0 and c <= n:
-            for i in range(n):
-                beneficiaires = []
-                if c == classement[i]:
-                    beneficiaires.append(i)
-            while beneficiaires != []:
-                min = 0
-                p = len(beneficiaires)
-                for b in range(p):
-                    if a_distribuer[beneficiaires[p]] < a_distribuer[beneficiaires[min]]:
-                        min = b
-                for i in range(n):
-                    d = min(a_distribuer[beneficiaires[min]], a_distribuer[i])
-                    for j in beneficiaires:
-                        gains[j] += d / p
-                    a_distribuer[i] -= d
-                del beneficiaires[min]
-            c += 1
-            pot = 0
-            for i in a_distribuer:
-                pot += i
-        return gains
+        gains = {j: 0 for j in joueurs}
 
-    def distribuer_pot(self):
-        """
-        Distribution du pot aux joueurs encore en lice selon la force de leur main.
+         # Cas avec un seul joueur en lice
+        if len(en_lice) == 1:
+            gagnant = joueurs[en_lice[0]]
+            gains[gagnant] = sum(mises)
+            return gains
 
-        Renvois
-        -------
-        list[int]
-            Gains attribués à chaque joueur
-        """
-        if not self.fin_de_manche():
-            raise RuntimeError("Impossible de distribuer le pot : la manche n'est pas terminée.")
+        # Étape 1 : créer les side pots
+        pots = []
+        dernier_niveau = 0
 
-        if len(joueurs_en_lice) == 0:
-            raise RuntimeError("Tous les joueurs ne peuvent être couchés.")
+        for mise_unique in set(mises):
 
-        n = len(self.info.joueurs)
+            # Récupère les indices des participants dont la mise est supérieure ou égale à une mise
+            participants = [i for i, m in enumerate(mises) if m >= mise_unique]
+            
+            # Si un seul joueur reste à ce niveau → pas de pot contesté
+            if len(participants) <= 1:
+                continue
 
-        if self.tour < 3:
-            gains = [0] * n
-            i = self.info.joueurs_en_lice[0]
-            gains[i] = self.info.valeur_pot()
+            # Calcule la valeur du side pot et l'ajoute à la liste, avec les candidats à ce pot
+            valeur_pot = (mise_unique - dernier_niveau) * len(participants)
+            pots.append((valeur_pot, participants))
+            dernier_niveau = mise_unique
 
+        # Étape 2 : distribuer les pots
+        for valeur_pot, participants in pots:
+            # Extraire les rangs des participants au pot
+            rangs = {i: classement[i] for i in participants if classement[i] > 0}
+
+            # Trouver le meilleur rang (1 = meilleur, puis 2, etc.)
+            meilleur_rang = min(rangs.values())
+
+            # Trouver tous les joueurs ex aequo à ce rang
+            meilleurs = [i for i, r in rangs.items() if r == meilleur_rang]
+
+            # Partage équitable du pot
+            gain_unitaire = valeur_pot // len(meilleurs)
+            for i in meilleurs:
+                gains[joueurs[i]] += gain_unitaire
+
+        # Étape 3 : restituer le surplus (non contesté)
+        if pots:
+            dernier_niveau = max([m for m, _ in pots])
         else:
-            gains = self.gains()
+            dernier_niveau = 0
+
+        for i, mise in enumerate(mises):
+            if mise > dernier_niveau:
+                gains[joueurs[i]] += mise - dernier_niveau
 
         return gains
 
@@ -507,6 +514,9 @@ class Manche:
 
     @log
     def action(self, joueur, action: str, relance: int=0):
+        """
+        Effectue l'action souhaitée d'un joueur, et les modifications qui s'en suivents dans la Manche
+        """
         
         indice_joueur = self.indice_joueur(joueur)
 
@@ -514,7 +524,11 @@ class Manche:
         if indice_joueur != self.indice_joueur_actuel:
             raise Exception(f"Ce n'est pas à {joueur.pseudo} de jouer")
 
-        # Réalise l'action désirée pour le joueur
+        # Vérifie que ce n'est pas la fin de la manche
+        if self.fin:
+            raise Exception("La manche est déjà terminée, aucune action ne peut être effectuée")
+
+        # Réalise l'action désirée par le joueur
         if action == "checker":
             self.checker(indice_joueur)
         elif action == "suivre":
@@ -529,6 +543,7 @@ class Manche:
         
         # Cas où c'est la fin de la manche
         if self.fin_de_manche():
+            self.fin = True
             return self.gains()
 
         # Cas où c'est la fin d'un tour
