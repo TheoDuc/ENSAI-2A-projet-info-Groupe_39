@@ -125,7 +125,7 @@ class Manche:
     # Tours des joueurs et joueurs
     # ---------------------------------------
 
-    def joueur_indice(self, joueur) -> int:
+    def indice_joueur(self, joueur) -> int:
         """Retourne l'indice du joueur si il est présent dans la manche"""
         for i in range(len(self.info.joueurs)):
             if self.info.joueurs[i] == joueur:
@@ -135,7 +135,7 @@ class Manche:
 
     def est_tour(self, joueur):
         """Vérifie si c'est au tour du joueur"""
-        if self.indice_joueur_actuel == self.joueur_indice(joueur):
+        if self.indice_joueur_actuel == self.indice_joueur(joueur):
             return True
         else:
             return False
@@ -185,6 +185,18 @@ class Manche:
         for i in range(len(self.info.statuts)):
             if self.info.statuts[i] not in [3, 4]:
                 self.info.modifier_statut(i, 0)
+    
+    def nouveau_tour(self):
+        """
+        Blabla
+        """
+
+        if self.tour == 3:
+            raise ValueError("La manche est déjà au dernier tour")
+        
+        self.__tour += 1
+        self.indice_nouveau_tour()
+        self.statuts_nouveau_tour()
 
     @log
     def preflop(self):
@@ -197,29 +209,32 @@ class Manche:
         self.joueur_suivant()
 
     @log
-    def flop(self):
+    def flop(self) -> str:
         """Révélation des 3 premières cartes communes"""
         for _ in range(3):
             self.__reserve.reveler(self.__board)
-        self.__tour += 1
-        self.indice_nouveau_tour()
-        self.statuts_nouveau_tour()
+
+        self.nouveau_tour()
+
+        return "La phase de flop commence !"
 
     @log
     def turn(self):
         """Révélation de la quatrième carte commune"""
         self.__reserve.reveler(self.__board)
-        self.__tour += 1
-        self.indice_nouveau_tour()
-        self.statuts_nouveau_tour()
+
+        self.nouveau_tour()
+
+        return "La phase de turn commence !"
 
     @log
     def river(self):
         """Révélation de la cinquième carte commune"""
         self.__reserve.reveler(self.__board)
-        self.__tour += 1
-        self.indice_nouveau_tour()
-        self.statuts_nouveau_tour()
+
+        self.nouveau_tour()
+
+        return "La phase de river commence !"
 
     def fin_du_tour(self) -> bool:
         """
@@ -234,19 +249,24 @@ class Manche:
         bool
             Vrai si tout les joueurs ont égalisé / couché / All in
         """
+
         for s in self.info.statuts:
             if s in [0, 1]:
                 return False
         return True
 
     def fin_de_manche(self) -> bool:
+
         n = 0
+
         for s in self.info.statuts:
             if s != 3:
                 n += 1
+
         if n == 0:
             raise ValueError("Les joueurs ne peuvent être tous couchés")
-        return n == 1
+        
+        return n == 1 or (self.fin_du_tour and self.tour == 3)
 
     # ---------------------------------------
     # Actions d'un joueur
@@ -261,7 +281,7 @@ class Manche:
         if not isinstance(indice_joueur, int):
             raise TypeError("indice_joueur doit être un entier")
 
-        # Si le joueur n'est pas innactif, relever une erreur
+        # Si le joueur n'est pas innactif, soulever une erreur
         if self.info.statuts[indice_joueur] != 0:
             raise ValueError(f"Le joueur doit avoir le statut d'innactif pour checker")
         
@@ -373,29 +393,57 @@ class Manche:
                 liste_indices.append(i)
         return liste_indices
 
-    def classement(self):
-        if self.tour < 3:
-            raise RuntimeError("Impossible de classer les joueurs : la board n'est pas dévoilé.")
+    def classement(self) -> list[int]:
+        """Renvoie une liste correspondant au classement de la partie"""
 
-        n = len(self.info.joueurs)
-        joueurs_en_lice = self.info.joueurs_en_lice()
-        board = self.board
-
-        for i in range(n):
-            Combinaison[i] = EvaluateurCombinaison.eval(self.info.mains[i].cartes + board.cartes)
-
-        classement = [0] * n
-        for i in joueurs_en_lice:
-            c = 0
-            for j in joueurs_en_lice:
-                if Combinaison[j] >= Combinaison[i]:
-                    c += 1
-            classement[i] = c
-
-    def gains(self):
         if self.tour < 3:
             raise RuntimeError("Impossible de classer les joueurs : la board n'est pas dévoilé entièrement")
 
+        n = len(self.info.joueurs)
+        joueurs_en_lice = self.joueurs_en_lice()
+        board = self.board
+
+        Combinaison = [None] * n
+        for i in joueurs_en_lice():
+                Combinaison[i] = EvaluateurCombinaison.eval(
+                    self.info.mains[i].cartes + board.cartes
+                )
+
+        # Donne un score à chaque joueur en lice selon le nombre de mains qu'il bat
+        scores = [0] * n
+        for j1 in joueurs_en_lice():
+            for j2 in joueurs_en_lice():
+                if Combinaison[j1] >= Combinaison[j2]:
+                    scores[j1] += 1
+
+        classement = [0] * n
+        top_scores = sorted(list(set(scores)), reverse=True)
+
+        rang = 1
+        for score in top_scores:
+            # Trouver tous les joueurs ayant ce score
+            indices = [i for i, s in enumerate(scores) if s == score and i in joueurs_en_lice]
+            if not indices:
+                continue
+            # Tous les joueurs à ce score obtiennent le même rang
+            for i in indices:
+                classement[i] = rang
+            # Rang suivant selon le nombre d'ex-aequo
+            rang += len(indices)
+
+        return classement
+
+    def gains(self) -> dict:
+        """Blabla"""
+
+        joueurs_en_lice = self.joueurs_en_lice()
+
+        if len(joueurs_en_lice) == 1:
+            joueur = self.info.joueurs[self.joueurs_en_lice[0]]
+
+            return {joueur : self.valeur_pot}
+
+        # Partie à revoir
         a_distribuer = self.info.mises.copy()
         pot = self.valeur_pot()
         n = len(a_distribuer)
@@ -452,3 +500,47 @@ class Manche:
             gains = self.gains()
 
         return gains
+
+    # ---------------------------------------
+    # Fonction générale d'avolution de la partie
+    # ---------------------------------------
+
+    @log
+    def action(self, joueur, action: str, relance: int=0):
+        
+        indice_joueur = self.indice_joueur(joueur)
+
+        # Vérifie que c'est au tour du joueur qui fait l'action
+        if indice_joueur != self.indice_joueur_actuel:
+            raise Exception(f"Ce n'est pas à {joueur.pseudo} de jouer")
+
+        # Réalise l'action désirée pour le joueur
+        if action == "checker":
+            self.checker(indice_joueur)
+        elif action == "suivre":
+            self.suivre(indice_joueur, relance)
+        elif action == "all-in":
+            self.all_in(indice_joueur)
+        elif action == "se coucher":
+            self.se_coucher(indice_joueur)
+        else:
+            actions = ("checker", "suivre", "all-in", "se coucher")
+            raise ValueError(f"L'action {action} n'existe pas, les actions possibles sont {actions}")
+        
+        # Cas où c'est la fin de la manche
+        if self.fin_de_manche():
+            return self.gains()
+
+        # Cas où c'est la fin d'un tour
+        elif self.fin_du_tour():
+            if self.tour == 0:
+                message = self.flop()
+            elif self.tour == 1:
+                message = self.turn()
+            elif self.tour == 2:
+                message = self.river()
+
+            return message
+        
+        self.joueur_suivant()
+        return f"C'est à {self.info.joueurs[self.indice_joueur_actuel].pseudo} de jouer !"
