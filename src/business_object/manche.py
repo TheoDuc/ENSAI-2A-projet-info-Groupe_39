@@ -330,6 +330,8 @@ class Manche:
 
         self.info.modifier_statut(indice_joueur, 2)
 
+        return pour_suivre + relance
+
         # Cas où le joueur relance
         if relance > 0:
             # Met à jour le statut des autres joueurs innactifs ou à jour
@@ -530,13 +532,13 @@ class Manche:
 
         # Réalise l'action désirée par le joueur
         if action == "checker":
-            self.checker(indice_joueur)
+            montant = self.checker(indice_joueur)
         elif action == "suivre":
-            self.suivre(indice_joueur, relance)
+            montant = self.suivre(indice_joueur, relance)
         elif action == "all-in":
-            self.all_in(indice_joueur)
+            montant = self.all_in(indice_joueur)
         elif action == "se coucher":
-            self.se_coucher(indice_joueur)
+            montant = self.se_coucher(indice_joueur)
         else:
             actions = ("checker", "suivre", "all-in", "se coucher")
             raise ValueError(f"L'action {action} n'existe pas, les actions possibles sont {actions}")
@@ -549,13 +551,14 @@ class Manche:
         # Cas où c'est la fin d'un tour
         elif self.fin_du_tour():
             if self.tour == 0:
-                message = self.flop()
+                self.flop()
             elif self.tour == 1:
-                message = self.turn()
+                self.turn()
             elif self.tour == 2:
-                message = self.river()
+                self.river()
 
-            return message
+            return montant
         
         self.joueur_suivant()
-        return f"C'est à {self.info.joueurs[self.indice_joueur_actuel].pseudo} de jouer !"
+        print(f"C'est à {self.info.joueurs[self.indice_joueur_actuel].pseudo} de jouer !")
+        return montant
