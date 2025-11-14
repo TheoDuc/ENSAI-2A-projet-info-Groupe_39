@@ -1,5 +1,5 @@
 import pytest
-from combinaison.combinaison import AbstractCombinaison
+from business_object.combinaison.combinaison import AbstractCombinaison
 
 
 class CombinaisonTest(AbstractCombinaison):
