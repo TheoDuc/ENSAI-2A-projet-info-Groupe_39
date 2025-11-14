@@ -82,11 +82,8 @@ class TestJoueur:
         "joueur1, joueur2, resultat",
         [
             (Joueur(1, "Crocorible", 200, "France"), Joueur(1, "Crocorible", 200, "France"), True),
-            (
-                Joueur(1, "Crocorible", 200, "France"),
-                Joueur(2, "Pikachu", 200, "France"),
-                False,
-            ),
+            (Joueur(1, "Crocorible", 200, "France"),Joueur(2, "Pikachu", 200, "France"),False),
+            (Joueur(1, "Crocorible", 200, "France"), "pas un joueur", False)
         ],
     )
     def test_joueur_eq(self, joueur1, joueur2, resultat):
