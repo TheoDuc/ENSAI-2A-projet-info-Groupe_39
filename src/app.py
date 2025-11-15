@@ -20,20 +20,25 @@ async def redirect_to_docs():
     """Redirect to the API documentation"""
     return RedirectResponse(url="/docs")
 
+@app.get("/admin/crediter/{joueur}/{montant}")
+def crediter(joueur: str, montant:int):
+    reponse = input("Etes-vous un admin (oui ou non)")
+    if reponse == 'oui':
+        CreditService().crediter(joueur,montant)
+    else:
+        return (f"vous n'êtes pas admin")
+    return(f"l'admin a bien crediter {montant} à {joueur}")
 
-@app.get("/joueur/", tags=["Joueurs"])
-async def lister_tous_joueurs():
-    """Lister tous les joueurs"""
-    logging.info("Lister tous les joueurs")
-    liste_joueurs = joueur_service.lister_tous()
+@app.get("/admin/debiter/{joueur}/{montant}")
+def debiter(joueur: str, montant:int):
+    reponse = input("Etes-vous un admin (oui ou non)")
+    if reponse == 'oui':
+        CreditService().debiter(joueur,montant)
+    else:
+        return (f"vous n'êtes pas admin")
+    return(f"l'admin a bien crediter {montant} à {joueur}")
 
-    liste_model = []
-    for joueur in liste_joueurs:
-        liste_model.append(joueur)
-
-    return liste_model
-
-
+    
 @app.get("/joueur/{id_joueur}", tags=["Joueurs"])
 async def joueur_par_id(id_joueur: int):
     """Trouver un joueur à partir de son id"""
@@ -46,10 +51,8 @@ class JoueurModel(BaseModel):
 
     id_joueur: int | None = None  # Champ optionnel
     pseudo: str
-    mdp: str
-    age: int
-    mail: str
-    fan_pokemon: bool
+    credit: int
+    pays: str
 
 
 @app.post("/joueur/", tags=["Joueurs"])
@@ -109,6 +112,6 @@ async def hello_name(name: str):
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=9876)
+    uvicorn.run(app, host="0.0.0.0", port=5432)
 
     logging.info("Arret du Webservice")

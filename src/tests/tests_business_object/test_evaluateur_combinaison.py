@@ -12,7 +12,7 @@ def get_kicker_valeurs(kicker):
         return []
     if isinstance(kicker, (list, tuple)):
         return list(kicker)
-    return [kicker]  # string -> liste d'une valeur
+    return [kicker]
 
 
 def test_eval_full():

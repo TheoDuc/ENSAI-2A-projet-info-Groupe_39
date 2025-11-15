@@ -1,18 +1,19 @@
-"""Implémentation des tests pour la classe InfoManche"""
-
 import pytest
 
 from business_object.info_manche import InfoManche
 from business_object.joueur import Joueur
 from business_object.main import Main
 
-"""
+
 class TestInfoManche:
+
+    # -------- Fixtures -------- #
+
     @pytest.fixture
     def joueurs(self):
         return [
             Joueur(1, "Alice", 500, "France"),
-            Joueur(2, "Bob", 300, "Canada"),
+            Joueur(2, "Bob", 300, "Canada")
         ]
 
     @pytest.fixture
@@ -22,21 +23,20 @@ class TestInfoManche:
             Main([pytest.dix_carreau, pytest.dix_trefle]),
         ]
 
-    # Tests d’initialisation
+    # -------- Tests d'initialisation -------- #
 
-    def test_infomanche_init_ok(self, joueurs):
+    def test_infomanche_init_succes(self, joueurs):
         # GIVEN / WHEN
         manche = InfoManche(joueurs)
 
         # THEN
         assert manche.joueurs == joueurs
         assert manche.statuts == [0, 0]
-        assert len(manche.mains) == len(joueurs)
-        assert all(m is None for m in manche.mains)
         assert manche.mises == [0, 0]
-        assert manche.tour_couche == [10, 10]
+        assert manche.tour_couche == [None, None]
+        assert manche.mains == [None, None]
 
-    def test_infomanche_init_type_error(self):
+    def test_infomanche_init_TypeError_mauvais_type_liste(self):
         # GIVEN
         mauvais_param = "pas une liste"
 
@@ -44,24 +44,25 @@ class TestInfoManche:
         with pytest.raises(TypeError, match="Le paramètre 'joueurs' doit être une liste"):
             InfoManche(mauvais_param)
 
-    def test_infomanche_init_joueur_non_instance(self):
+    def test_infomanche_init_TypeError_mauvais_type_joueur(self):
         # GIVEN
         mauvais_joueurs = ["Alice", "Bob"]
 
         # WHEN / THEN
         with pytest.raises(
-            TypeError, match="Tous les éléments de 'joueurs' doivent être des instances de Joueur."
+            TypeError,
+            match="Tous les éléments de 'joueurs' doivent être des instances de Joueur"
         ):
             InfoManche(mauvais_joueurs)
 
-    def test_infomanche_init_vide(self):
+    def test_infomanche_init_ValueError_pas_assez_de_joueurs(self):
         # GIVEN / WHEN / THEN
-        with pytest.raises(ValueError, match="0 présents"):
+        with pytest.raises(ValueError, match="Au moins deux joueurs doivent être présents"):
             InfoManche([])
 
-    # Tests assignation_mains
+    # -------- Tests assignation_mains -------- #
 
-    def test_assignation_mains_ok(self, joueurs, mains):
+    def test_assignation_mains_succes(self, joueurs, mains):
         # GIVEN
         manche = InfoManche(joueurs)
 
@@ -71,54 +72,72 @@ class TestInfoManche:
         # THEN
         assert manche.mains == mains
 
-    def test_assignation_mains_type_error(self, joueurs):
+    def test_assignation_mains_TypeError(self, joueurs):
         # GIVEN
         manche = InfoManche(joueurs)
         mauvaises_mains = ["pas une main"]
 
         # WHEN / THEN
-        with pytest.raises(TypeError, match="Le paramètre 'mains' doit être une liste de Main."):
+        with pytest.raises(TypeError, match="Le paramètre 'mains' doit être une liste de Main"):
             manche.assignation_mains(mauvaises_mains)
 
-    def test_assignation_mains_nombre_incorrect(self, joueurs, mains):
+    def test_assignation_mains_ValueError_nombre_incorrect(self, joueurs, mains):
         # GIVEN
         manche = InfoManche(joueurs)
-        mauvaises_mains = [mains[0]]  # seulement une main
+        mauvaises_mains = [mains[0]]  # 1 seule main
 
         # WHEN / THEN
         with pytest.raises(
-            ValueError, match="Le nombre de mains doit correspondre au nombre de joueurs."
+            ValueError,
+            match="Le nombre de mains doit correspondre au nombre de joueurs"
         ):
             manche.assignation_mains(mauvaises_mains)
 
-    # Tests coucher_joueur
+    # -------- Tests modifier_statut / mise / tour_couche -------- #
 
-    def test_coucher_joueur_ok(self, joueurs):
+    def test_modifier_statut(self, joueurs):
         # GIVEN
         manche = InfoManche(joueurs)
-        indice = 1
-        tour = 1
 
         # WHEN
-        manche.coucher_joueur(indice, tour)
+        manche.modifier_statut(1, 3)
 
         # THEN
-        assert manche.tour_couche[indice] == tour
         assert manche.statuts[1] == 3
 
-    # Tests __str__
+    def test_modifier_mise(self, joueurs):
+        # GIVEN
+        manche = InfoManche(joueurs)
+
+        # WHEN
+        manche.modifier_mise(0, 150)
+
+        # THEN
+        assert manche.mises[0] == 150
+
+    def test_modifier_tour_couche(self, joueurs):
+        # GIVEN
+        manche = InfoManche(joueurs)
+
+        # WHEN
+        manche.modifier_tour_couche(1, 2)
+
+        # THEN
+        assert manche.tour_couche[1] == 2
+
+    # -------- Test __str__ -------- #
 
     def test_str_contenu(self, joueurs):
         # GIVEN
         manche = InfoManche(joueurs)
 
         # WHEN
-        texte = str(manche)
+        affichage = str(manche)
 
         # THEN
-        assert "InfoManche(" in texte
-        assert "joueurs=" in texte
-        assert "statuts=" in texte
-        assert "mains=" in texte
-        assert "mises=" in texte
-"""
+        assert "InfoManche(" in affichage
+        assert "joueurs=" in affichage
+        assert "statuts=" in affichage
+        assert "mains=" in affichage
+        assert "mises=" in affichage
+        assert "tour_couche=" in affichage

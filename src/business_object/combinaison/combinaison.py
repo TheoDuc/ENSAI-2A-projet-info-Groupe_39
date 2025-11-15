@@ -43,7 +43,7 @@ class AbstractCombinaison(ABC):
         elif isinstance(kicker, str):
             self._kicker = (kicker,)
         elif isinstance(kicker, (list, tuple)):
-            self._kicker = tuple(kicker)  # toujours en tuples
+            self._kicker = tuple(kicker)
         else:
             raise TypeError("Le kicker doit être un str, une liste, un tuple ou None.")
 
@@ -63,7 +63,7 @@ class AbstractCombinaison(ABC):
         Raises
         ------
         ValueError
-            Si le nombre de cartes est inférieur à `n`.
+            Si le nombre de cartes est inférieur à 5.
         """
         if len(cartes) < n:
             raise ValueError(f"Il faut au moins {n} cartes pour évaluer cette combinaison.")
@@ -132,7 +132,7 @@ class AbstractCombinaison(ABC):
     # --- Représentations ---
 
     def _fmt_valeurs(self, val) -> Optional[str]:
-        """Convertit tuple/liste -> string propre pour l'affichage."""
+        """Convertit tuple/liste"""
         if val is None:
             return None
         if isinstance(val, (tuple, list)):
