@@ -187,7 +187,7 @@ class MancheJoueurDAO(metaclass=Singleton):
         return res == 1
 
 
-mjdao = MancheJoueurDAO()    
+mjdao = MancheJoueurDAO()
 joueur1 = Joueur(998, 'a', 500, 'us') 
 joueur2 = Joueur(999, 'admin', 50, 'fr')
 info_manche = InfoManche([joueur1, joueur2])

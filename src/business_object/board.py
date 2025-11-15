@@ -7,7 +7,7 @@ from business_object.liste_cartes import AbstractListeCartes
 class Board(AbstractListeCartes):
     """Modélisation du board de poker"""
 
-    def __init__(self, cartes: list[Carte] = []):
+    def __init__(self, cartes: list[Carte] = None, complet: bool = False):
         """
         Instanciation d'un board
 
@@ -25,8 +25,7 @@ class Board(AbstractListeCartes):
         if cartes is not None and len(cartes) > 5:
             raise ValueError(f"Le nombre de cartes dans le board est trop grand : {len(cartes)}")
 
-        else:
-            super().__init__(cartes)
+        super().__init__(cartes, complet)
 
     def ajouter_carte(self, carte: Carte):
         """
@@ -42,5 +41,5 @@ class Board(AbstractListeCartes):
             raise ValueError(
                 f"Le nombre de cartes dans le board est trop grand : {len(self.cartes) + 1}"
             )
-        else:
-            self.ajouter_carte_base(carte)
+
+        super().ajouter_carte(carte)

@@ -30,7 +30,7 @@ class AbstractListeCartesTest(ABC):
         cartes = [pytest.trois_carreau, pytest.quatre_carreau]
 
         # WHEN
-        liste_cartes = cls(cartes)
+        liste_cartes = cls(cartes, False)
 
         # THEN
         assert liste_cartes.cartes == cartes
@@ -78,14 +78,14 @@ class AbstractListeCartesTest(ABC):
         # THEN
         assert longueur == resultat
 
-    def test_liste_cartes_ajouter_carte_succes(self, liste_cartes):
+    def test_liste_cartes_ajouter_carte_succes(self, cls, liste_cartes):
         # GIVEN
         # liste_carte en fixture
         carte = pytest.cinq_trefle
         resultat = [pytest.as_pique, pytest.dix_coeur, pytest.cinq_trefle]
 
         # WHEN
-        liste_cartes.ajouter_carte_base(carte)
+        liste_cartes.ajouter_carte(carte)
 
         # THEN
         assert liste_cartes.cartes == resultat
@@ -98,7 +98,7 @@ class AbstractListeCartesTest(ABC):
 
         # WHEN / THEN
         with pytest.raises(TypeError, match=message_attendu):
-            liste_cartes.ajouter_carte_base(carte)
+            liste_cartes.ajouter_carte(carte)
 
     def test_liste_cartes_retirer_carte_succes(self, liste_cartes):
         # GIVEN
@@ -135,8 +135,8 @@ class AbstractListeCartesTest(ABC):
     def test_liste_cartes_melanger(self, cls):
         # GIVEN
         # cls en fixture
-        liste_carte = cls(None)
-        liste_carte_temoin = cls(None)
+        liste_carte = cls(None, True)
+        liste_carte_temoin = cls(None, True)
 
         # WHEN
         liste_carte.melanger()
