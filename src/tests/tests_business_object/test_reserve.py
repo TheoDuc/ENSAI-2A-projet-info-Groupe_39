@@ -12,7 +12,7 @@ from tests.tests_business_object.test_liste_cartes import AbstractListeCartesTes
 class TestReserve(AbstractListeCartesTest):
     @pytest.fixture
     def liste_cartes(self):
-        return Reserve([pytest.as_pique, pytest.dix_coeur])
+        return Reserve([pytest.as_pique, pytest.dix_coeur], False)
 
     @pytest.fixture
     def cls(self):
@@ -33,7 +33,7 @@ class TestReserve(AbstractListeCartesTest):
     def test_reserve_ajouter_carte_succes(self):
         # GIVEN
         carte = pytest.cinq_trefle
-        reserve = Reserve([pytest.as_pique])
+        reserve = Reserve([pytest.as_pique], False)
         resultat = [pytest.as_pique, pytest.cinq_trefle]
 
         # WHEN
@@ -44,7 +44,7 @@ class TestReserve(AbstractListeCartesTest):
 
     def test_reserve_bruler(self):
         # GIVEN
-        reserve = Reserve([pytest.deux_coeur, pytest.huit_coeur, pytest.valet_trefle])
+        reserve = Reserve([pytest.deux_coeur, pytest.huit_coeur, pytest.valet_trefle], False)
         resultat = [pytest.huit_coeur, pytest.valet_trefle, pytest.deux_coeur]
 
         # WHEN
@@ -55,7 +55,7 @@ class TestReserve(AbstractListeCartesTest):
 
     def test_reserve_reveler_succes(self):
         # GIVEN
-        reserve = Reserve([pytest.as_pique, pytest.as_trefle, pytest.as_coeur])
+        reserve = Reserve([pytest.as_pique, pytest.as_trefle, pytest.as_coeur], False)
         board = Board([pytest.roi_pique])
         resultat_reserve = [pytest.as_trefle, pytest.as_coeur]
         resultat_board = [pytest.roi_pique, pytest.as_pique]
@@ -69,7 +69,7 @@ class TestReserve(AbstractListeCartesTest):
 
     def test_reserve_reveler_echec(self):
         # GIVEN
-        reserve = Reserve([pytest.as_pique, pytest.as_trefle, pytest.as_coeur])
+        reserve = Reserve([pytest.as_pique, pytest.as_trefle, pytest.as_coeur], False)
         main = Main(None)
         message_attendu = f"board pas de type Board : {type(main)}"
 
@@ -80,7 +80,7 @@ class TestReserve(AbstractListeCartesTest):
     def test_reserve_distribuer_succes(self):
         # GIVEN
         reserve = Reserve(
-            [pytest.as_pique, pytest.quatre_trefle, pytest.valet_carreau, pytest.valet_coeur]
+            [pytest.as_pique, pytest.quatre_trefle, pytest.valet_carreau, pytest.valet_coeur], False
         )
         n_joueurs = 2
         resultat = [
@@ -99,7 +99,7 @@ class TestReserve(AbstractListeCartesTest):
     def test_reserve_distribuer_echec(self):
         # GIVEN
         reserve = Reserve(
-            [pytest.as_pique, pytest.quatre_trefle, pytest.valet_carreau, pytest.valet_coeur]
+            [pytest.as_pique, pytest.quatre_trefle, pytest.valet_carreau, pytest.valet_coeur], False
         )
         n_joueurs = 3
         message_attendu = (

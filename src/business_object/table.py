@@ -19,8 +19,8 @@ class Table:
         grosse_blind: int,
         numero_table: int = 0,
         mode_jeu: int = 1,
-        joueurs: list = [],
-        manche: Manche = None
+        joueurs: list = None,
+        manche: Manche = None,
     ):
         """
         Instanciation de la table de jeu
@@ -49,8 +49,13 @@ class Table:
         self.__grosse_blind = grosse_blind
         self.__numero_table = numero_table
         self.__mode_jeu = mode_jeu
-        self.__joueurs = list(joueurs)
         self.__manche = Manche
+
+        if joueurs is None:
+            self.__joueurs = []
+        else:
+            self.__joueurs = joueurs
+
         self.dealer_index = 0  # DE la part de cheik pour rotation dealer
 
     # creer une classe property pour joueur_max, grosse_blind, mode_jeu et joueurs

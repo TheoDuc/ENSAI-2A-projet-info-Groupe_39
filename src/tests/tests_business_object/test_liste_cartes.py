@@ -30,7 +30,7 @@ class AbstractListeCartesTest(ABC):
         cartes = [pytest.trois_carreau, pytest.quatre_carreau]
 
         # WHEN
-        liste_cartes = cls(cartes)
+        liste_cartes = cls(cartes, False)
 
         # THEN
         assert liste_cartes.cartes == cartes
@@ -135,8 +135,8 @@ class AbstractListeCartesTest(ABC):
     def test_liste_cartes_melanger(self, cls):
         # GIVEN
         # cls en fixture
-        liste_carte = cls(None)
-        liste_carte_temoin = cls(None)
+        liste_carte = cls(None, True)
+        liste_carte_temoin = cls(None, True)
 
         # WHEN
         liste_carte.melanger()

@@ -9,7 +9,7 @@ from business_object.main import Main
 class Reserve(AbstractListeCartes):
     """Modélisation de la reserve"""
 
-    def __init__(self, cartes: list[Carte] = None):
+    def __init__(self, cartes: list[Carte] = None, complet: bool = True):
         """
         Instanciation de la reserve de carte
 
@@ -24,7 +24,7 @@ class Reserve(AbstractListeCartes):
             Instance de 'Reserve'
         """
 
-        super().__init__(cartes)
+        super().__init__(cartes, complet)
 
     def bruler(self):
         """

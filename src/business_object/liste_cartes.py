@@ -10,7 +10,7 @@ from business_object.carte import Carte
 class AbstractListeCartes(ABC):
     """Modélisation d'une liste de cartes provenant d'un jeu de cartes"""
 
-    def __init__(self, cartes: list[Carte]):
+    def __init__(self, cartes: list[Carte], complet):
         """
         Instanciation d'une liste de cartes
 
@@ -36,11 +36,14 @@ class AbstractListeCartes(ABC):
                         f"cartes ne doit contenir que des objet de type Carte : {type(carte)}"
                     )
 
+        if cartes is None:
+            self.__cartes = []
+
         if cartes is not None:
             self.__cartes = cartes
 
         # Créer un jeu de cartes complet
-        else:
+        if complet:
             self.__cartes = [
                 Carte(valeur, couleur) for valeur in Carte.VALEURS() for couleur in Carte.COULEURS()
             ]

@@ -7,7 +7,7 @@ from business_object.liste_cartes import AbstractListeCartes
 class Main(AbstractListeCartes):
     """Modélisation de la main d'un joueur"""
 
-    def __init__(self, cartes: list[Carte] = []):
+    def __init__(self, cartes: list[Carte] = None, complet: bool = False):
         """
         Instanciation d'une main
 
@@ -22,7 +22,10 @@ class Main(AbstractListeCartes):
             Instance de 'Main'
         """
 
-        super().__init__(cartes)
+        if cartes == "vide":
+            cartes = []
+
+        super().__init__(cartes, complet)
 
     def intervertir_cartes(self):
         """
