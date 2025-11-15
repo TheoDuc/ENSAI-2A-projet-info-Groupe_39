@@ -80,6 +80,13 @@ class Manche:
         """Tour de jeu actuel"""
         return self.__tour
 
+    @tour.setter
+    def tour(self, value: int):
+        """Permet de modifier le tour de jeu pour les tests ou progression de la manche"""
+        if not isinstance(value, int) or not (0 <= value <= 3):
+            raise ValueError("Le tour doit être un entier entre 0 et 3")
+        self.__tour = value
+
     @property
     def info(self) -> InfoManche:
         """Informations des joueurs dans la partie"""
@@ -191,7 +198,7 @@ class Manche:
         for i in range(len(self.info.statuts)):
             if self.info.statuts[i] not in [3, 4]:
                 self.info.modifier_statut(i, 0)
-    
+
     def nouveau_tour(self):
         """
         Blabla
@@ -199,7 +206,7 @@ class Manche:
 
         if self.tour == 3:
             raise ValueError("La manche est déjà au dernier tour")
-        
+
         self.__tour += 1
         self.indice_nouveau_tour()
         self.statuts_nouveau_tour()
@@ -262,7 +269,6 @@ class Manche:
         return True
 
     def fin_de_manche(self) -> bool:
-
         n = 0
 
         for s in self.info.statuts:
@@ -271,7 +277,7 @@ class Manche:
 
         if n == 0:
             raise ValueError("Les joueurs ne peuvent être tous couchés")
-        
+
         return n == 1 or (self.fin_du_tour and self.tour == 3)
 
     # ---------------------------------------
@@ -289,13 +295,12 @@ class Manche:
 
         # Si le joueur n'est pas innactif, soulever une erreur
         if self.info.statuts[indice_joueur] != 0:
-            raise ValueError(f"Le joueur doit avoir le statut d'innactif pour checker")
-        
-        self.info.modifier_statut[indice_joueur, 2]
+            raise ValueError("Le joueur doit avoir le statut d'innactif pour checker")
 
+        self.info.modifier_statut(indice_joueur, 2)  # comme c'est une méthode
 
     @log
-    def suivre(self, indice_joueur: int, relance : int = 0) -> int:
+    def suivre(self, indice_joueur: int, relance: int = 0) -> int:
         """
         Ajoute une mise pour un joueur
 
@@ -334,7 +339,7 @@ class Manche:
         if relance > 0:
             # Met à jour le statut des autres joueurs innactifs ou à jour
             for i in range(len(self.info.statuts)):
-                if self.info.statuts[i] in [0, 2]:
+                if i != indice_joueur and self.info.statuts[i] in [0, 2]:
                     self.info.statuts[i] = 1
 
         return pour_suivre + relance
@@ -343,7 +348,7 @@ class Manche:
     def all_in(self, indice_joueur: int) -> int:
         """Mise tout les crédits d'un joueur"""
 
-        if self.info.statut[indice_joueur] in [3,4]:
+        if self.info.statuts[indice_joueur] in [3, 4]:
             raise ValueError("Le joueur ne peut plus all-in")
 
         # Le montant total du all-in
@@ -353,6 +358,7 @@ class Manche:
 
         ancienne_mise = self.info.mises[indice_joueur]
         nouvelle_mise = montant + ancienne_mise
+        self.info.modifier_mise(indice_joueur, nouvelle_mise)
         self.info.modifier_statut(indice_joueur, 4)
 
         # Cas où le joueur all-in dépasse la mise la plus haute
@@ -388,7 +394,7 @@ class Manche:
 
         for mise in self.info.mises:
             pot += mise
-        
+
         return pot
 
     def joueurs_en_lice(self):
@@ -403,22 +409,22 @@ class Manche:
         """Renvoie une liste correspondant au classement de la partie"""
 
         if self.tour < 3:
-            raise RuntimeError("Impossible de classer les joueurs : la board n'est pas dévoilé entièrement")
+            raise RuntimeError(
+                "Impossible de classer les joueurs : la board n'est pas dévoilé entièrement"
+            )
 
         n = len(self.info.joueurs)
         joueurs_en_lice = self.joueurs_en_lice()
         board = self.board
 
         Combinaison = [None] * n
-        for i in joueurs_en_lice():
-                Combinaison[i] = EvaluateurCombinaison.eval(
-                    self.info.mains[i].cartes + board.cartes
-                )
+        for i in joueurs_en_lice:  # j'ai enlévé les parenthèses car elle est deja rétourné
+            Combinaison[i] = EvaluateurCombinaison.eval(self.info.mains[i].cartes + board.cartes)
 
         # Donne un score à chaque joueur en lice selon le nombre de mains qu'il bat
         scores = [0] * n
-        for j1 in joueurs_en_lice():
-            for j2 in joueurs_en_lice():
+        for j1 in joueurs_en_lice:
+            for j2 in joueurs_en_lice:
                 if Combinaison[j1] >= Combinaison[j2]:
                     scores[j1] += 1
 
@@ -443,8 +449,8 @@ class Manche:
         """Récupère une certaine quantité d'un entier"""
         if montant_a_recupere >= mise:
             return [0, mise]
-        
-        return [mise-montant_a_recupere, montant_a_recupere]
+
+        return [mise - montant_a_recupere, montant_a_recupere]
 
     def gains(self) -> dict:
         """Calcule les gains des joueurs en fin de manche."""
@@ -456,7 +462,7 @@ class Manche:
 
         gains = {j: 0 for j in joueurs}
 
-         # Cas avec un seul joueur en lice
+        # Cas avec un seul joueur en lice
         if len(en_lice) == 1:
             gagnant = joueurs[en_lice[0]]
             gains[gagnant] = sum(mises)
@@ -467,10 +473,9 @@ class Manche:
         dernier_niveau = 0
 
         for mise_unique in set(mises):
-
             # Récupère les indices des participants dont la mise est supérieure ou égale à une mise
             participants = [i for i, m in enumerate(mises) if m >= mise_unique]
-            
+
             # Si un seul joueur reste à ce niveau → pas de pot contesté
             if len(participants) <= 1:
                 continue
@@ -513,11 +518,11 @@ class Manche:
     # ---------------------------------------
 
     @log
-    def action(self, joueur, action: str, relance: int=0):
+    def action(self, joueur, action: str, relance: int = 0):
         """
         Effectue l'action souhaitée d'un joueur, et les modifications qui s'en suivents dans la Manche
         """
-        
+
         indice_joueur = self.indice_joueur(joueur)
 
         # Vérifie que c'est au tour du joueur qui fait l'action
@@ -539,8 +544,10 @@ class Manche:
             self.se_coucher(indice_joueur)
         else:
             actions = ("checker", "suivre", "all-in", "se coucher")
-            raise ValueError(f"L'action {action} n'existe pas, les actions possibles sont {actions}")
-        
+            raise ValueError(
+                f"L'action {action} n'existe pas, les actions possibles sont {actions}"
+            )
+
         # Cas où c'est la fin de la manche
         if self.fin_de_manche():
             self.fin = True
@@ -556,6 +563,6 @@ class Manche:
                 message = self.river()
 
             return message
-        
+
         self.joueur_suivant()
         return f"C'est à {self.info.joueurs[self.indice_joueur_actuel].pseudo} de jouer !"
