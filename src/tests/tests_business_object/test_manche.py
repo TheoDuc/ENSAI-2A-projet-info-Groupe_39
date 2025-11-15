@@ -7,8 +7,6 @@ from business_object.joueur import Joueur
 from business_object.main import Main
 from business_object.manche import Manche
 
-# ------------------------ Fixtures ------------------------
-
 
 @pytest.fixture
 def joueurs():
