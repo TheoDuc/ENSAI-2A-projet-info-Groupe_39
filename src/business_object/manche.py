@@ -323,6 +323,7 @@ class Manche:
         # Si le joueur n'a pas assez de crédits pour suivre
         if pour_suivre >= self.info.joueurs[indice_joueur].credit:
             raise ValueError("Le joueur doit all-in")
+            # On peut faire return self.all_in(indice_joueur)
 
         # Si le joueur n'a pas assez de crédits pour relancer autant
         if relance + pour_suivre >= self.info.joueurs[indice_joueur].credit:
@@ -397,6 +398,7 @@ class Manche:
 
         return pot
 
+    @property
     def joueurs_en_lice(self):
         """Renvoie la liste d'indices des joueurs qui ne sont pas couchés"""
         liste_indices = []
@@ -408,20 +410,23 @@ class Manche:
     def classement(self) -> list[int]:
         """Renvoie une liste correspondant au classement de la partie"""
 
-        if self.tour < 3:
-            raise RuntimeError(
-                "Impossible de classer les joueurs : la board n'est pas dévoilé entièrement"
+        if self.tour < 3 or len(self.board.cartes) < 5:
+            raise ValueError(
+                "Impossible de classer les joueurs : la board n'est pas dévoilée entièrement"
             )
 
         n = len(self.info.joueurs)
-        joueurs_en_lice = self.joueurs_en_lice()
+        joueurs_en_lice = self.joueurs_en_lice
         board = self.board
 
         Combinaison = [None] * n
-        for i in joueurs_en_lice:  # j'ai enlévé les parenthèses car elle est deja rétourné
-            Combinaison[i] = EvaluateurCombinaison.eval(self.info.mains[i].cartes + board.cartes)
+        for i in joueurs_en_lice:
+            cartes_totales = self.info.mains[i].cartes + board.cartes
+            if len(cartes_totales) < 5:
+                raise ValueError(f"Pas assez de cartes pour le joueur {i}")
+            Combinaison[i] = EvaluateurCombinaison.eval(cartes_totales)
 
-        # Donne un score à chaque joueur en lice selon le nombre de mains qu'il bat
+        # Calcul du score et classement (comme avant)
         scores = [0] * n
         for j1 in joueurs_en_lice:
             for j2 in joueurs_en_lice:
@@ -430,17 +435,11 @@ class Manche:
 
         classement = [0] * n
         top_scores = sorted(list(set(scores)), reverse=True)
-
         rang = 1
         for score in top_scores:
-            # Trouver tous les joueurs ayant ce score
             indices = [i for i, s in enumerate(scores) if s == score and i in joueurs_en_lice]
-            if not indices:
-                continue
-            # Tous les joueurs à ce score obtiennent le même rang
             for i in indices:
                 classement[i] = rang
-            # Rang suivant selon le nombre d'ex-aequo
             rang += len(indices)
 
         return classement

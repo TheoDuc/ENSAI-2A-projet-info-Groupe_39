@@ -1,9 +1,11 @@
 from abc import ABC, abstractmethod
+from functools import total_ordering
 from typing import List, Optional, Tuple, Union
 
 from business_object.carte import Carte
 
 
+@total_ordering
 class AbstractCombinaison(ABC):
     """
     Classe abstraite représentant une combinaison de cartes au poker.

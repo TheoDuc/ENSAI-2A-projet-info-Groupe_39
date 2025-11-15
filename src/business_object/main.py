@@ -28,6 +28,8 @@ class Main(AbstractListeCartes):
         else:
             super().__init__(cartes)
 
+        # Ajout dans Main
+
     def ajouter_carte(self, carte: Carte):
         """
         Ajoute une carte dans la main. Et vérifie que le nombre de cartes reste en dessous de 2
