@@ -6,21 +6,23 @@ from business_object.combinaison.combinaison import AbstractCombinaison
 
 class Brelan(AbstractCombinaison):
     """
-    Représente un Brelan (trois cartes de même valeur).
+    Représente un Brelan, c'est-à-dire trois cartes de même valeur.
+
+    Un Brelan peut avoir jusqu'à deux cartes supplémentaires ("kickers")
+    pour départager les égalités entre plusieurs Brelans.
     """
 
     def __init__(self, hauteur: str, kicker: tuple[str, ...] = ()) -> None:
         """
-        Initialise un objet Brelan avec une hauteur donnée et la liste de ses kickers.
+        Initialise un Brelan avec sa valeur principale et ses kickers.
 
         Paramètres
         ----------
         hauteur : str
-            Valeur principale du Brelan.
-
-        kicker : tuple[str] | None, optionnel
-            Valeurs des cartes restantes servant à départager les égalités.
-            Seuls les deux kickers les plus forts sont retenus.
+            La valeur principale du Brelan (par exemple "Roi").
+        kicker : tuple[str, ...], optionnel
+            Les valeurs des cartes restantes servant à départager les égalités.
+            Seuls les deux kickers les plus forts sont conservés.
 
         Renvois
         -------
@@ -36,43 +38,45 @@ class Brelan(AbstractCombinaison):
         Renvois
         -------
         int
-            Force numérique associée au Brelan (4).
-            Une valeur plus élevée indique une combinaison plus forte.
+            Valeur numérique représentant la force d’un Brelan.
+            Plus la valeur est élevée, plus la combinaison est forte.
+            Ici, un Brelan a une force de 4.
         """
         return 4
 
     @classmethod
     def est_present(cls, cartes: list[Carte]) -> bool:
         """
-        Vérifie si un Brelan (trois cartes de même valeur) est présent dans la main.
+        Vérifie la présence d'un Brelan dans une liste de cartes.
 
         Paramètres
         ----------
         cartes : list[Carte]
-            Liste des cartes parmi lesquelles on recherche un Brelan.
+            Liste des cartes à analyser.
 
         Renvois
         -------
         bool
-            True si au moins une valeur apparaît exactement trois fois, sinon False.
+            True si au moins trois cartes de même valeur sont présentes, False sinon.
         """
         valeurs = [c.valeur for c in cartes]
-        return any(valeurs.count(v) == 3 for v in set(valeurs))
+        freq = Counter(valeurs).values()
+        return 3 in freq
 
     @classmethod
     def from_cartes(cls, cartes: list[Carte]) -> "Brelan":
         """
-        Construit un objet Brelan à partir d’une liste de cartes.
+        Construit un objet Brelan à partir d'une liste de cartes.
 
         Paramètres
         ----------
         cartes : list[Carte]
-            Liste des cartes disponibles.
+            Liste des cartes disponibles pour former le Brelan.
 
         Renvois
         -------
         Brelan
-            Instance de la classe représentant le Brelan détecté.
+            Instance représentant le Brelan détecté, avec ses kickers.
 
         Exceptions
         ----------
@@ -89,27 +93,22 @@ class Brelan(AbstractCombinaison):
             raise ValueError(f"Aucun brelan présent dans les cartes {details}")
 
         hauteur = max(brelans, key=lambda v: Carte.VALEURS().index(v))
-        kicker = tuple(
-            sorted(
-                [c.valeur for c in cartes if c.valeur != hauteur],
-                key=lambda x: Carte.VALEURS().index(x),
-                reverse=True,
-            )[:2]  # On retient seulement les deux plus hauts kickers dans la combinaison
+        autres = sorted(
+            (c for c in cartes if c.valeur != hauteur),
+            key=lambda c: Carte.VALEURS().index(c.valeur),
+            reverse=True,
         )
+        kicker = tuple(c.valeur for c in autres[:2])
         return cls(hauteur, kicker)
 
     def __str__(self) -> str:
         """
-        Renvoie une représentation textuelle lisible du Brelan.
-
-        Paramètres
-        ----------
-        Aucun
+        Renvoie une description lisible du Brelan pour un joueur.
 
         Renvois
         -------
         str
-            Chaîne lisible par un joueur, par exemple : "Brelan de Roi".
+            Exemple : "Brelan de Roi" ou "Brelan d'As".
         """
         if self.hauteur == "As":
             return "Brelan d'As"
@@ -117,22 +116,15 @@ class Brelan(AbstractCombinaison):
 
     def __repr__(self) -> str:
         """
-        Renvoie une représentation technique du Brelan.
-
-        Paramètres
-        ----------
-        Aucun
+        Renvoie une représentation technique détaillée du Brelan.
 
         Renvois
         -------
         str
-            Chaîne détaillant la combinaison, par exemple :
-            "Brelan(hauteur=Roi, kickers=(As, Dame))"
+            Exemple : "Brelan(hauteur=Roi, kickers=(As, Dame))".
         """
-
         if self.kicker is None:
             return f"Brelan(hauteur={self.hauteur})"
 
-        # Forcer un tuple pour l'affichage
         kicker_tuple = self.kicker if isinstance(self.kicker, tuple) else (self.kicker,)
         return f"Brelan(hauteur={self.hauteur}, kickers={kicker_tuple})"

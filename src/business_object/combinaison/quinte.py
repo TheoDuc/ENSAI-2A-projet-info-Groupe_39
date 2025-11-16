@@ -1,53 +1,76 @@
+from typing import List
+
 from business_object.carte import Carte
 
 from .combinaison import AbstractCombinaison
 
 
 class Quinte(AbstractCombinaison):
-    """Classe représentant une Quinte (suite de 5 cartes de valeurs consécutives)."""
+    """
+    Représente une Quinte au poker (suite de 5 cartes consécutives).
 
-    def __init__(self, hauteur: str, kicker) -> None:
+    La combinaison se caractérise par la carte la plus haute de la suite.
+    Le kicker n'est pas utilisé pour cette combinaison.
+    """
+
+    def __init__(self, hauteur: str, kicker=None) -> None:
         """
-        Initialise une combinaison Quinte.
+        Initialise une Quinte.
 
         Paramètres
         ----------
         hauteur : str
-            Valeur de la carte la plus haute de la Quinte.
-        """
+            Carte la plus haute de la suite.
+        kicker : None
+            Non utilisé pour Quinte.
 
-        super().__init__(hauteur, kicker=None)
+        Renvois
+        -------
+        None
+        """
+        super().__init__(hauteur, ())
 
     @classmethod
     def FORCE(cls) -> int:
-        """Renvoie la force hiérarchique de la combinaison Quinte (4)."""
+        """
+        Force hiérarchique de la Quinte.
+
+        Renvois
+        -------
+        int
+            Valeur entière représentant la force de la combinaison (4).
+        """
         return 4
 
     @classmethod
-    def est_present(cls, cartes: list[Carte]) -> bool:
+    def est_present(cls, cartes: List[Carte]) -> bool:
         """
-        Vérifie si une Quinte est présente dans une liste de cartes.
+        Vérifie si une Quinte est présente dans la main.
 
         Paramètres
         ----------
         cartes : list[Carte]
-            Liste d’objets Carte à analyser.
+            Liste de cartes à analyser.
 
         Renvois
         -------
         bool
-            True si une suite de 5 cartes consécutives est détectée, False sinon.
+            True si une Quinte est présente, False sinon.
         """
         valeurs = sorted({Carte.VALEURS().index(c.valeur) for c in cartes})
+        if 12 in valeurs:  # gérer As bas pour A-2-3-4-5
+            valeurs = [-1 if v == 12 else v for v in valeurs] + valeurs
+        valeurs = sorted(set(valeurs))
+
         for i in range(len(valeurs) - 4):
             if valeurs[i : i + 5] == list(range(valeurs[i], valeurs[i] + 5)):
                 return True
         return False
 
     @classmethod
-    def from_cartes(cls, cartes: list[Carte]) -> "Quinte":
+    def from_cartes(cls, cartes: List[Carte]) -> "Quinte":
         """
-        Construit une instance de Quinte à partir d’une liste de cartes.
+        Construit une Quinte à partir d'une main de cartes.
 
         Paramètres
         ----------
@@ -62,39 +85,45 @@ class Quinte(AbstractCombinaison):
         Exceptions
         ----------
         ValueError
-            Si aucune Quinte n’est trouvée dans les cartes.
+            Si aucune Quinte n'est détectée dans la main.
         """
         cls.verifier_min_cartes(cartes)
         valeurs = sorted({Carte.VALEURS().index(c.valeur) for c in cartes})
+        if 12 in valeurs:  # As bas
+            valeurs = [-1 if v == 12 else v for v in valeurs] + valeurs
+        valeurs = sorted(set(valeurs))
+
         suites = []
         for i in range(len(valeurs) - 4):
             suite = valeurs[i : i + 5]
             if suite == list(range(suite[0], suite[0] + 5)):
                 suites.append(suite)
+
         if not suites:
             raise ValueError("Aucune Quinte présente.")
-        # On prend la carte la plus haute de la meilleure suite
+
         max_suite = max(suites, key=lambda s: s[-1])
-        hauteur = Carte.VALEURS()[max_suite[-1]]
-        return cls(hauteur=hauteur, kicker=None)
+        hauteur = Carte.VALEURS()[max_suite[-1] if max_suite[-1] != -1 else 12]
+        return cls(hauteur=hauteur)
 
     def __str__(self) -> str:
         """
-        Renvoie une représentation textuelle lisible de la Quinte.
+        Représentation lisible de la Quinte.
 
         Renvois
         -------
         str
-            Exemple : "Quinte".
+            Chaîne lisible pour le joueur, par exemple : "Quinte".
         """
         return "Quinte"
 
     def __repr__(self) -> str:
         """
-        Renvoie une représentation technique de la Quinte
+        Représentation technique de la Quinte.
 
         Renvois
         -------
-
+        str
+            Chaîne détaillant la hauteur de la Quinte, par exemple : "Quinte(hauteur='As')".
         """
         return f"Quinte(hauteur='{self.hauteur}')"

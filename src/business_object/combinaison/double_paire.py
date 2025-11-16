@@ -1,4 +1,5 @@
 from collections import Counter
+from typing import List, Tuple
 
 from business_object.carte import Carte
 
@@ -7,136 +8,118 @@ from .combinaison import AbstractCombinaison
 
 class DoublePaire(AbstractCombinaison):
     """
-    Classe représentant une combinaison *Double Paire* (deux paires de cartes de même valeur).
+    Représente une combinaison Double Paire au poker.
 
-    La combinaison est caractérisée par :
-    - la hauteur de la paire la plus forte,
-    - la hauteur de la deuxième paire ,
-    - et éventuellement la carte restante servant de kicker supplémentaire.
+    Une Double Paire est constituée de deux paires de cartes de même valeur,
+    plus éventuellement une carte restante servant de kicker.
     """
 
-    def __init__(self, hauteur: tuple[str], kicker: str) -> None:
+    def __init__(self, hauteur: Tuple[str, str], kicker: Tuple[str, ...] = ()) -> None:
         """
         Initialise une combinaison Double Paire.
 
         Paramètres
         ----------
-        hauteur : tuple[str]
-        kicker : str
-        La carte restante servant de kicker.
+        hauteur : Tuple[str, str]
+            Hauteur des deux paires, la plus forte en premier.
+        kicker : Tuple[str, ...], optionnel
+            Carte restante servant de kicker.
         """
-        hauteur = sorted(hauteur, key=lambda x: Carte.VALEURS().index(x), reverse=True)
+        hauteur = tuple(sorted(hauteur, key=lambda x: Carte.VALEURS().index(x), reverse=True))
         super().__init__(hauteur, kicker)
 
     @classmethod
     def FORCE(cls) -> int:
         """
-        Renvoie la force hiérarchique de la combinaison *Double Paire*.
+        Force hiérarchique de la combinaison Double Paire.
 
-        Renvois
+        Returns
         -------
         int
-            Valeur entière représentant la force de la combinaison.
-
+            Valeur représentant la force de la combinaison (2).
         """
         return 2
 
     @classmethod
-    def est_present(cls, cartes: list[Carte]) -> bool:
+    def est_present(cls, cartes: List[Carte]) -> bool:
         """
-        Vérifie si une Double Paire est présente dans une liste de cartes.
+        Vérifie la présence d'une Double Paire dans une liste de cartes.
 
         Paramètres
         ----------
-        cartes : list[Carte]
-            Liste d’objets Carte représentant la main à analyser.
+        cartes : List[Carte]
+            Liste de cartes à analyser.
 
-        Renvois
+        Returns
         -------
         bool
-            True si au moins deux valeurs apparaissent au moins deux fois, False sinon.
+            True si au moins deux valeurs apparaissent au moins deux fois.
         """
         valeurs = [c.valeur for c in cartes]
-        return len([v for v in set(valeurs) if valeurs.count(v) >= 2]) >= 2
+        freq = Counter(valeurs)
+        paires = [v for v, count in freq.items() if count >= 2]
+        return len(paires) >= 2
 
     @classmethod
-    def from_cartes(cls, cartes: list[Carte]) -> "DoublePaire":
+    def from_cartes(cls, cartes: List[Carte]) -> "DoublePaire":
         """
-        Construit une instance de Double Paire à partir d’une liste de cartes.
-
-        Recherche les deux paires les plus fortes et détermine le kicker
-        éventuel (la carte la plus haute restante).
+        Construit une Double Paire à partir d'une liste de cartes.
 
         Paramètres
         ----------
-        cartes : list[Carte]
-            Liste d’objets Carte pour générer la combinaison.
+        cartes : List[Carte]
+            Liste de cartes disponibles.
 
-        Renvois
+        Returns
         -------
         DoublePaire
-            Instance de la combinaison avec la paire la plus forte et le kicker calculé.
+            Instance représentant la Double Paire détectée.
 
-        Exceptions
-        ----------
+        Raises
+        ------
         ValueError
-            Si moins de deux paires sont présentes dans la main.
-
-
+            Si aucune Double Paire n'est présente.
         """
         cls.verifier_min_cartes(cartes)
 
         valeurs = [c.valeur for c in cartes]
         compteur = Counter(valeurs)
-
-        # Trouver toutes les valeurs ayant au moins deux cartes
         paires_possibles = [v for v, count in compteur.items() if count >= 2]
+
         if len(paires_possibles) < 2:
             raise ValueError("Aucune Double Paire présente dans les cartes")
-        # Prendre les deux paires les plus hautes
-        paires_hautes = sorted(
-            paires_possibles, key=lambda v: Carte.VALEURS().index(v), reverse=True
-        )[:2]
 
-        # Déterminer le kicker : carte la plus haute restante
-        cartes_restantes = [v for v in valeurs if v not in paires_hautes]
-
-        kicker_val = (
-            max(cartes_restantes, key=lambda v: Carte.VALEURS().index(v))
-            if cartes_restantes
-            else None
+        # Sélection des deux paires les plus fortes
+        paires_hautes = tuple(
+            sorted(paires_possibles, key=lambda v: Carte.VALEURS().index(v), reverse=True)[:2]
         )
 
-        return cls(hauteur=paires_hautes, kicker=kicker_val)
+        # Kicker : carte la plus haute restante
+        cartes_restantes = [v for v in valeurs if v not in paires_hautes]
+        kicker = ()
+        if cartes_restantes:
+            kicker = (max(cartes_restantes, key=lambda v: Carte.VALEURS().index(v)),)
+
+        return cls(hauteur=paires_hautes, kicker=kicker)
 
     def __str__(self) -> str:
         """
-        Renvoie une représentation textuelle lisible de la Double Paire.
+        Représentation lisible par un joueur.
 
-        Paramètres
-        ----------
-        Aucun
-
-        Renvois
+        Returns
         -------
         str
-            Chaîne lisible par un joueur, par exemple :
-            "Double Paire Roi  Dame".
+            Exemple : "Double Paire Roi Dame".
         """
         return f"Double Paire {self.hauteur[0]} {self.hauteur[1]}"
 
     def __repr__(self) -> str:
         """
-        Renvoie une représentation technique de la Double Paire
+        Représentation technique détaillée de la Double Paire.
 
-        Paramètres
-        ----------
-        Aucun
-
-        Renvois
+        Returns
         -------
         str
-            Exemple : "DoublePaire(hauteur=Roi, kicker=(Dame, 9))".
+            Exemple : "DoublePaire(hauteur=('Roi','Dame'), kicker=('As',))".
         """
-        kicker_str = self.kicker if self.kicker else "None"
-        return f"DoublePaire(hauteur={self.hauteur}, kicker={kicker_str})"
+        return f"DoublePaire(hauteur={self.hauteur}, kicker={self.kicker or ()})"

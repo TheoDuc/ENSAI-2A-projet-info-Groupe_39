@@ -5,7 +5,7 @@ from business_object.combinaison.simple import Simple
 
 class Test_Simple:
     def test_simple_creation_simple(self):
-        # GIVEN : un jeu de 7 cartes
+        # GIVEN :
         cartes = [
             pytest.as_coeur,
             pytest.roi_carreau,
@@ -45,7 +45,7 @@ class Test_Simple:
         assert not Simple.est_present(cartes)
 
     def test_simple_str_repr(self):
-        # GIVEN : création d'une Simple avec 7 cartes
+        # GIVEN : création d'une Simple
         cartes = [
             pytest.as_coeur,
             pytest.roi_carreau,

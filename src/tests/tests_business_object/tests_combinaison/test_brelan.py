@@ -6,7 +6,7 @@ from business_object.combinaison.brelan import Brelan
 
 class Test_Brelan:
     def test_brelan_init_succes(self):
-        # GIVEN : 7 cartes formant un brelan
+        # GIVEN :
         cartes = [
             pytest.dame_coeur,
             pytest.dame_trefle,
@@ -27,7 +27,7 @@ class Test_Brelan:
         assert brelan.kicker == ("As", "Roi")
 
     def test_brelan_init_invalide(self):
-        # GIVEN : 7 cartes sans brelan
+        # GIVEN :
         cartes = [
             pytest.deux_pique,
             pytest.trois_coeur,
@@ -83,7 +83,7 @@ class Test_Brelan:
         )
 
     def test_brelan_str(self):
-        # GIVEN : brelan sur 7 cartes
+        # GIVEN :
         cartes = [
             pytest.dame_coeur,
             pytest.dame_trefle,
@@ -101,7 +101,7 @@ class Test_Brelan:
         assert str(brelan) == "Brelan de Dame"
 
     def test_brelan_str_as(self):
-        # GIVEN : brelan d'As sur 7 cartes
+        # GIVEN :
         cartes = [
             pytest.as_coeur,
             pytest.as_trefle,
@@ -119,7 +119,7 @@ class Test_Brelan:
         assert str(brelan) == "Brelan d'As"
 
     def test_brelan_repr(self):
-        # GIVEN : 7 cartes formant un brelan
+        # GIVEN :
         cartes = [
             pytest.dame_coeur,
             pytest.dame_trefle,

@@ -1,3 +1,4 @@
+from collections import Counter
 from typing import List
 
 from business_object.carte import Carte
@@ -7,124 +8,107 @@ from .combinaison import AbstractCombinaison
 
 class Couleur(AbstractCombinaison):
     """
-    Classe représentant une combinaison de type *Couleur* (Flush) au poker.
+    Représente une combinaison de type Couleur (Flush) au poker.
 
-    Une couleur est composée de cinq cartes (ou plus) de la même couleur,
-    sans considération d'ordre. La force de la combinaison est déterminée
-    par la carte la plus haute, puis par les kickers éventuels.
+    Une Couleur est constituée d'au moins cinq cartes de la même couleur.
+    La force de la combinaison est déterminée par la carte la plus haute.
     """
 
-    def __init__(self, hauteur: tuple[str]) -> None:
+    def __init__(self, hauteur: List[str], kicker=None) -> None:
         """
         Initialise une combinaison Couleur.
 
         Paramètres
         ----------
-        hauteur : tuple[str]
-            Valeur de la carte la plus haute de la couleur .
-        kicker: None
+        hauteur : List[str]
+            Liste des valeurs des cinq cartes les plus hautes de la couleur.
+        kicker : None
+            Non utilisé pour la Couleur.
         """
-        super().__init__(hauteur, kicker=None)
+        super().__init__(hauteur, kicker or ())
 
     @classmethod
     def FORCE(cls) -> int:
         """
-        Renvoie la force hiérarchique de la combinaison *Couleur*.
+        Renvoie la force hiérarchique de la combinaison Couleur.
 
-        Renvois
+        Returns
         -------
         int
-            Valeur entière représentant la force de la combinaison.
-
+            Valeur représentant la force de la combinaison (5).
         """
         return 5
 
     @classmethod
     def est_present(cls, cartes: List[Carte]) -> bool:
         """
-        Vérifie si une *Couleur* (Flush) est présente dans une liste de cartes.
+        Vérifie la présence d'une Couleur dans une liste de cartes.
 
         Paramètres
         ----------
-        cartes : list[Carte]
-            Liste d’objets Carte représentant la main à évaluer.
+        cartes : List[Carte]
+            Main de cartes à analyser.
 
-        Renvois
+        Returns
         -------
         bool
-            True si au moins cinq cartes partagent la même couleur, False sinon.
-
-
-
+            True si au moins cinq cartes ont la même couleur, False sinon.
         """
         couleurs = [c.couleur for c in cartes]
-        return any(couleurs.count(c) >= 5 for c in set(couleurs))
+        freq = Counter(couleurs)
+        return any(count >= 5 for count in freq.values())
 
     @classmethod
     def from_cartes(cls, cartes: List[Carte]) -> "Couleur":
         """
-        Construit une instance de Couleur à partir d’une liste de cartes.
-
-        Recherche automatiquement la couleur majoritaire (présente au moins 5 fois)
-        et détermine la carte la plus haute ainsi que les kickers correspondants.
+        Construit une combinaison Couleur à partir d'une liste de cartes.
 
         Paramètres
         ----------
-        cartes : list[Carte]
-            Liste d’objets Carte à partir desquelles on veut créer la combinaison.
+        cartes : List[Carte]
+            Liste de cartes disponibles.
 
-        Renvois
+        Returns
         -------
         Couleur
-            Instance de la classe Couleur correspondant à la meilleure couleur trouvée.
+            Instance représentant la couleur détectée.
 
-        Exceptions
-        ----------
+        Raises
+        ------
         ValueError
-            Si aucune couleur valide (au moins cinq cartes identiques en couleur) n’est trouvée.
-
-
+            Si aucune couleur n'est présente.
         """
         cls.verifier_min_cartes(cartes)
+
         couleurs = [c.couleur for c in cartes]
         couleur_max = next((c for c in set(couleurs) if couleurs.count(c) >= 5), None)
-
         if couleur_max is None:
             raise ValueError("Aucune Couleur présente dans les cartes")
 
         cartes_couleur = [c for c in cartes if c.couleur == couleur_max]
         cartes_couleur.sort(key=lambda c: Carte.VALEURS().index(c.valeur), reverse=True)
+
         hauteur = [c.valeur for c in cartes_couleur[:5]]
-        return cls(hauteur)
+        return cls(hauteur=hauteur, kicker=None)
 
     def __str__(self) -> str:
         """
-        Renvoie une représentation textuelle lisible de la *Couleur*.
+        Représentation lisible par un joueur.
 
-        Paramètres
-        ----------
-        Aucun
-
-        Renvois
+        Returns
         -------
         str
-            Chaîne lisible par un joueur, par exemple : "Couleur de As".
+            Exemple : "Couleur".
         """
         return "Couleur"
 
     def __repr__(self) -> str:
         """
-        Renvoie une représentation détaillée de la *Couleur* pour le débogage.
+        Représentation technique détaillée de la combinaison.
 
-        Paramètres
-        ----------
-        Aucun
-
-        Renvois
+        Returns
         -------
         str
-            Chaîne descriptive incluant toutes les cartes formant la couleur,
-            par exemple : "Couleur([As de cœur, Roi de cœur, Dame de cœur, Valet de cœur, 9 de cœur])".
+            Exemple : "Couleur(hauteur=['As', 'Roi', 'Dame', 'Valet', '10'])".
         """
-
         return f"Couleur(hauteur={self.hauteur})"

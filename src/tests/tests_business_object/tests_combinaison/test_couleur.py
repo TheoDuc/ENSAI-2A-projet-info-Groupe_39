@@ -7,7 +7,7 @@ class Test_Couleur:
     """Tests unitaires pour la combinaison Couleur avec 7 cartes."""
 
     def test_couleur_init_succes(self):
-        # GIVEN : 7 cartes dont 5 ou plus de la même couleur
+        # GIVEN :
         cartes = [
             pytest.as_coeur,
             pytest.roi_coeur,

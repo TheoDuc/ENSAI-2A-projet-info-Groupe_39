@@ -8,38 +8,25 @@ from business_object.carte import Carte
 @total_ordering
 class AbstractCombinaison(ABC):
     """
-    Classe abstraite représentant une combinaison de cartes au poker.
+    Classe de base pour toutes les combinaisons de cartes au poker.
 
-    Paramètres
-    ----------
-    hauteur : str | tuple[str, ...] | list[str]
-        Représente la ou les cartes principales de la combinaison.
-
-    kicker : str | tuple[str, ...] | list[str] | None, optionnel
-        Cartes d’appoint utilisées pour départager deux mains identiques.
-        Si non fourni, le kicker est vide.
-
-    Attributs
-    ----------
-    _hauteur : str | list[str]
-        Hauteur principale de la combinaison (str si une seule valeur, liste sinon).
-    _kicker : tuple[str, ...]
-        Ensemble immuable représentant les cartes de départage.
+    Chaque combinaison est caractérisée par :
+    - une ou plusieurs cartes principales ("hauteur"),
+    - un ou plusieurs kickers pour départager des mains identiques.
     """
 
     def __init__(
         self,
-        hauteur: Union[str, Tuple[str, ...], list[str]],
-        kicker: Optional[Union[str, Tuple[str, ...], list[str]]] = None,
+        hauteur: Union[str, Tuple[str, ...], List[str]],
+        kicker: Optional[Union[str, Tuple[str, ...], List[str]]] = None,
     ) -> None:
+        # Normalisation de la hauteur
         if isinstance(hauteur, (list, tuple)):
-            if len(hauteur) == 1:
-                hauteur = hauteur[0]
-            else:
-                hauteur = list(hauteur)
+            hauteur = hauteur[0] if len(hauteur) == 1 else list(hauteur)
         elif not isinstance(hauteur, str):
             raise TypeError("La hauteur doit être un str, une liste ou un tuple.")
 
+        # Normalisation du kicker
         if kicker is None:
             self._kicker = ()
         elif isinstance(kicker, str):
@@ -51,74 +38,67 @@ class AbstractCombinaison(ABC):
 
         self._hauteur = hauteur
 
+    @staticmethod
     def verifier_min_cartes(cartes: list, n: int = 5) -> None:
         """
         Vérifie que la liste de cartes contient au moins `n` cartes.
 
-        Paramètres
-        ----------
-        cartes : list
-            Liste de cartes à vérifier.
-        n : int
-            Nombre minimal de cartes requis (par défaut 5).
-
         Raises
         ------
         ValueError
-            Si le nombre de cartes est inférieur à 5.
+            Si le nombre de cartes est inférieur à `n`.
         """
         if len(cartes) < n:
-            raise ValueError(f"Il faut au moins {n} cartes pour évaluer cette combinaison.")
+            raise ValueError(f"Au moins {n} cartes sont nécessaires pour cette combinaison.")
 
     @property
     def hauteur(self) -> Union[str, List[str]]:
+        """Retourne la ou les cartes principales de la combinaison."""
         if isinstance(self._hauteur, (list, tuple)):
-            if len(self._hauteur) == 1:
-                return self._hauteur[0]
-            return list(self._hauteur)
+            return self._hauteur[0] if len(self._hauteur) == 1 else list(self._hauteur)
         return self._hauteur
 
     @property
     def kicker(self) -> Optional[Union[str, Tuple[str, ...]]]:
+        """Retourne les kickers sous forme de valeur unique ou de tuple."""
         if not self._kicker:
             return None
-        # si c'est un tuple d'une seule valeur, retourne la valeur simple
-        if isinstance(self._kicker, tuple) and len(self._kicker) == 1:
-            return self._kicker[0]
-        return self._kicker
+        return self._kicker[0] if len(self._kicker) == 1 else self._kicker
 
     # --- Méthodes abstraites ---
     @classmethod
     @abstractmethod
     def FORCE(cls) -> int:
+        """Renvoie la force de la combinaison pour comparaison."""
         pass
 
     @classmethod
     @abstractmethod
     def est_present(cls, cartes: List[Carte]) -> bool:
+        """Indique si la combinaison est présente dans une liste de cartes."""
         pass
 
     @classmethod
     @abstractmethod
     def from_cartes(cls, cartes: List[Carte]) -> "AbstractCombinaison":
+        """Construit une instance de la combinaison à partir d’une liste de cartes."""
         pass
 
+    # --- Comparaison entre combinaisons ---
     def _valeur_comparaison(self) -> Tuple[int, Tuple[int, ...], Tuple[int, ...]]:
-        """Renvoie la valeur numérique de comparaison de la combinaison."""
-
-        # Hauteur → normalisation en tuple d'indices
+        """Renvoie les valeurs numériques pour comparer deux combinaisons."""
+        # Hauteur → indices
         if isinstance(self._hauteur, (list, tuple)):
             hauteur_vals = tuple(Carte.VALEURS().index(h) for h in self._hauteur)
         else:
             hauteur_vals = (Carte.VALEURS().index(self._hauteur),)
 
-        # Kicker → peut être vide
+        # Kicker → indices
         if not self._kicker:
             kicker_vals = ()
-        elif isinstance(self._kicker, (list, tuple)):
-            kicker_vals = tuple(Carte.VALEURS().index(k) for k in self._kicker)
         else:
-            kicker_vals = (Carte.VALEURS().index(self._kicker),)
+            kicker_vals = tuple(Carte.VALEURS().index(k) for k in self._kicker)
+
         return (self.FORCE(), hauteur_vals, kicker_vals)
 
     def __eq__(self, other) -> bool:
@@ -132,27 +112,24 @@ class AbstractCombinaison(ABC):
         return self._valeur_comparaison() < other._valeur_comparaison()
 
     # --- Représentations ---
-
     def _fmt_valeurs(self, val) -> Optional[str]:
-        """Convertit tuple/liste"""
+        """Convertit un tuple ou une liste en chaîne lisible."""
         if val is None:
             return None
         if isinstance(val, (tuple, list)):
-            if len(val) == 1:
-                return val[0]
-            return " et ".join(val)
+            return val[0] if len(val) == 1 else " et ".join(val)
         return val
 
     def __str__(self) -> str:
-        nom = self.__class__.__name__
         h = self._fmt_valeurs(self.hauteur)
-        if h == "As":
-            return f"{nom} d'{h}"
-        return f"{nom} de {h}"
+        nom = self.__class__.__name__
+        return f"{nom} d'{h}" if h == "As" else f"{nom} de {h}"
 
     def __repr__(self) -> str:
         h = self._fmt_valeurs(self.hauteur)
         k = self._fmt_valeurs(self.kicker)
-        if not self._kicker:
-            return f"{self.__class__.__name__}(hauteur={h})"
-        return f"{self.__class__.__name__}(hauteur={h}, kicker={k})"
+        return (
+            f"{self.__class__.__name__}(hauteur={h})"
+            if not self._kicker
+            else f"{self.__class__.__name__}(hauteur={h}, kicker={k})"
+        )

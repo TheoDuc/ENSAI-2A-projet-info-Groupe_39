@@ -1,119 +1,139 @@
+from typing import List
+
 from business_object.carte import Carte
 
 from .combinaison import AbstractCombinaison
 
 
 class QuinteFlush(AbstractCombinaison):
-    """Classe représentant une Quinte Flush (suite de 5 cartes de même couleur)."""
+    """
+    Représente une Quinte Flush au poker (suite de 5 cartes de même couleur).
+
+    La combinaison est caractérisée par la valeur la plus haute de la suite.
+    Le kicker n'est pas utilisé pour cette combinaison.
+    """
 
     def __init__(self, hauteur: str, kicker=None) -> None:
         """
-        Initialise une combinaison Quinte Flush.
+        Initialise une Quinte Flush.
 
         Paramètres
         ----------
         hauteur : str
-            Valeur de la carte la plus haute de la Quinte Flush.
-        kicker: None
-
+            Carte la plus haute de la suite.
+        kicker : None
+            Non utilisé pour Quinte Flush.
         """
-
-        super().__init__(hauteur, kicker=None)
+        super().__init__(hauteur, ())
 
     @classmethod
     def FORCE(cls) -> int:
-        """Renvoie la force hiérarchique de la combinaison Quinte Flush (8)."""
+        """
+        Force hiérarchique de la Quinte Flush.
+
+        Returns
+        -------
+        int
+            Valeur représentant la force de la combinaison (8).
+        """
         return 8
 
     @classmethod
-    def est_present(cls, cartes: list[Carte]) -> bool:
+    def est_present(cls, cartes: List[Carte]) -> bool:
         """
-        Vérifie si une Quinte Flush est présente dans une liste de cartes.
+        Vérifie si une Quinte Flush est présente.
 
         Paramètres
         ----------
-        cartes : list[Carte]
-            Liste d’objets Carte à analyser.
+        cartes : List[Carte]
+            Main de cartes à analyser.
 
-        Renvois
+        Returns
         -------
         bool
-            True si une Quinte Flush est détectée, False sinon.
+            True si une suite de 5 cartes de même couleur existe.
         """
         couleurs = [c.couleur for c in cartes]
-        couleur_max = next((c for c in set(couleurs) if couleurs.count(c) >= 5), None)
-        if not couleur_max:
-            return False
+        for couleur_max in set(couleurs):
+            cartes_couleur = [c for c in cartes if c.couleur == couleur_max]
+            if len(cartes_couleur) < 5:
+                continue
 
-        cartes_couleur = [c for c in cartes if c.couleur == couleur_max]
-        valeurs = sorted([Carte.VALEURS().index(c.valeur) for c in cartes_couleur])
-        for i in range(len(valeurs) - 4):
-            if valeurs[i : i + 5] == list(range(valeurs[i], valeurs[i] + 5)):
-                return True
+            valeurs = sorted({Carte.VALEURS().index(c.valeur) for c in cartes_couleur})
+            # Gérer l'As bas pour A-2-3-4-5
+            if 12 in valeurs:  # As
+                valeurs = [-1 if v == 12 else v for v in valeurs] + valeurs
+            valeurs = sorted(set(valeurs))
+
+            for i in range(len(valeurs) - 4):
+                if valeurs[i : i + 5] == list(range(valeurs[i], valeurs[i] + 5)):
+                    return True
         return False
 
     @classmethod
-    def from_cartes(cls, cartes: list[Carte]) -> "QuinteFlush":
+    def from_cartes(cls, cartes: List[Carte]) -> "QuinteFlush":
         """
-        Construit une instance de Quinte Flush à partir d’une liste de cartes.
+        Construit une Quinte Flush à partir d'une main de cartes.
 
         Paramètres
         ----------
-        cartes : list[Carte]
-            Liste de cartes à partir de laquelle on cherche une Quinte Flush.
+        cartes : List[Carte]
+            Liste de cartes disponibles.
 
-        Renvois
+        Returns
         -------
         QuinteFlush
             Instance représentant la Quinte Flush détectée.
 
-        Exceptions
-        ----------
+        Raises
+        ------
         ValueError
-            Si aucune Quinte Flush n’est trouvée dans les cartes.
+            Si aucune Quinte Flush n'est trouvée.
         """
         cls.verifier_min_cartes(cartes)
         couleurs = [c.couleur for c in cartes]
-        couleur_max = next((c for c in set(couleurs) if couleurs.count(c) >= 5), None)
-        if not couleur_max:
-            raise ValueError("Aucune couleur avec les 5 cartes.")
 
-        cartes_couleur = [c for c in cartes if c.couleur == couleur_max]
-        valeurs = sorted([Carte.VALEURS().index(c.valeur) for c in cartes_couleur])
+        for couleur_max in set(couleurs):
+            cartes_couleur = [c for c in cartes if c.couleur == couleur_max]
+            if len(cartes_couleur) < 5:
+                continue
 
-        suites = []
-        for i in range(len(valeurs) - 4):
-            suite = valeurs[i : i + 5]
-            if suite == list(range(suite[0], suite[0] + 5)):
-                suites.append(suite)
-        if not suites:
-            raise ValueError("Aucune Quinte Flush présente.")
-        # On prend la carte la plus haute de la meilleure suite
-        max_suite = max(suites, key=lambda s: s[-1])
-        hauteur = Carte.VALEURS()[max_suite[-1]]
-        return cls(hauteur=hauteur)
+            valeurs = sorted({Carte.VALEURS().index(c.valeur) for c in cartes_couleur})
+            if 12 in valeurs:
+                valeurs = [-1 if v == 12 else v for v in valeurs] + valeurs
+            valeurs = sorted(set(valeurs))
+
+            suites = [
+                valeurs[i : i + 5]
+                for i in range(len(valeurs) - 4)
+                if valeurs[i : i + 5] == list(range(valeurs[i], valeurs[i] + 5))
+            ]
+
+            if suites:
+                max_suite = max(suites, key=lambda s: s[-1])
+                hauteur = Carte.VALEURS()[max_suite[-1] if max_suite[-1] != -1 else 12]
+                return cls(hauteur=hauteur)
+
+        raise ValueError("Aucune Quinte Flush présente.")
 
     def __str__(self) -> str:
         """
-        Renvoie une représentation textuelle lisible de la Quinte Flush.
+        Représentation lisible de la Quinte Flush.
 
-        Renvois
+        Returns
         -------
         str
-            Exemple : "Quinte Flush As".
+            Exemple : "Quinte Flush" ou "Quinte Flush Royale" si As.
         """
-
-        if self.hauteur == "As":
-            return "Quinte Flush Royale"
-        return "Quinte Flush"
+        return "Quinte Flush Royale" if self.hauteur == "As" else "Quinte Flush"
 
     def __repr__(self) -> str:
         """
-        Renvoie une représentation technique de la Quinte Flush
+        Représentation technique pour le débogage.
 
-        Renvois
+        Returns
         -------
-
+        str
+            Exemple : "Quinte Flush(hauteur='Roi')"
         """
-
         return f"Quinte Flush(hauteur='{self.hauteur}')"

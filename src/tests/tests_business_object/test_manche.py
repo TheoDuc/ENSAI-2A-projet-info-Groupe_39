@@ -200,3 +200,54 @@ def test_classement_ex_aequo(manche):
 
     # assert classement[0] == classement[1]  # les ex-aequo ont le même rang
     assert classement[2] != classement[0]  # le troisième joueur a un rang différent
+
+
+def test_recuperer_montant_superieur(manche):
+    # montant_a_recupere >= mise
+    result = manche.recuperer(mise=50, montant_a_recupere=100)
+    assert result == [0, 50]
+
+
+def test_recuperer_montant_inferieur(manche):
+    # montant_a_recupere < mise
+    result = manche.recuperer(mise=50, montant_a_recupere=20)
+    assert result == [30, 20]
+
+
+def test_recuperer_montant_egal(manche):
+    # montant_a_recupere == mise
+    result = manche.recuperer(mise=50, montant_a_recupere=50)
+    assert result == [0, 50]
+
+
+# ------------------------ Tests gains ------------------------
+
+
+def test_gains_un_seul_joueur(manche):
+    # Tous les autres joueurs se couchent (statut 3)
+    manche.info.statuts[:] = [2, 3, 3]
+
+    # Définir des mises pour chaque joueur
+    manche.info.mises[:] = [100, 50, 50]
+
+    # Assurer que le board est complet pour éviter l'appel à classement()
+    manche.board.cartes.clear()  # utilise la propriété pour garder _board intact
+
+    # Ajouter les 5 cartes du board
+    for carte in [
+        Carte("2", "Pique"),
+        Carte("5", "Trêfle"),
+        Carte("8", "Carreau"),
+        Carte("10", "Trêfle"),
+        Carte("Roi", "Carreau"),
+    ]:
+        manche.board.ajouter_carte(carte)
+
+    # Forcer le tour à la river
+    manche.tour = 3
+    gains = manche.gains()
+
+    # Vérifier que le joueur restant récupère tout
+    assert gains[manche.info.joueurs[0].id_joueur] == 200  # somme des mises
+    assert gains[manche.info.joueurs[1].id_joueur] == 0
+    assert gains[manche.info.joueurs[2].id_joueur] == 0

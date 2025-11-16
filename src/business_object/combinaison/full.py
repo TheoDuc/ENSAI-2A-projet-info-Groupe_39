@@ -1,5 +1,5 @@
 from collections import Counter
-from typing import List
+from typing import List, Optional
 
 from business_object.carte import Carte
 
@@ -7,54 +7,53 @@ from .combinaison import AbstractCombinaison
 
 
 class Full(AbstractCombinaison):
-    """Classe représentant un Full (Brelan + Paire) au poker."""
+    """
+    Représente une combinaison Full au poker (Brelan + Paire).
 
-    def __init__(self, hauteur: list[str], kicker=None) -> None:
+    Le Full est caractérisé par :
+    - la valeur du Brelan (trois cartes identiques),
+    - la valeur de la Paire (deux cartes identiques différentes du Brelan).
+    """
+
+    def __init__(self, hauteur: List[str], kicker: Optional[str] = None) -> None:
         """
         Initialise une combinaison Full.
 
         Paramètres
         ----------
-        hauteur : list[str]
-            Liste de deux valeurs : [brelan, paire], la plus forte en premier.
-
-        Renvois
-        -------
-        None
+        hauteur : List[str]
+            Liste de deux valeurs [brelan, paire], la plus forte en premier.
+        kicker : str, optionnel
+            Non utilisé pour le Full.
         """
-        # hauteur = sorted(hauteur, key=lambda x: Carte.VALEURS().index(x), reverse=True)
         super().__init__(hauteur, kicker)
 
     @classmethod
     def FORCE(cls) -> int:
         """
-        Renvoie la force hiérarchique de la combinaison Full.
+        Force hiérarchique du Full.
 
-        Paramètres
-        ----------
-        Aucun
-
-        Renvois
+        Returns
         -------
         int
-            Valeur entière correspondant à la force du Full (6).
+            Valeur représentant la force de la combinaison (6).
         """
         return 6
 
     @classmethod
-    def est_present(cls, cartes: List["Carte"]) -> bool:
+    def est_present(cls, cartes: List[Carte]) -> bool:
         """
-        Vérifie si un Full est présent dans une liste de cartes.
+        Vérifie la présence d'un Full dans une liste de cartes.
 
         Paramètres
         ----------
-        cartes : list[Carte]
-            Liste d’objets Carte à analyser.
+        cartes : List[Carte]
+            Main de cartes à analyser.
 
-        Renvois
+        Returns
         -------
         bool
-            True si un Brelan et une Paire distincte sont présents, False sinon.
+            True si un Brelan et une Paire distincte sont présents.
         """
         valeurs = [c.valeur for c in cartes]
         compteur = Counter(valeurs)
@@ -63,36 +62,36 @@ class Full(AbstractCombinaison):
         return has_brelan and has_paire
 
     @classmethod
-    def from_cartes(cls, cartes: List["Carte"]) -> "Full":
+    def from_cartes(cls, cartes: List[Carte]) -> "Full":
         """
-        Construit une instance de Full à partir d’une liste de cartes.
+        Construit un Full à partir d'une liste de cartes.
 
         Paramètres
         ----------
-        cartes : list[Carte]
-            Liste de cartes à partir de laquelle on cherche un Full.
+        cartes : List[Carte]
+            Liste de cartes disponibles.
 
-        Renvois
+        Returns
         -------
         Full
             Instance représentant le Full détecté.
 
-        Exceptions
-        ----------
+        Raises
+        ------
         ValueError
-            Si aucun Brelan ou Paire n’est trouvé pour constituer le Full.
+            Si aucun Brelan ou Paire n'est trouvé.
         """
         cls.verifier_min_cartes(cartes)
         valeurs = [c.valeur for c in cartes]
         compteur = Counter(valeurs)
 
-        # Le brelan le plus fort
+        # Brelan le plus fort
         brelans = [v for v, count in compteur.items() if count >= 3]
         if not brelans:
             raise ValueError("Aucun brelan pour former un Full")
         brelan = max(brelans, key=lambda v: Carte.VALEURS().index(v))
 
-        # La paire la plus forte différente du brelan
+        # Paire la plus forte différente du brelan
         paires = [v for v, count in compteur.items() if count >= 2 and v != brelan]
         if not paires:
             raise ValueError("Aucune paire pour former un Full")
@@ -102,13 +101,9 @@ class Full(AbstractCombinaison):
 
     def __str__(self) -> str:
         """
-        Renvoie une représentation lisible du Full pour le joueur.
+        Représentation lisible du Full.
 
-        Paramètres
-        ----------
-        Aucun
-
-        Renvois
+        Returns
         -------
         str
             Exemple : "Full Dame Roi".
@@ -117,15 +112,11 @@ class Full(AbstractCombinaison):
 
     def __repr__(self) -> str:
         """
-        Renvoie une représentation technique du Full pour le débogage.
+        Représentation technique détaillée du Full.
 
-        Paramètres
-        ----------
-        Aucun
-
-        Renvois
+        Returns
         -------
         str
-            Exemple : "Full(Hauteur(Dame), Paire(Roi))".
+            Exemple : "Full(hauteur=['Dame','Roi'], kicker=None)".
         """
         return f"Full(hauteur={self.hauteur}, kicker={self.kicker})"

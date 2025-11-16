@@ -5,7 +5,7 @@ from business_object.combinaison.quinte_flush import QuinteFlush
 
 class Test_QuinteFlush:
     def test_quinte_flush_creation(self):
-        # GIVEN : 7 cartes formant une Quinte Flush As haut
+        # GIVEN :
         cartes = [
             pytest.as_coeur,
             pytest.roi_coeur,
