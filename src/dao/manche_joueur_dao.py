@@ -19,26 +19,19 @@ class MancheJoueurDAO(metaclass=Singleton):
     def creer_manche_joueur(self, id_manche: int, info_manche: InfoManche) -> bool:
         """
         Création des entrées de la table manche_joueur pour une manche donnée.
-
-        Parameters
-        ----------
-        id_manche : int
-            Identifiant unique de la manche concernée
-        info_manche : InfoManche
-            Objet contenant la liste des joueurs, leurs mises, statuts et tours de couchage
-
-        Returns
-        -------
-        created : bool
-            True si la création s'est bien déroulée, False sinon
         """
         try:
             with DBConnection().connection as connection:
                 with connection.cursor() as cursor:
-                    manche = Manche(info_manche, 5)
-                    gains = manche.distribuer_pot()
+
+                    # Récupération des gains depuis InfoManche si possible, sinon 0
+                    try:
+                        gains = info_manche.gains()
+                    except AttributeError:
+                        gains = [0] * len(info_manche.joueurs)
+
                     for i, joueur in enumerate(info_manche.joueurs):
-                        # On récupère les cartes du joueur si elles existent
+                        # Cartes du joueur si elles existent
                         carte1 = None
                         carte2 = None
                         gain = gains[i]
@@ -46,7 +39,7 @@ class MancheJoueurDAO(metaclass=Singleton):
                             try:
                                 carte1, carte2 = info_manche.cartes_mains[i]
                             except (IndexError, TypeError):
-                                pass  # si non défini, reste None
+                                pass  # reste None si non défini
 
                         # Insertion SQL
                         cursor.execute(
@@ -75,7 +68,7 @@ class MancheJoueurDAO(metaclass=Singleton):
                                 "id_joueur": joueur.id_joueur,
                                 "carte_main_1": carte1,
                                 "carte_main_2": carte2,
-                                "gain": gains[i],
+                                "gain": gain,
                                 "mise": info_manche.mises[i],
                                 "tour_couche": info_manche.tour_couche[i],
                             },
@@ -193,3 +186,5 @@ joueur2 = Joueur(999, 'admin', 50, 'fr')
 info_manche = InfoManche([joueur1, joueur2])
 print(mjdao.creer_manche_joueur(1, info_manche))
 print(mjdao.trouver_par_ids(997,997))
+
+
