@@ -251,3 +251,97 @@ def test_gains_un_seul_joueur(manche):
     assert gains[manche.info.joueurs[0]] == 200  # somme des mises
     assert gains[manche.info.joueurs[1]] == 0
     assert gains[manche.info.joueurs[2]] == 0
+
+
+# Test sur les Exceptions
+
+
+def test_init_info_type_error():
+    with pytest.raises(TypeError, match="Le paramètre 'info' doit être une instance de InfoManche"):
+        Manche(info="not_info", grosse_blind=10)
+
+
+def test_init_grosse_blind_type_error():
+    joueurs = [
+        Joueur(id_joueur=1, pseudo="Cheik", credit=1000, pays="France"),
+        Joueur(id_joueur=2, pseudo="Theo", credit=1000, pays="France"),
+    ]
+    info = InfoManche(joueurs=joueurs)
+    with pytest.raises(TypeError, match="Le paramètre 'grosse_blind' doit être un entier"):
+        Manche(info=info, grosse_blind="10")
+
+
+def test_init_grosse_blind_value_error():
+    joueurs = [
+        Joueur(id_joueur=1, pseudo="Cheik", credit=1000, pays="France"),
+        Joueur(id_joueur=2, pseudo="Theo", credit=1000, pays="France"),
+    ]
+    info = InfoManche(joueurs=joueurs)
+    with pytest.raises(ValueError, match="Le montant de la grosse blind doit être supérieur à 2"):
+        Manche(info=info, grosse_blind=1)
+
+
+def test_manche_fin_du_tour_fin_de_manche_True(manche):
+    # Tous les joueurs sont actifs (statut = 2)
+    for i in range(len(manche.info.joueurs)):
+        manche.info.modifier_statut(i, 2)
+
+    # Tous les joueurs ont agi
+    assert manche.fin_du_tour() is True
+
+    # Vérifie fin_de_manche() si tour = 3
+    manche.tour = 3
+    assert manche.fin_de_manche() is True
+
+    # Couchons un joueur (statut = 3) ; fin_du_tour() reste True si les autres ont agi
+    manche.info.modifier_statut(0, 3)
+    # Les autres joueurs sont toujours actifs (statut = 2) => fin du tour toujours True
+    assert manche.fin_du_tour() is True
+
+
+def test_manche_fin_du_tour_fin_de_manche_False(manche):
+    # Tous les joueurs actifs (statut = 2)
+    for i in range(len(manche.info.joueurs)):
+        manche.info.modifier_statut(i, 2)
+
+    # Tous les joueurs ont agi
+    assert manche.fin_du_tour() is True
+
+    # Vérifie fin_de_manche() si tour = 3
+    manche.tour = 3
+    assert manche.fin_de_manche() is True
+
+    # Couchons un joueur, les autres sont encore actifs
+    manche.info.modifier_statut(0, 3)
+    assert manche.fin_du_tour() is True
+
+    # Mettons un joueur en attente (statut = 0)
+    manche.info.modifier_statut(1, 0)
+    assert manche.fin_du_tour() is False
+
+    # Remettons le joueur en actif alors fin du tour redevient True
+    manche.info.modifier_statut(1, 2)
+    assert manche.fin_du_tour() is True
+
+
+def test_actions_joueur(manche):
+    idx = 0
+
+    # Checker
+    manche.info.statuts[idx] = 0
+    manche.checker(idx)
+    assert manche.info.statuts[idx] == 2
+
+    # Suivre
+    montant = manche.suivre(idx, relance=0)
+    assert montant >= 0
+
+    # All-in
+    manche.info.joueurs[idx].credit = 50
+    montant_allin = manche.all_in(idx)
+    assert montant_allin == 50
+    assert manche.info.statuts[idx] == 4
+
+    # Se coucher
+    manche.se_coucher(idx)
+    assert manche.info.statuts[idx] == 3
