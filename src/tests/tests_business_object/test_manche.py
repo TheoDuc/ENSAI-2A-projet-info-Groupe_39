@@ -299,3 +299,52 @@ class Test_Manche:
         info.mises[1] = 50
         with pytest.raises(ValueError, match="Le joueur doit all-in"):
             manche.suivre(0, relance=0)
+
+    def test_indice_joueur_suivant_all_couches(self, manche):
+        manche.info.statuts[:] = [3, 3, 3]
+        with pytest.raises(ValueError):
+            manche.indice_joueur_suivant()
+
+    def test_suivre_joueur_doigt_all_in(self):
+        joueurs = [Joueur(1, "A", 10, "France"), Joueur(2, "B", 50, "France")]
+        info = InfoManche(joueurs)
+        manche = Manche(info, 10)
+        info.mises[1] = 50
+        with pytest.raises(ValueError, match="Le joueur doit all-in"):
+            manche.suivre(0, relance=0)
+
+    def test_all_in_joueur_deja_couche(self, manche):
+        manche.info.statuts[0] = 3
+        with pytest.raises(ValueError):
+            manche.all_in(0)
+
+    def test_suivre_relance_trop_grande(self):
+        joueurs = [Joueur(1, "A", 20, "France"), Joueur(2, "B", 50, "France")]
+        info = InfoManche(joueurs)
+        manche = Manche(info, 10)
+        info.mises[0] = 10
+        info.mises[1] = 50
+        with pytest.raises(ValueError, match="Le joueur doit all-in"):
+            manche.suivre(0, relance=50)
+
+    def test_fin_de_manche_all_couches(self, manche):
+        manche.info.statuts[:] = [3, 3, 3]
+        with pytest.raises(ValueError):
+            manche.fin_de_manche()
+
+    def test_action_checker_suivre_all_in_se_coucher(self, manche, joueurs):
+        # Tour au joueur 0
+        montant = manche.action(joueurs[0], "checker")
+        assert montant is None or isinstance(montant, int)
+
+        # Tour au joueur 1
+        montant = manche.action(joueurs[1], "suivre", relance=0)
+        assert isinstance(montant, int)
+
+        # All-in
+        montant = manche.action(joueurs[2], "all-in")
+        assert isinstance(montant, int)
+
+        # Se coucher
+        manche.action(joueurs[0], "se coucher")
+        assert manche.info.statuts[0] == 3
