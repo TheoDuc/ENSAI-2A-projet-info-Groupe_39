@@ -332,8 +332,8 @@ class Manche:
 
     def classement(self) -> list[int]:
         """Classe les joueurs en fonction de leurs mains. Rang 1 = meilleur."""
-        if self.tour < 3 or len(self.board.cartes) < 5:
-            raise ValueError("Impossible de classer : board non complète.")
+        if self.tour < 3 or len(self.board) < 5:
+            raise ValueError("Impossible de classer : le board n'est pas complet")
 
         joueurs_actifs = self.joueurs_en_lice
         evals = {}
@@ -374,12 +374,6 @@ class Manche:
             if i not in classement_dict:
                 classement_dict[i] = rang
 
-        # Debug optionnel
-        print("Classement:", classement_dict)
-        for i in range(len(self.info.joueurs)):
-            combo = getattr(self.info.mains[i], "_combinaison", None)
-            print(f"Joueur {i} combo:", combo)
-
         return [classement_dict[i] for i in range(len(self.info.joueurs))]
 
     def recuperer(self, mise: int, montant_a_recupere: int) -> list[int]:
@@ -400,10 +394,9 @@ class Manche:
         if self.tour < 3 or len(self.board.cartes) < 5:
             raise ValueError("Le board n'est pas complet, impossible de calculer les gains.")
 
-        n_joueurs = len(self.info.joueurs)
         mises_restantes = self.info.mises[:]
         classement = self.classement()  # Rang 1 = meilleur
-        gains = {j.id_joueur: 0.0 for j in self.info.joueurs}
+        gains = {j: 0 for j in self.info.joueurs}
 
         # Tant qu'il reste des mises à distribuer
         while any(m > 0 for m in mises_restantes):
@@ -428,7 +421,7 @@ class Manche:
             # Partage équitable du pot
             part = pot / len(meilleurs)
             for i in meilleurs:
-                gains[self.info.joueurs[i].id_joueur] += part
+                gains[self.info.joueurs[i]] += part
 
         return gains
 

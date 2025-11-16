@@ -2,7 +2,6 @@
 
 from business_object.joueur import Joueur
 from business_object.main import Main
-from utils.log_decorator import log
 
 
 class InfoManche:
@@ -29,7 +28,7 @@ class InfoManche:
         ValueError
             Si la liste des joueurs est vide
         """
-        
+
         if not isinstance(joueurs, list):
             raise TypeError(
                 f"Le paramètre 'joueurs' doit être une liste, pas {type(joueurs).__name__}"
@@ -84,15 +83,15 @@ class InfoManche:
             f"tour_couche={self.tour_couche})"
         )
 
-    def modifier_statut(self, indice_joueur, statut : int):
+    def modifier_statut(self, indice_joueur, statut: int):
         """Modifie le statut d'un joueur par son indice"""
         self.__statuts[indice_joueur] = statut
 
-    def modifier_mise(self, indice_joueur, nouveau_montant : int):
+    def modifier_mise(self, indice_joueur, nouveau_montant: int):
         """Modifie la mise d'un joueur par son indice"""
         self.__mises[indice_joueur] = nouveau_montant
 
-    def modifier_tour_couche(self, indice_joueur, tour : int):
+    def modifier_tour_couche(self, indice_joueur, tour: int):
         """Modifie la mise d'un joueur par son indice"""
         self.__tour_couche[indice_joueur] = tour
 

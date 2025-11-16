@@ -88,9 +88,12 @@ class Joueur:
         """Retourne la table où se trouve le joueur"""
         return self.__table
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Permet d'afficher le pseudo et les crédits du joueur"""
         return f"{self.__pseudo} : {self.__credit} crédits"
+
+    def __repr__(self) -> str:
+        return f"Joueur({self.__id_joueur}, {self.__pseudo}, {self.__pays})"
 
     def __eq__(self, other) -> bool:
         """
@@ -111,6 +114,9 @@ class Joueur:
             return False
 
         return self.__id_joueur == other.id_joueur
+
+    def __hash__(self) -> int:
+        return hash(self.__repr__())
 
     @log
     def changer_identifiant(self, new_id: int):
@@ -134,7 +140,6 @@ class Joueur:
         logger.info(f"L'identifiant de {self.pseudo} devient {new_id}")
 
         return
-
 
     @log
     def ajouter_credits(self, credits: int) -> int:

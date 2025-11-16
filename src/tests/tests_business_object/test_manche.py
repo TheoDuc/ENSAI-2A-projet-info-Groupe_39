@@ -248,6 +248,6 @@ def test_gains_un_seul_joueur(manche):
     gains = manche.gains()
 
     # Vérifier que le joueur restant récupère tout
-    assert gains[manche.info.joueurs[0].id_joueur] == 200  # somme des mises
-    assert gains[manche.info.joueurs[1].id_joueur] == 0
-    assert gains[manche.info.joueurs[2].id_joueur] == 0
+    assert gains[manche.info.joueurs[0]] == 200  # somme des mises
+    assert gains[manche.info.joueurs[1]] == 0
+    assert gains[manche.info.joueurs[2]] == 0
