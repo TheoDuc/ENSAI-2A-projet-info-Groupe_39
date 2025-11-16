@@ -273,7 +273,7 @@ def test_init_grosse_blind_type_error():
 
 def test_init_grosse_blind_value_error():
     joueurs = [
-        Joueur(id_joueur=1, pseudo="Cheik", credit=1000, pays="France"),
+        Joueur(id_joueur=1, pseudo="Guillaume", credit=1000, pays="France"),
         Joueur(id_joueur=2, pseudo="Theo", credit=1000, pays="France"),
     ]
     info = InfoManche(joueurs=joueurs)
@@ -322,3 +322,26 @@ def test_manche_fin_du_tour_fin_de_manche_False(manche):
     # Remettons le joueur en actif alors fin du tour redevient True
     manche.info.modifier_statut(1, 2)
     assert manche.fin_du_tour() is True
+
+
+def test_nouveau_tour_exception(manche):
+    # Déjà au dernier tour (par exemple 3)
+    manche._Manche__tour = 3
+    with pytest.raises(ValueError):
+        manche.nouveau_tour()
+
+
+def test_suivre_limits():
+    joueurs = [
+        Joueur(id_joueur=1, pseudo="A", credit=20, pays="France"),
+        Joueur(id_joueur=2, pseudo="B", credit=1000, pays="France"),
+    ]
+    info = InfoManche(joueurs)
+    manche = Manche(info, 10)
+
+    # On force une mise élevée chez le joueur 2
+    info.mises[1] = 50  # max(mises) = 50
+    # pour_suivre pour joueur 0 = 50 - 0 = 50 > crédit(20)
+
+    with pytest.raises(ValueError):
+        manche.suivre(0, relance=0)
