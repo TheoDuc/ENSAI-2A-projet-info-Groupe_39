@@ -26,7 +26,7 @@ class Test_Manche:
     @staticmethod
     def manche(info_manche):
         m = Manche(info_manche, grosse_blind=10)
-
+        m._Manche__indice_joueur_actuel = 0
         # Assigner des mains valides
         mains = [
             Main(cartes=[Carte("2", "Trêfle"), Carte("3", "Trêfle")]),
@@ -257,3 +257,45 @@ class Test_Manche:
         # Ici on sait que le joueur 0 et 2 ont une main égale sur le board -> même rang
         # Le joueur 1 a un rang différent
         assert classement[1] != classement[0]
+
+    def test_manche_init_info_type_error_1(self):
+        with pytest.raises(TypeError):
+            Manche(info="not_info", grosse_blind=10)
+
+    def test_manche_init_grosse_blind_type_error_1(self, joueurs):
+        info = InfoManche(joueurs)
+        with pytest.raises(TypeError):
+            Manche(info=info, grosse_blind="10")
+
+    def test_manche_init_grosse_blind_value_error_1(self, joueurs):
+        info = InfoManche(joueurs)
+        with pytest.raises(ValueError):
+            Manche(info=info, grosse_blind=1)
+
+    def test_action_exceptions(self, manche, joueurs):
+        # 1. Pas au joueur de jouer
+        with pytest.raises(Exception, match="Ce n'est pas à J2 de jouer"):
+            manche.action(joueurs[1], "checker")
+
+        # 2. Manche terminée
+        manche._Manche__fin = True
+        with pytest.raises(Exception, match="La manche est déjà terminée"):
+            manche.action(joueurs[0], "checker")
+        manche._Manche__fin = False  # reset
+
+        # 3. Action invalide
+        with pytest.raises(ValueError, match="L'action danser n'existe pas"):
+            manche.action(joueurs[0], "danser")
+
+    def test_manche_suivre_limits_(self):
+        joueurs = [
+            Joueur(1, "A", 20, "France"),
+            Joueur(2, "B", 1000, "France"),
+        ]
+        info = InfoManche(joueurs)
+        manche = Manche(info, 10)
+
+        # Joueur 1 a misé 50 → joueur 0 ne peut pas suivre
+        info.mises[1] = 50
+        with pytest.raises(ValueError, match="Le joueur doit all-in"):
+            manche.suivre(0, relance=0)
