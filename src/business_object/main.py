@@ -26,6 +26,7 @@ class Main(AbstractListeCartes):
             cartes = []
 
         super().__init__(cartes, complet)
+        self._combinaison = None
 
     def intervertir_cartes(self):
         """

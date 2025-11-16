@@ -331,37 +331,54 @@ class Manche:
         return [i for i, statut in enumerate(self.info.statuts) if statut != 3]
 
     def classement(self) -> list[int]:
-        """Classe les joueurs en fonction de leurs mains. Rang 1 = meilleur"""
+        """Classe les joueurs en fonction de leurs mains. Rang 1 = meilleur."""
         if self.tour < 3 or len(self.board.cartes) < 5:
             raise ValueError("Impossible de classer : board non complète.")
 
         joueurs_actifs = self.joueurs_en_lice
         evals = {}
+
         for i in joueurs_actifs:
             cartes_totales = self.info.mains[i].cartes + self.board.cartes
-            comb = EvaluateurCombinaison.eval(cartes_totales)
+            # On prend la combinaison forcée si elle existe
+            if hasattr(self.info.mains[i], "_combinaison") and self.info.mains[i]._combinaison:
+                comb = self.info.mains[i]._combinaison
+            else:
+                comb = EvaluateurCombinaison.eval(cartes_totales)
             evals[i] = comb._valeur_comparaison()
 
+        # Tri décroissant par valeur de combinaison
         sorted_joueurs = sorted(joueurs_actifs, key=lambda i: evals[i], reverse=True)
+
         classement_dict = {}
         rang = 1
         idx = 0
 
         while idx < len(sorted_joueurs):
             debut = idx
+            # Regroupe les ex-aequo
             while (
                 idx + 1 < len(sorted_joueurs)
                 and evals[sorted_joueurs[idx + 1]] == evals[sorted_joueurs[debut]]
             ):
                 idx += 1
+            # Attribuer le même rang à tous les ex-aequo
             for k in range(debut, idx + 1):
                 classement_dict[sorted_joueurs[k]] = rang
+            # Incrément du rang après les ex-aequo
             rang += idx - debut + 1
             idx += 1
 
+        # Rang pour les joueurs non-actifs (statut != 2)
         for i in range(len(self.info.joueurs)):
             if i not in classement_dict:
                 classement_dict[i] = rang
+
+        # Debug optionnel
+        print("Classement:", classement_dict)
+        for i in range(len(self.info.joueurs)):
+            combo = getattr(self.info.mains[i], "_combinaison", None)
+            print(f"Joueur {i} combo:", combo)
 
         return [classement_dict[i] for i in range(len(self.info.joueurs))]
 
@@ -372,29 +389,46 @@ class Manche:
         return [mise - montant_a_recupere, montant_a_recupere]
 
     def gains(self) -> dict[int, float]:
-        """Calcule les gains avec side pots et ex-aequo"""
+        """
+        Calcule les gains de chaque joueur à la fin de la manche.
+        Prend en compte les ex-aequo et les side pots.
+
+        Retour
+        ------
+        dict[int, float] : clé = id_joueur, valeur = gain
+        """
         if self.tour < 3 or len(self.board.cartes) < 5:
-            raise RuntimeError("Board non complet")
+            raise ValueError("Le board n'est pas complet, impossible de calculer les gains.")
 
-        joueurs = self.info.joueurs
-        mises_restantes = self.info.mises.copy()
-        classement = self.classement()
-        gains = {j.id_joueur: 0.0 for j in joueurs}
+        n_joueurs = len(self.info.joueurs)
+        mises_restantes = self.info.mises[:]
+        classement = self.classement()  # Rang 1 = meilleur
+        gains = {j.id_joueur: 0.0 for j in self.info.joueurs}
 
+        # Tant qu'il reste des mises à distribuer
         while any(m > 0 for m in mises_restantes):
+            # Joueurs actifs pour ce pot
             participants = [i for i, m in enumerate(mises_restantes) if m > 0]
-            mise_min = min(mises_restantes[i] for i in participants)
-            valeur_pot = mise_min * len(participants)
+            if not participants:
+                break
 
+            # Montant minimum parmi les mises restantes
+            mise_min = min(mises_restantes[i] for i in participants)
+            # Montant du pot courant
+            pot = sum(min(mises_restantes[i], mise_min) for i in participants)
+
+            # Déduire la mise_min de chaque participant
             for i in participants:
                 mises_restantes[i] -= mise_min
 
+            # Identifier les meilleurs joueurs pour ce pot
             min_rang = min(classement[i] for i in participants)
             meilleurs = [i for i in participants if classement[i] == min_rang]
 
-            gain_unitaire = valeur_pot / len(meilleurs)
+            # Partage équitable du pot
+            part = pot / len(meilleurs)
             for i in meilleurs:
-                gains[joueurs[i].id_joueur] += gain_unitaire
+                gains[self.info.joueurs[i].id_joueur] += part
 
         return gains
 
