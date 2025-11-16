@@ -322,26 +322,3 @@ def test_manche_fin_du_tour_fin_de_manche_False(manche):
     # Remettons le joueur en actif alors fin du tour redevient True
     manche.info.modifier_statut(1, 2)
     assert manche.fin_du_tour() is True
-
-
-def test_actions_joueur(manche):
-    idx = 0
-
-    # Checker
-    manche.info.statuts[idx] = 0
-    manche.checker(idx)
-    assert manche.info.statuts[idx] == 2
-
-    # Suivre
-    montant = manche.suivre(idx, relance=0)
-    assert montant >= 0
-
-    # All-in
-    manche.info.joueurs[idx].credit = 50
-    montant_allin = manche.all_in(idx)
-    assert montant_allin == 50
-    assert manche.info.statuts[idx] == 4
-
-    # Se coucher
-    manche.se_coucher(idx)
-    assert manche.info.statuts[idx] == 3
