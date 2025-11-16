@@ -4,10 +4,10 @@ from business_object.combinaison.quinte import Quinte
 
 
 class Test_Quinte:
-    """Tests unitaires pour la combinaison Quinte avec 7 cartes."""
+    """Tests unitaires pour la combinaison Quinte ."""
 
     def test_quinte_creation(self):
-        # GIVEN : 7 cartes formant une Quinte As haut
+        # GIVEN :
         cartes = [
             pytest.as_coeur,
             pytest.roi_pique,

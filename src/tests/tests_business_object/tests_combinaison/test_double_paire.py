@@ -3,9 +3,9 @@ import pytest
 from business_object.combinaison.double_paire import DoublePaire
 
 
-class Test_DoublePaire7Cartes:
+class Test_DoublePaireCartes:
     def test_double_paire_init_succes(self):
-        # GIVEN : 7 cartes formant une Double Paire
+        # GIVEN :
         cartes = [
             pytest.roi_coeur,
             pytest.roi_carreau,
@@ -25,7 +25,7 @@ class Test_DoublePaire7Cartes:
         assert DoublePaire.FORCE() == 2
 
     def test_double_paire_init_invalide(self):
-        # GIVEN : 7 cartes sans Double Paire
+        # GIVEN :
         cartes = [
             pytest.roi_coeur,
             pytest.dame_coeur,
@@ -100,7 +100,7 @@ class Test_DoublePaire7Cartes:
         assert dp1 == DoublePaire.from_cartes(cartes_1)
 
     def test_double_paire_str_repr(self):
-        # GIVEN : 7 cartes formant une Double Paire
+        # GIVEN :
         cartes = [
             pytest.roi_coeur,
             pytest.roi_carreau,

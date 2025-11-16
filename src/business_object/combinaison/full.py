@@ -99,6 +99,12 @@ class Full(AbstractCombinaison):
 
         return cls(hauteur=[brelan, paire])
 
+    def _valeur_comparaison(self):
+        # Brelan puis paire
+        brelan_val = Carte.VALEURS().index(self._hauteur[0])
+        paire_val = Carte.VALEURS().index(self._hauteur[1])
+        return (self.FORCE(), (brelan_val, paire_val), ())
+
     def __str__(self) -> str:
         """
         Représentation lisible du Full.
