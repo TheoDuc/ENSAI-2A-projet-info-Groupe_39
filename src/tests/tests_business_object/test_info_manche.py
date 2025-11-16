@@ -6,15 +6,9 @@ from business_object.main import Main
 
 
 class TestInfoManche:
-
-    # -------- Fixtures -------- #
-
     @pytest.fixture
     def joueurs(self):
-        return [
-            Joueur(1, "Alice", 500, "France"),
-            Joueur(2, "Bob", 300, "Canada")
-        ]
+        return [Joueur(1, "Alice", 500, "France"), Joueur(2, "Bob", 300, "Canada")]
 
     @pytest.fixture
     def mains(self):
@@ -50,8 +44,7 @@ class TestInfoManche:
 
         # WHEN / THEN
         with pytest.raises(
-            TypeError,
-            match="Tous les éléments de 'joueurs' doivent être des instances de Joueur"
+            TypeError, match="Tous les éléments de 'joueurs' doivent être des instances de Joueur"
         ):
             InfoManche(mauvais_joueurs)
 
@@ -59,8 +52,6 @@ class TestInfoManche:
         # GIVEN / WHEN / THEN
         with pytest.raises(ValueError, match="Au moins deux joueurs doivent être présents"):
             InfoManche([])
-
-    # -------- Tests assignation_mains -------- #
 
     def test_assignation_mains_succes(self, joueurs, mains):
         # GIVEN
@@ -88,12 +79,9 @@ class TestInfoManche:
 
         # WHEN / THEN
         with pytest.raises(
-            ValueError,
-            match="Le nombre de mains doit correspondre au nombre de joueurs"
+            ValueError, match="Le nombre de mains doit correspondre au nombre de joueurs"
         ):
             manche.assignation_mains(mauvaises_mains)
-
-    # -------- Tests modifier_statut / mise / tour_couche -------- #
 
     def test_modifier_statut(self, joueurs):
         # GIVEN
@@ -124,8 +112,6 @@ class TestInfoManche:
 
         # THEN
         assert manche.tour_couche[1] == 2
-
-    # -------- Test __str__ -------- #
 
     def test_str_contenu(self, joueurs):
         # GIVEN

@@ -27,6 +27,7 @@ class Test_Quinte:
         assert Quinte.FORCE() == 4
 
     def test_quinte_est_present(self):
+        # GIVEN
         cartes = [
             pytest.as_coeur,
             pytest.roi_pique,
@@ -36,9 +37,11 @@ class Test_Quinte:
             pytest.neuf_coeur,
             pytest.huit_carreau,
         ]
+        # THEN
         assert Quinte.est_present(cartes)
 
     def test_quinte_est_present_faux(self):
+        # GIVEN
         cartes = [
             pytest.as_coeur,
             pytest.roi_pique,
@@ -48,9 +51,11 @@ class Test_Quinte:
             pytest.sept_coeur,
             pytest.six_coeur,
         ]
+        # THEN
         assert not Quinte.est_present(cartes)
 
     def test_quinte_comparaison(self):
+        # GIVEN
         cartes1 = [
             pytest.as_coeur,
             pytest.roi_pique,
@@ -65,16 +70,18 @@ class Test_Quinte:
             pytest.dix_trefle,
             pytest.neuf_coeur,
         ]
+        # WHEN
         q_as = Quinte.from_cartes(cartes1)
         q_roi = Quinte.from_cartes(cartes2)
 
-        # Comparaisons
+        # THEN
         assert q_as > q_roi
         assert q_roi < q_as
         assert q_as == Quinte.from_cartes(cartes1)
         assert q_as != q_roi
 
     def test_quinte_creation_invalide(self):
+        # GIVEN
         cartes = [
             pytest.as_coeur,
             pytest.roi_pique,
@@ -84,11 +91,12 @@ class Test_Quinte:
             pytest.huit_coeur,
             pytest.sept_coeur,
         ]
-        # Il n’y a pas de quinte complète de 5 cartes consécutives
+        # THEN
         with pytest.raises(ValueError):
             Quinte.from_cartes(cartes)
 
     def test_quinte_str_repr(self):
+        # GIVEN
         cartes = [
             pytest.as_coeur,
             pytest.roi_pique,
@@ -96,10 +104,11 @@ class Test_Quinte:
             pytest.valet_trefle,
             pytest.dix_coeur,
         ]
+        # WHEN
         q = Quinte.from_cartes(cartes)
 
         texte_str = str(q)
         texte_repr = repr(q)
-
+        # THEN
         assert texte_str == "Quinte"
         assert texte_repr == "Quinte(hauteur='As')"

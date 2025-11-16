@@ -5,21 +5,28 @@ from business_object.liste_cartes import AbstractListeCartes
 
 
 class Main(AbstractListeCartes):
-    """Modélisation de la main d'un joueur"""
+    """
+    Représente la main d'un joueur au poker.
+
+    Cette classe hérite de AbstractListeCartes et permet de gérer les cartes
+    détenues par un joueur, ainsi que leur combinaison évaluée.
+    """
 
     def __init__(self, cartes: list[Carte] = None, complet: bool = False):
         """
-        Instanciation d'une main
+        Initialise une main avec une liste de cartes.
 
         Paramètres
         ----------
-        cartes : list[Carte]
-            Liste de cartes
+        cartes : list[Carte] | None
+            Cartes initiales de la main. Peut être None pour une main vide.
+        complet : bool
+            Si True, initialise avec un jeu complet (cas rare pour Main).
 
         Renvois
         -------
         Main
-            Instance de 'Main'
+            Instance de la main créée.
         """
 
         if cartes == "vide":
@@ -30,16 +37,15 @@ class Main(AbstractListeCartes):
 
     def intervertir_cartes(self):
         """
-        Inverse l'ordre des cartes dans la main
+        Déplace la première carte de la main à la fin, inversant ainsi l'ordre.
 
         Paramètres
         ----------
-        None
+        Aucun
 
         Renvois
         -------
         None
-
         """
 
         self.ajouter_carte(self.retirer_carte())

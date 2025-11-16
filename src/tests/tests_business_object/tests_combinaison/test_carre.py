@@ -4,15 +4,13 @@ from business_object.combinaison.carre import Carre
 
 
 class Test_Carre:
-    """Tests unitaires pour la classe Carre avec GIVEN / WHEN / THEN."""
-
     def test_carre_init_succes(self):
         # GIVEN
         cartes = [
             pytest.roi_coeur,
             pytest.roi_trefle,
             pytest.roi_carreau,
-            pytest.roi_pique,  # le Carré
+            pytest.roi_pique,
             pytest.as_coeur,
             pytest.dame_trefle,
             pytest.neuf_carreau,

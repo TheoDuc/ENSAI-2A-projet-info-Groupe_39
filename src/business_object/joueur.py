@@ -8,29 +8,38 @@ logger = logging.getLogger(__name__)
 
 
 class Joueur:
-    """Modélisation d'un joueur de poker"""
+    """
+    Représente un joueur de poker avec ses informations personnelles et son état de jeu.
+
+    Cette classe gère :
+    - l'identifiant et le pseudo du joueur,
+    - le crédit disponible,
+    - le pays d'origine,
+    - la table à laquelle il est associé,
+
+    """
 
     def __init__(self, id_joueur: int, pseudo: str, credit: int, pays: str, table=None) -> "Joueur":
         """
-        Instanciation d'un joueur (poker)
+        Crée un nouveau joueur avec ses informations de base.
 
         Paramètres
         ----------
         id_joueur : int
-            identifiant du joueur
+            Identifiant unique du joueur.
         pseudo : str
-            pseudo du joueur
+            Nom ou pseudo du joueur.
         credit : int
-            crédits que possède le joeuur
+            Montant de crédits possédés par le joueur.
         pays : str
-            pays du joueur
-        table : Table
-            table où le joueur joue (None si il ne joue pas)
+            Pays d'origine du joueur.
+        table : Table | None, optionnel
+            Table à laquelle le joueur est associé (None si aucun).
 
         Renvois
         -------
         Joueur
-            Instance de 'Joueur'
+            Instance du joueur créée.
         """
 
         if not isinstance(id_joueur, int):
@@ -58,10 +67,10 @@ class Joueur:
         self.__table = table
 
         # Pour gerer la manche
-        self.est_actif = True  # True si le joueur peut jouer dans la manche
-        self.a_checke = False  # True si le joueur a checké dans le tour actuel
-        self.est_couche = False  # True si le joueur s'est couché
-        self.all_in = False  # True si le joueur a misé tout son crédit
+        self.est_actif = True
+        self.a_checke = False
+        self.est_couche = False
+        self.all_in = False
 
     @property
     def id_joueur(self) -> int:
@@ -97,17 +106,17 @@ class Joueur:
 
     def __eq__(self, other) -> bool:
         """
-        Vérifie l'égalité entre deux joueurs
+        Compare deux joueurs selon leur identifiant.
 
         Paramètres
         ----------
         other : any
-            objet comparée
+            Objet à comparer.
 
         Renvois
         -------
         bool
-            Vrai si l'identifiant des deux joueurs est le même
+            True si les identifiants des deux joueurs sont identiques, False sinon.
         """
 
         if not isinstance(other, Joueur):
@@ -121,13 +130,12 @@ class Joueur:
     @log
     def changer_identifiant(self, new_id: int):
         """
-        change l'identifant d'un joueur
+        Change l'identifiant du joueur.
 
         Paramètres
         ----------
         new_id : int
-            nouvelle identifiant
-
+            Nouvel identifiant à attribuer.
         """
 
         if not isinstance(new_id, int):
@@ -144,17 +152,17 @@ class Joueur:
     @log
     def ajouter_credits(self, credits: int) -> int:
         """
-        Ajoute des crédits à un joueur
+        Ajoute des crédits au joueur.
 
         Paramètres
         ----------
         credits : int
-            nombre de credits à ajouter
+            Nombre de crédits à ajouter.
 
         Renvois
         -------
         int
-            Somme des crédits totaux après crédit
+            Total des crédits après l'ajout.
         """
 
         if not isinstance(credits, int):
@@ -171,17 +179,22 @@ class Joueur:
     @log
     def retirer_credits(self, credits: int) -> int:
         """
-        Retire des crédits à un joueur
+        Retire des crédits au joueur.
 
         Paramètres
         ----------
         credits : int
-            nombre de credits à retirer
+            Nombre de crédits à retirer.
 
         Renvois
         -------
         int
-            Nombre de crédits possédés par le joueur
+            Crédit restant du joueur après le retrait.
+
+        Exceptions
+        ----------
+        ValueError
+            Si le joueur ne possède pas suffisamment de crédits.
         """
 
         if not isinstance(credits, int):
@@ -206,16 +219,17 @@ class Joueur:
     @log
     def rejoindre_table(self, table) -> None:
         """
-        Associe le joueur à une table (si il n'en a pas déjà une)
+        Associe le joueur à une table de poker.
 
         Paramètres
         ----------
         table : Table
-            La table que le joueur rejoint
+            Table que le joueur souhaite rejoindre.
 
-        Renvois
-        -------
-        None
+        Exceptions
+        ----------
+        Exception
+            Si le joueur est déjà à une table.
         """
 
         from business_object.table import Table
@@ -233,16 +247,12 @@ class Joueur:
     @log
     def quitter_table(self) -> None:
         """
-        Retire le joueur de sa table si il en a une, et remplace son attribut table par None
+        Retire le joueur de sa table actuelle.
 
-        Paramètres
+        Exceptions
         ----------
-        table : Table
-            La table que le joueur rejoint
-
-        Renvois
-        -------
-        None
+        Exception
+            Si le joueur n'est associé à aucune table.
         """
 
         if self.table is None:

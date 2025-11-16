@@ -11,7 +11,12 @@ logger = logging.getLogger(__name__)
 
 
 class Table:
-    """Modélisation d'une table de jeu"""
+    """
+    Modélisation d'une table de jeu de poker.
+
+    Une table gère les joueurs, la grosse blind, le dealer, le mode de jeu
+    et éventuellement la manche en cours.
+    """
 
     def __init__(
         self,
@@ -153,13 +158,16 @@ class Table:
     @log
     def mettre_grosse_blind(self, montant: int) -> None:
         """
-        Change la valeur de la grosse blind
+        Change la valeur de la grosse blind de la table.
 
         Paramètres
         ----------
-        credit : int
-            nouvelle valeur de la grosse blind
+        montant : int
+            Nouvelle valeur de la grosse blind.
 
+        Renvois
+        -------
+        None
         """
         if not isinstance(montant, int):
             raise TypeError("Le crédit doit être un entier")
@@ -169,7 +177,18 @@ class Table:
 
     @log
     def rotation_dealer(self) -> None:
-        """Change l'ordre dans la liste de joueur"""
+        """
+        Change la valeur de la grosse blind de la table.
+
+        Paramètres
+        ----------
+        montant : int
+            Nouvelle valeur de la grosse blind.
+
+        Renvois
+        -------
+        None
+        """
         dealer = self.retirer_joueur(0)
         self.ajouter_joueur(dealer)
 
@@ -177,7 +196,23 @@ class Table:
 
     @log
     def nouvelle_manche(self) -> None:
-        """Lance une manche"""
+        """
+        Lance une nouvelle manche sur la table.
+
+        Paramètres
+        ----------
+        Aucun
+
+        Renvois
+        -------
+        None
+
+        Exceptions
+        ----------
+        Exception
+            Si le nombre de joueurs restants est inférieur à 2 après le retrait des joueurs
+            sans crédit suffisant pour la grosse blind.
+        """
         for indice_joueur in range(len(self.__joueurs)):
             if self.__joueurs[indice_joueur].credit < self.__grosse_blind:
                 self.retirer_joueur(indice_joueur)

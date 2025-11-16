@@ -45,7 +45,7 @@ def test_est_present_full(cartes, expected):
 
 
 def test_from_cartes_valide_full():
-    # GIVEN: 7 cartes formant un Full
+    # GIVEN:
     cartes = [
         pytest.dame_coeur,
         pytest.dame_pique,

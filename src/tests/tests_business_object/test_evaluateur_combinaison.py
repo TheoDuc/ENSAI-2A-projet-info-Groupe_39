@@ -16,6 +16,7 @@ def get_kicker_valeurs(kicker):
 
 
 def test_eval_full():
+    # GIVEN: une liste de cartes formant un Full
     cartes = [
         pytest.roi_coeur,
         pytest.roi_pique,
@@ -23,13 +24,18 @@ def test_eval_full():
         pytest.dame_trefle,
         pytest.dame_coeur,
     ]
+
+    # WHEN: on évalue la combinaison
     combi = EvaluateurCombinaison.eval(cartes)
+
+    # THEN
     assert isinstance(combi, Full)
     assert combi.hauteur == ["Roi", "Dame"]
     assert combi.kicker is None
 
 
 def test_eval_paire():
+    # GIVEN: une liste de cartes formant une Paire
     cartes = [
         pytest.roi_coeur,
         pytest.roi_pique,
@@ -37,13 +43,18 @@ def test_eval_paire():
         pytest.dix_trefle,
         pytest.neuf_coeur,
     ]
+
+    # WHEN: on évalue la combinaison
     combi = EvaluateurCombinaison.eval(cartes)
+
+    # THEN:
     assert isinstance(combi, Paire)
     assert combi.hauteur == "Roi"
     assert get_kicker_valeurs(combi.kicker) == ["Dame", "10", "9"]
 
 
 def test_eval_simple():
+    # GIVEN:
     cartes = [
         pytest.as_coeur,
         pytest.roi_pique,
@@ -51,7 +62,11 @@ def test_eval_simple():
         pytest.dix_trefle,
         pytest.neuf_coeur,
     ]
+
+    # WHEN: on évalue la combinaison
     combi = EvaluateurCombinaison.eval(cartes)
+
+    # THEN
     assert isinstance(combi, Simple)
     assert combi.hauteur == "As"
     assert get_kicker_valeurs(combi.kicker) == ["Roi", "Dame", "10", "9"]

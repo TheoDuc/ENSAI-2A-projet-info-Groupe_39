@@ -8,7 +8,7 @@ from .combinaison import AbstractCombinaison
 
 class Couleur(AbstractCombinaison):
     """
-    Représente une combinaison de type Couleur (Flush) au poker.
+    Représente une combinaison de type Couleur  au poker.
 
     Une Couleur est constituée d'au moins cinq cartes de la même couleur.
     La force de la combinaison est déterminée par la carte la plus haute.

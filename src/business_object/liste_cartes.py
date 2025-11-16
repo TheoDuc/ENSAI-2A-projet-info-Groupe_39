@@ -8,21 +8,29 @@ from business_object.carte import Carte
 
 
 class AbstractListeCartes(ABC):
-    """Modélisation d'une liste de cartes provenant d'un jeu de cartes"""
+    """
+    Représente une liste de cartes issues d'un jeu de cartes.
+
+    Cette classe permet de gérer un ensemble de cartes, d'ajouter ou retirer des cartes,
+    et de mélanger la liste. Elle peut également représenter un jeu complet.
+    """
 
     def __init__(self, cartes: list[Carte], complet):
         """
-        Instanciation d'une liste de cartes
+        Initialise une liste de cartes.
 
         Paramètres
         ----------
-        cartes : list[Carte]
-            Liste de cartes
+        cartes : list[Carte] | None
+            Liste initiale de cartes. Peut être vide ou None.
+        complet : bool
+            Indique si la liste doit être initialisée avec un jeu complet
+            (toutes les valeurs et couleurs possibles).
 
         Renvois
         -------
-        _ListeCartes
-            Instance de '_ListeCartes'
+        AbstractListeCartes
+            Instance de la classe représentant la liste de cartes.
         """
 
         if not isinstance(cartes, list) and cartes is not None:
@@ -50,11 +58,25 @@ class AbstractListeCartes(ABC):
 
     @property
     def cartes(self) -> list:
-        """Retourne une copie profonde de l'attribut 'cartes'"""
+        """
+        Retourne une copie profonde des cartes présentes dans la liste.
+
+        Renvois
+        -------
+        list[Carte]
+            Copie des cartes contenues dans la liste.
+        """
         return deepcopy(self.__cartes)
 
     def __str__(self) -> str:
-        """Représentation informelle d'un objet de type _ListeCartes"""
+        """
+        Représentation lisible de la liste de cartes.
+
+        Renvois
+        -------
+        str
+            Chaîne affichant toutes les cartes dans la liste.
+        """
         if len(self.__cartes) == 0:
             return "[]"
 
@@ -65,23 +87,30 @@ class AbstractListeCartes(ABC):
         return texte[:-2] + "]"
 
     def __len__(self) -> int:
-        """Renvoie le nombre de cartes dans l'attribut 'cartes'"""
+        """
+        Nombre de cartes présentes dans la liste.
+
+        Renvois
+        -------
+        int
+            Nombre de cartes.
+        """
         return len(self.__cartes)
 
     def __eq__(self, other) -> bool:
         """
-        Compare l'égalité entre deux listes de cartes
+        Compare l'égalité entre deux listes de cartes.
 
         Paramètres
         ----------
         other : any
-            objet comparée
+            Objet à comparer.
 
         Renvois
         -------
         bool
-            Vrai si l'ordre des cartes et les cartes sont identiques.
-            Le type des deux objets doit aussi être identique.
+            True si les listes sont du même type, ont la même taille
+            et contiennent exactement les mêmes cartes dans le même ordre.
         """
 
         if type(self) is not type(other):
@@ -98,12 +127,12 @@ class AbstractListeCartes(ABC):
 
     def ajouter_carte(self, carte: Carte) -> None:
         """
-        Ajoute une carte dans la liste de cartes
+        Ajoute une carte à la liste.
 
         Paramètres
         ----------
         carte : Carte
-            carte à ajouter à la liste de cartes
+            Carte à ajouter.
         """
 
         if not isinstance(carte, Carte):
@@ -113,17 +142,24 @@ class AbstractListeCartes(ABC):
 
     def retirer_carte(self, indice: int = 0) -> Carte:
         """
-        Retire une carte de la liste selon son indice
+        Retire une carte de la liste selon son indice.
 
         Paramètres
         ----------
-        indice : int
-            Indice de la carte à retirer dans la liste de cartes
+        indice : int, optionnel
+            Position de la carte à retirer (par défaut le premier élément).
 
         Renvois
         -------
         Carte
-            Retourne la carte retirée de la liste de cartes
+            Carte retirée de la liste.
+
+        Exceptions
+        ----------
+        Exception
+            Si la liste est vide.
+        ValueError
+            Si l'indice est invalide.
         """
 
         if len(self) == 0:
@@ -138,5 +174,7 @@ class AbstractListeCartes(ABC):
         return self.__cartes.pop(indice)
 
     def melanger(self):
-        """Mélange l'ordre des cartes"""
+        """
+        Mélange aléatoirement les cartes de la liste.
+        """
         shuffle(self.__cartes)

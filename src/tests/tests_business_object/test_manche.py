@@ -9,6 +9,7 @@ from business_object.manche import Manche
 
 
 class Test_Manche:
+    # GIVEN/ WHEN
     @pytest.fixture
     @staticmethod
     def joueurs():
@@ -63,6 +64,7 @@ class Test_Manche:
         manche.tour = 3
 
     def test_manche_init(self, manche, info_manche):
+        # THEN
         assert manche.tour == 3
         assert manche.info == info_manche
         assert manche.indice_joueur_actuel == 0
@@ -72,157 +74,194 @@ class Test_Manche:
         assert manche.reserve is not None
 
     def test_manche_indice_joueur(self, manche, joueurs):
+        # THEN
         assert manche.indice_joueur(joueurs[0]) == 0
 
     def test_manche_indice_joueur_inexistant(self, manche):
+        # GIVEN/WHEN
         joueur_inexistant = Joueur(id_joueur=99, pseudo="X", credit=1000, pays="France")
+        # THEN
         with pytest.raises(ValueError):
             manche.indice_joueur(joueur_inexistant)
 
     def test_manche_est_tour(self, manche, joueurs):
+        # GIVEN/WHEN
         j0, j1, j2 = joueurs
+        # THEN
         assert manche.est_tour(j0) is True
         assert manche.est_tour(j1) is False
         assert manche.est_tour(j2) is False
 
     def test_manche_indice_joueur_suivant(self, manche):
+        # GIVEN
+        # WHEN
+        # THEN
         assert manche.indice_joueur_suivant() == 1
 
     def test_manche_checker(self, manche):
+        # GIVEN/WHEN
         manche.info.statuts[:] = [0, 0, 0]
         manche.checker(0)
+        # THEN
         assert manche.info.statuts[0] == 2
 
+        # THEN
         with pytest.raises(TypeError):
             manche.checker("0")
-
+        # THEN
         with pytest.raises(ValueError):
             manche.checker(0)
 
     def test_manche_suivre_relance(self, manche):
+        # GIVEN/WHEN
         montant = manche.suivre(0, relance=10)
+        # HEN
         assert montant > 0
         assert manche.info.mises[0] > 0
         assert manche.info.statuts[0] == 2
 
     def test_manche_se_coucher(self, manche):
+        # GIVEN/WHEN
         manche.se_coucher(0)
+        # THEN
         assert manche.info.statuts[0] == 3
         assert manche.info.tour_couche[0] == manche.tour
 
     def test_manche_all_in(self, manche):
+        # GIVEN/WHEN
         credit = manche.info.joueurs[0].credit
         montant = manche.all_in(0)
+        # THEN
         assert montant == credit
         assert manche.info.statuts[0] == 4
 
     def test_manche_fin_du_tour(self, manche):
+        # GIVEN/WHEN
         manche.info.statuts[:] = [2, 2, 2]
+        # THEN
         assert manche.fin_du_tour() is True
 
     def test_manche_fin_de_manche(self, manche):
+        # GIVEN/WHEN
         manche.info.statuts[:] = [2, 3, 2]
+        # THEN
         assert manche.fin_de_manche() is True
 
     def test_manche_valeur_pot(self, manche):
+        # GIVEN/WHEN
         manche.info.mises[:] = [10, 20, 30]
+        # THEN
         assert manche.valeur_pot() == 60
 
     def test_manche_joueurs_en_lice(self, manche):
+        # GIVEN/WHEN
         manche.info.statuts[:] = [0, 3, 0]
         joueurs = manche.joueurs_en_lice
+        # THEN
         assert len(joueurs) == 2
 
-    # ------------------------ Tests classement ------------------------
-
     def test_manche_classement_erreur_board_incomplete(self, manche):
+        # GIVEN/WHEN
         manche._tour = 2
+        # THEN
         with pytest.raises(ValueError):
             manche.classement()
 
     def test_manche_classement_simple(self, manche):
+        # GIVEN
         Test_Manche.remplir_board(manche)
 
         manche.info.mains[0]._cartes = [Carte("2", "Trêfle"), Carte("3", "Carreau")]
         manche.info.mains[1]._cartes = [Carte("4", "Trêfle"), Carte("6", "Carreau")]
         manche.info.mains[2]._cartes = [Carte("7", "Trêfle"), Carte("9", "Carreau")]
-
+        # WHEN
         classement = manche.classement()
+        # THEN
         assert sorted(classement) == [1, 2, 3]
 
     def test_manche_classement_ex_aequo(self, manche):
+        # GIVEN
         Test_Manche.remplir_board(manche)
 
         manche.info.mains[0]._cartes = [Carte("2", "Trêfle"), Carte("3", "Carreau")]
         manche.info.mains[1]._cartes = [Carte("2", "Trêfle"), Carte("3", "Carreau")]
         manche.info.mains[2]._cartes = [Carte("4", "Trêfle"), Carte("5", "Carreau")]
-
+        # WHEN
         classement = manche.classement()
+        # THEN
         assert classement[2] != classement[0]
 
-    # ------------------------ Tests récupérer ------------------------
-
     def test_manche_recuperer_montant_superieur(self, manche):
+        # GIVEN/WHEN/THEN
         assert manche.recuperer(50, 100) == [0, 50]
 
     def test_manche_recuperer_montant_inferieur(self, manche):
+        # GIVEN/WHEN/THEN
         assert manche.recuperer(50, 20) == [30, 20]
 
     def test_manche_recuperer_montant_egal(self, manche):
+        # GIVEN/WHEN/THEN
         assert manche.recuperer(50, 50) == [0, 50]
 
-    # ------------------------ Tests gains ------------------------
-
     def test_manche_gains_un_seul_joueur(self, manche):
+        # GIVEN
         manche.info.statuts[:] = [2, 3, 3]
         manche.info.mises[:] = [100, 50, 50]
-
+        # WHEN
         Test_Manche.remplir_board(manche)
         gains = manche.gains()
-
+        # THEN
         assert gains[manche.info.joueurs[0]] == 200
         assert gains[manche.info.joueurs[1]] == 0
         assert gains[manche.info.joueurs[2]] == 0
 
-    # ------------------------ Tests exceptions init ------------------------
-
     def test_manche_init_info_type_error(self):
+        # GIVEN/WHEN/THEN
         with pytest.raises(TypeError):
             Manche(info="not_info", grosse_blind=10)
 
     def test_manche_init_grosse_blind_type_error(self):
+        # GIVEN
         joueurs = [Joueur(1, "A", 1000, "France"), Joueur(2, "B", 1000, "France")]
+        # WHEN
         info = InfoManche(joueurs)
+        # THEN
         with pytest.raises(TypeError):
             Manche(info=info, grosse_blind="10")
 
     def test_manche_init_grosse_blind_value_error(self):
+        # GIVEN
         joueurs = [Joueur(1, "A", 1000, "France"), Joueur(2, "B", 1000, "France")]
+        # WHEN
         info = InfoManche(joueurs)
+        # THEN
         with pytest.raises(ValueError):
             Manche(info=info, grosse_blind=1)
 
-    # ------------------------ Tests divers ------------------------
-
     def test_manche_nouveau_tour_exception(self, manche):
+        # GIVEN/WHEN
         manche._Manche__tour = 3
+        # THEN
         with pytest.raises(ValueError):
             manche.nouveau_tour()
 
     def test_manche_suivre_limits(self):
+        # GIVEN
         joueurs = [
             Joueur(1, "A", 20, "France"),
             Joueur(2, "B", 1000, "France"),
         ]
+        # WHEN
         info = InfoManche(joueurs)
         manche = Manche(info, 10)
 
         info.mises[1] = 50
+        # THEN
         with pytest.raises(ValueError):
             manche.suivre(0, relance=0)
 
     def test_classement_ex_aequo(self, manche):
-        # Board spécifique pour ex-aequo
+        # GIVEN
         manche.board.cartes.clear()
         board = [
             Carte("As", "Coeur"),
@@ -232,13 +271,11 @@ class Test_Manche:
             Carte("2", "Coeur"),
         ]
 
-        # Ajouter les cartes au board
         for carte in board:
             manche.board.ajouter_carte(carte)
 
         manche.tour = 3
 
-        # Assigner les mains
         manche.info.assignation_mains(
             [
                 Main([Carte("Roi", "Coeur"), Carte("3", "Coeur")]),
@@ -246,105 +283,124 @@ class Test_Manche:
                 Main([Carte("Dame", "Pique"), Carte("Dame", "Coeur")]),
             ]
         )
-
-        # Modifier le statut d’un joueur pour simuler un joueur couché (optionnel)
+        # WHEN
         manche.info.modifier_statut(1, 3)
-
-        # Calcul du classement
         classement = manche.classement()
 
-        # Vérifier l'ex-aequo
-        # Ici on sait que le joueur 0 et 2 ont une main égale sur le board -> même rang
-        # Le joueur 1 a un rang différent
+        # THEN
         assert classement[1] != classement[0]
 
     def test_manche_init_info_type_error_1(self):
+        # GIVEN/WHEN/THEN
         with pytest.raises(TypeError):
             Manche(info="not_info", grosse_blind=10)
 
     def test_manche_init_grosse_blind_type_error_1(self, joueurs):
+        # GIVEN/WHEN
         info = InfoManche(joueurs)
+        # THEN
         with pytest.raises(TypeError):
             Manche(info=info, grosse_blind="10")
 
     def test_manche_init_grosse_blind_value_error_1(self, joueurs):
+        # GIVEN/WHEN
         info = InfoManche(joueurs)
+        # THEN
         with pytest.raises(ValueError):
             Manche(info=info, grosse_blind=1)
 
     def test_action_exceptions(self, manche, joueurs):
-        # 1. Pas au joueur de jouer
+        # GIVEN/WHEN/THEN
         with pytest.raises(Exception, match="Ce n'est pas à J2 de jouer"):
             manche.action(joueurs[1], "checker")
 
-        # 2. Manche terminée
+        # GIVEN/WHEN
         manche._Manche__fin = True
+        # THEN
         with pytest.raises(Exception, match="La manche est déjà terminée"):
             manche.action(joueurs[0], "checker")
-        manche._Manche__fin = False  # reset
+        manche._Manche__fin = False
 
-        # 3. Action invalide
+        # THEN
         with pytest.raises(ValueError, match="L'action danser n'existe pas"):
             manche.action(joueurs[0], "danser")
 
     def test_manche_suivre_limits_(self):
+        # GIVEN
         joueurs = [
             Joueur(1, "A", 20, "France"),
             Joueur(2, "B", 1000, "France"),
         ]
+        # WHEN
         info = InfoManche(joueurs)
         manche = Manche(info, 10)
 
-        # Joueur 1 a misé 50 → joueur 0 ne peut pas suivre
         info.mises[1] = 50
+        # THEN
         with pytest.raises(ValueError, match="Le joueur doit all-in"):
             manche.suivre(0, relance=0)
 
     def test_indice_joueur_suivant_all_couches(self, manche):
+        # GIVEN/WHEN
         manche.info.statuts[:] = [3, 3, 3]
+        # THEN
         with pytest.raises(ValueError):
             manche.indice_joueur_suivant()
 
     def test_suivre_joueur_doigt_all_in(self):
+        # GIVEN
         joueurs = [Joueur(1, "A", 10, "France"), Joueur(2, "B", 50, "France")]
+        # WHEN
         info = InfoManche(joueurs)
         manche = Manche(info, 10)
         info.mises[1] = 50
+        # THEN
         with pytest.raises(ValueError, match="Le joueur doit all-in"):
             manche.suivre(0, relance=0)
 
     def test_all_in_joueur_deja_couche(self, manche):
+        # GIVEN/WHEN
         manche.info.statuts[0] = 3
+        # THEN
         with pytest.raises(ValueError):
             manche.all_in(0)
 
     def test_suivre_relance_trop_grande(self):
+        # GIVEN
         joueurs = [Joueur(1, "A", 20, "France"), Joueur(2, "B", 50, "France")]
+        # WHEN
         info = InfoManche(joueurs)
         manche = Manche(info, 10)
         info.mises[0] = 10
         info.mises[1] = 50
+        # THEN
         with pytest.raises(ValueError, match="Le joueur doit all-in"):
             manche.suivre(0, relance=50)
 
     def test_fin_de_manche_all_couches(self, manche):
+        # GIVEN/WHEN
         manche.info.statuts[:] = [3, 3, 3]
+        # THEN
         with pytest.raises(ValueError):
             manche.fin_de_manche()
 
     def test_action_checker_suivre_all_in_se_coucher(self, manche, joueurs):
-        # Tour au joueur 0
+        # GIVEN/WHEN
         montant = manche.action(joueurs[0], "checker")
+        # THEN
         assert montant is None or isinstance(montant, int)
 
-        # Tour au joueur 1
+        # GIVEN/WHEN
         montant = manche.action(joueurs[1], "suivre", relance=0)
+        # THEN
         assert isinstance(montant, int)
 
-        # All-in
+        # GIVEN/WHEN
         montant = manche.action(joueurs[2], "all-in")
+        # THEN
         assert isinstance(montant, int)
 
-        # Se coucher
+        # GIVEN/WHEN
         manche.action(joueurs[0], "se coucher")
+        # THEN
         assert manche.info.statuts[0] == 3

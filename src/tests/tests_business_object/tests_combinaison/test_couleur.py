@@ -4,8 +4,6 @@ from business_object.combinaison.couleur import Couleur
 
 
 class Test_Couleur:
-    """Tests unitaires pour la combinaison Couleur avec 7 cartes."""
-
     def test_couleur_init_succes(self):
         # GIVEN :
         cartes = [
@@ -72,7 +70,7 @@ class Test_Couleur:
         assert couleur_as == Couleur.from_cartes(cartes_as)
 
     def test_couleur_str_repr(self):
-        # GIVEN : 7 cartes formant une Couleur
+        # GIVEN :
         cartes = [
             pytest.as_coeur,
             pytest.roi_coeur,
@@ -103,7 +101,7 @@ class Test_Couleur:
         assert Couleur.est_present(cartes)
 
     def test_couleur_est_present_faux(self):
-        # GIVEN : main sans Couleur (moins de 5 cartes de même couleur)
+        # GIVEN :
         cartes = [
             pytest.as_coeur,
             pytest.roi_coeur,

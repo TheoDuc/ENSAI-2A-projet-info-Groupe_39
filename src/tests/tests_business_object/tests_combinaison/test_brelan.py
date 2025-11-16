@@ -43,7 +43,7 @@ class Test_Brelan:
             Brelan.from_cartes(cartes)
 
     def test_brelan_comparaison(self):
-        # GIVEN : deux brelans sur 7 cartes
+        # GIVEN :
         brelan_dame = Brelan.from_cartes(
             [
                 pytest.dame_coeur,
@@ -67,7 +67,7 @@ class Test_Brelan:
             ]
         )
 
-        # THEN : comparaisons cohérentes
+        # THEN :
         assert brelan_roi > brelan_dame
         assert not brelan_dame > brelan_roi
         assert brelan_dame == Brelan.from_cartes(
@@ -142,18 +142,17 @@ class Test_Brelan:
             )[:2]
         )
 
-        # La hauteur peut être stockée en str ou tuple selon la version → on l’adapte :
         hauteur_fmt = brelan.hauteur if isinstance(brelan.hauteur, str) else brelan.hauteur[0]
         attendu = f"Brelan(hauteur={hauteur_fmt}, kickers={kicker})"
         assert repr(brelan) == attendu
 
     def test_brelan_repr_sans_kicker(self):
-        # GIVEN : création manuelle sans kicker
+        # GIVEN :
         brelan = Brelan("Roi", ())
 
         # THEN : représentation minimale
         assert repr(brelan) == "Brelan(hauteur=Roi)"
 
     def test_brelan_force(self):
-        # THEN : la force doit être correcte
+        # THEN
         assert Brelan.FORCE() == 4

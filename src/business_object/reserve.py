@@ -7,7 +7,9 @@ from business_object.main import Main
 
 
 class Reserve(AbstractListeCartes):
-    """Modélisation de la reserve"""
+    """
+    Modélisation de la réserve de cartes (pioche) pour une manche de poker
+    """
 
     def __init__(self, cartes: list[Carte] = None, complet: bool = True):
         """
