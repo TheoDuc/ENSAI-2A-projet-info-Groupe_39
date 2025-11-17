@@ -1,15 +1,36 @@
 """Implémentation de la classe ActionService"""
 
-from business_object.joueur import Joueur
 from business_object.manche import Manche
 from service.credit_service import CreditService
+from service.joueur_service import JoueurService
 
 
 class ActionService:
-    """Modélisation des actions possibles d'un joueur dans une Manche"""
+    """Actions possibles d'un joueur dans une Manche"""
 
-    def manche_joueur(self, joueur: Joueur) -> Manche:
-        """Blabla"""
+    def manche_joueur(self, id_joueur: int) -> Manche:
+        """
+        Fonction qui renvoie la manche dans laquelle le joueur joue
+
+        Paramètres
+        ----------
+        id_joueur : int
+            l'identifiant du jouur
+
+        Renvois
+        -------
+        Manche
+            la manche dans laquelle est le jouur
+
+        Exceptions
+        ----------
+        ValueError
+            si le joueur n'est pas à une table
+            si aucune manche n'est en cours sur la table du joueur
+            si le joueur n'est pas dans la manche en cours
+        """
+
+        joueur = self.joueur_par_id(id_joueur)
 
         if joueur.table is None:
             raise ValueError(
@@ -26,8 +47,26 @@ class ActionService:
 
         return joueur.table.manche
 
-    def all_in(self, joueur: Joueur) -> bool:
-        """Blabla"""
+    def all_in(self, id_joueur: int) -> None:
+        """
+        Fonction qui gère toutes les modifications engendrées par le all-in d'un joueur
+
+        Paramètres
+        ----------
+        id_joueur : int
+            l'identifiant du jouur qui réalise l'action
+
+        Renvois
+        -------
+        None
+
+        Exceptions
+        ----------
+        Exception
+            si ce n'est pas au tour du joueur de jouer
+        """
+
+        joueur = JoueurService().trouver_par_id(id_joueur)
 
         manche = self.manche_joueur(joueur)
         indice_joueur = manche.indice_joueur(joueur)
@@ -37,10 +76,27 @@ class ActionService:
 
         montant = manche.info.all_in(indice_joueur)
         CreditService().debiter(joueur, montant)
-        return True
 
-    def checker(self, joueur: Joueur) -> bool:
-        """Blabla"""
+    def checker(self, id_joueur: int) -> None:
+        """
+        Fonction qui gère toutes les modifications engendrées par l'action de checker d'un joueur
+
+        Paramètres
+        ----------
+        id_joueur : int
+            l'identifiant du jouur qui réalise l'action
+
+        Renvois
+        -------
+        None
+
+        Exceptions
+        ----------
+        Exception
+            si ce n'est pas au tour du joueur de jouer
+        """
+
+        joueur = JoueurService().trouver_par_id(id_joueur)
 
         manche = self.manche_joueur(joueur)
         indice_joueur = manche.indice_joueur(joueur)
@@ -49,14 +105,32 @@ class ActionService:
             raise Exception(f"Ce n'est pas à {joueur.pseudo} de jouer")
 
         if not manche.info.statuts[indice_joueur] == 2:
-            print(f"{joueur.pseudo} ne peut pas checker car il est en retard sur les mises")
-            return False
+            raise ValueError(
+                f"{joueur.pseudo} ne peut pas checker car il est en retard sur les mises"
+            )
 
         manche.info.mettre_statut(indice_joueur, 2)
-        return True
 
-    def se_coucher(self, joueur: Joueur) -> bool:
-        """Blabla"""
+    def se_coucher(self, id_joueur: int) -> None:
+        """
+        Fonction qui gère toutes les modifications engendrées par l'action de se coucher d'un joueur
+
+        Paramètres
+        ----------
+        id_joueur : int
+            l'identifiant du jouur qui réalise l'action
+
+        Renvois
+        -------
+        None
+
+        Exceptions
+        ----------
+        Exception
+            si ce n'est pas au tour du joueur de jouer
+        """
+
+        joueur = JoueurService().trouver_par_id(id_joueur)
 
         manche = self.manche_joueur(joueur)
         indice_joueur = manche.indice_joueur(joueur)
@@ -65,10 +139,27 @@ class ActionService:
             raise Exception(f"Ce n'est pas à {joueur.pseudo} de jouer")
 
         manche.info.coucher_joueur(indice_joueur, 3)
-        return True
 
-    def suivre(self, joueur: Joueur, relance: int = 0) -> bool:
-        """Blabla"""
+    def suivre(self, id_joueur: int, relance: int = 0) -> None:
+        """
+        Fonction qui gère toutes les modifications engendrées par le suivi d'un joueur
+
+        Paramètres
+        ----------
+        id_joueur : int
+            l'identifiant du jouur qui réalise l'action
+
+        Renvois
+        -------
+        None
+
+        Exceptions
+        ----------
+        Exception
+            si ce n'est pas au tour du joueur de jouer
+        """
+
+        joueur = JoueurService().trouver_par_id(id_joueur)
 
         manche = self.manche_joueur(joueur)
         indice_joueur = manche.indice_joueur(joueur)
@@ -78,4 +169,3 @@ class ActionService:
 
         montant = manche.info.suivre(indice_joueur, relance)
         CreditService().debiter(joueur, montant)
-        return True

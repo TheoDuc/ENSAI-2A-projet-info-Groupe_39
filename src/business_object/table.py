@@ -61,9 +61,6 @@ class Table:
         else:
             self.__joueurs = joueurs
 
-        self.dealer_index = 0  # DE la part de cheik pour rotation dealer
-
-    # creer une classe property pour joueur_max, grosse_blind, mode_jeu et joueurs
     @property
     def joueur_max(self):
         """Retourne l'attribut 'joueur_max'"""

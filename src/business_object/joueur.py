@@ -260,10 +260,10 @@ class Joueur:
         if not isinstance(pseudo, str):
             raise TypeError(f"Le pseudo doit être de type str : {type(pseudo)}")
 
-        self.__pseudo = pseudo
         logger.info(f"{self.pseudo} à changé de pseudo")
+        self.__pseudo = pseudo
 
-        return 
+        return
 
     @log
     def changer_pays(self, pays: str) -> None:
@@ -281,9 +281,7 @@ class Joueur:
         """
 
         if not isinstance(pays, str):
-            raise TypeError(f"Le pays doit être de type str : {type(pseudo)}")
+            raise TypeError(f"Le pays doit être de type str : {type(pays)}")
 
         self.__pays = pays
         logger.info(f"{self.pseudo} à changé de pays")
-
-        return 

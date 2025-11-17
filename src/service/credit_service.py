@@ -2,17 +2,38 @@
 
 import logging
 
-from business_object.joueur import Joueur
 from dao.joueur_dao import JoueurDao
+from service.joueur_service import JoueurService
 
 logger = logging.getLogger(__name__)
 
 
 class CreditService:
-    """Service de gestion des crédits des joueurs (RAM + DAO)"""
+    """Service de gestion des crédits des joueurs"""
 
-    def crediter(self, joueur: Joueur, montant: int) -> bool:
-        """Crédite un joueur dans la RAM et dans la DAO"""
+    def crediter(self, id_joueur: int, montant: int) -> None:
+        """
+        Crédite un joueur dans la RAM et dans la DAO
+
+        Paramètres
+        ----------
+        id_joueur : int
+            l'identifiant du jouur qui est débité
+
+        Renvois
+        -------
+        None
+
+        Exceptions
+        ----------
+        ValueError
+            si le montant à créditer est incorrect
+
+
+        joueur = self.joueur_par_id(id_joueur)
+        """
+
+        joueur = JoueurService().trouver_par_id(id_joueur)
 
         if montant <= 0:
             raise ValueError("Le montant à créditer doit être positif.")
@@ -28,12 +49,31 @@ class CreditService:
                 joueur.retirer_credits(montant)
 
             logger.error(f"Échec du crédit pour {joueur.pseudo} : {e}")
-            return False
+            raise Exception(f"Échec du crédit pour {joueur.pseudo} : {e}")
 
-        return True
+    def debiter(self, id_joueur: int, montant: int) -> None:
+        """
+        Crédite un joueur dans la RAM et dans la DAO
 
-    def debiter(self, joueur: Joueur, montant: int) -> bool:
-        """Débite un joueur dans la RAM et dans la DAO"""
+        Paramètres
+        ----------
+        id_joueur : int
+            l'identifiant du jouur qui est débité
+
+        Renvois
+        -------
+        None
+
+        Exceptions
+        ----------
+        ValueError
+            si le montant à créditer est incorrect
+
+
+        joueur = self.joueur_par_id(id_joueur)
+        """
+
+        joueur = JoueurService().trouver_par_id(id_joueur)
 
         if montant <= 0:
             raise ValueError("Le montant à débiter doit être positif.")
@@ -49,4 +89,4 @@ class CreditService:
                 joueur.ajouter_credits(montant)
 
             logger.error(f"Échec du débit pour {joueur.pseudo} : {e}")
-            return False
+            raise Exception(f"Échec du crédit pour {joueur.pseudo} : {e}")

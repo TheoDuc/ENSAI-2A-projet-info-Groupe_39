@@ -17,10 +17,6 @@ class JoueurService:
 
     dao = JoueurDao()
 
-    # def __init__(self, dao=None):
-    #     # On peut injecter un mock DAO pour les tests
-    #     self.dao = dao or JoueurDao()
-
     @log
     def se_connecter(self, pseudo: str) -> Joueur | None:
         """Simule la connexion d’un joueur via son pseudo"""
@@ -61,17 +57,14 @@ class JoueurService:
 
         return None
 
-    @log
     def trouver_par_id(self, id_joueur: int) -> Joueur | None:
         """Récupère un joueur par ID"""
         return self.dao.trouver_par_id(id_joueur)
 
-    @log
     def trouver_par_pseudo(self, pseudo: str) -> Joueur | None:
         """Récupère un joueur par pseudo"""
-        return self.dao.trouver_par_pseudo(pseudo) 
+        return self.dao.trouver_par_pseudo(pseudo)
 
-    @log
     def lister_tous(self) -> list[Joueur]:
         """Liste tous les joueurs"""
         return self.dao.lister_tous()
