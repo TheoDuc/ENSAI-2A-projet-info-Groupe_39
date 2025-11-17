@@ -35,25 +35,17 @@ class JoueurModel(BaseModel):
     pays: str
     crédit: int | None = None  # Champ optionnel
 
-# exemple pour plus tard
-@app.put("/admin/crediter2/{joueur}/{montant}", tags=["Admin"])
-def crediter(joueur, montant:int):
-    reponse = input("Etes-vous un admin (oui ou non)")
-    if reponse == 'oui':
-        credit_service.crediter(joueur,montant)
-    else:
-        return (f"vous n'êtes pas admin")
-    return(f"l'admin a bien crediter {montant} à {joueur}")
-
-# fonctionne pas car JoueurModel n'a pas les méthodes de Joueur
-@app.put("/admin/crediter/{montant}", tags=["Admin"])
-def crediter(joueur : JoueurModel, montant:int):
+# fonctionne pas oublier de demander si admin dans les view
+@app.put("/admin/crediter/{pseudo}/{montant}", tags=["Admin"])
+def crediter(pseudo, montant:int):
+    joueur = joueur_service.trouver_par_pseudo(pseudo)
     credit_service.crediter(joueur,montant)
     return(f"l'admin a bien crediter {montant} à {joueur}")
 
-# fonctionne pas car Joueur() devient un str en entree
-@app.put("/admin/debiter/{joueur}/{montant}", tags=["Admin"])
-def debiter(joueur, montant:int):
+# fonctionne 
+@app.put("/admin/debiter/{pseudo}/{montant}", tags=["Admin"])
+def debiter(pseudo, montant:int):
+    joueur = joueur_service.trouver_par_pseudo(pseudo)
     credit_service.debiter(joueur,montant)
     return(f"l'admin a bien debiter {montant} à {joueur}")
 
@@ -92,22 +84,23 @@ async def creer_joueur(j: JoueurModel):
 
     return joueur
 
-# probleme avec les joueur.pays et joueur.pays qu'on ne peut pas modifier
-@app.put("/joueur/{id_joueur}", tags=["Joueurs"])
-def modifier_joueur(id_joueur: int, j: JoueurModel):
+# fonctionne
+@app.put("/joueur/{id_joueur}/{pseudo}/{pays}", tags=["Joueurs"])
+def modifier_joueur(id_joueur: int, pseudo: str, pays: str):
     """Modifier un joueur"""
     logging.info("Modifier un joueur")
     joueur = joueur_service.trouver_par_id(id_joueur)
     if not joueur:
         raise HTTPException(status_code=404, detail="Joueur non trouvé")
-
-    joueur.pseudo = j.pseudo
-    joueur.pays = j.pays
+    
+    if not joueur_service.pseudo_deja_utilise(pseudo):
+        joueur.changer_pseudo(pseudo)
+    joueur.changer_pays(pays)
     joueur = joueur_service.modifier(joueur)
     if not joueur:
         raise HTTPException(status_code=404, detail="Erreur lors de la modification du joueur")
 
-    return f"Joueur {j.pseudo} modifié"
+    return f"Joueur {pseudo} modifié"
 
 # fonctionne 
 @app.delete("/joueur/{pseudo}", tags=["Joueurs"])
@@ -140,17 +133,19 @@ async def creer_table(t: TableModel):
     table = table_service.creer_table(t.joueur_max, t.grosse_blind)
     return table
 
-@app.put("/table/ajouter/{joueur}", tags=["Table"])
-async def ajouter_joueur(joueur):
+@app.put("/table/ajouter/{pseudo}", tags=["Table"])
+async def ajouter_joueur(pseudo):
     """ajoute un joueur a la table"""
     logging.info("ajoute un joueur a la table")
+    joueur = joueur_service.trouver_par_pseudo(pseudo)
     table_service.ajouter_joueur(joueur)
     return f"le joueur {joueur.pseudo} a été ajouté à la table"
 
-@app.put("/table/retirer/{joueur}", tags=["Table"])
-async def retirer_un_joueur(joueur):
+@app.put("/table/retirer/{pseudo}", tags=["Table"])
+async def retirer_un_joueur(pseudo):
     """retire un joueur a la table"""
     logging.info("retire un joueur a la table")
+    joueur = joueur_service.trouver_par_pseudo(pseudo)
     table_service.retirer_joueur(joueur)
     return f"le joueur {joueur.pseudo} a été retiré de la table"
 

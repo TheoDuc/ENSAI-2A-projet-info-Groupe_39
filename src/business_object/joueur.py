@@ -241,3 +241,49 @@ class Joueur:
         self.__table.retirer_joueur(indice)
         self.__table = None
         logger.info(f"Le joueur {self.pseudo} a quitté sa table")
+
+    @log
+    def changer_pseudo(self, pseudo: str) -> None:
+        """
+        Change le pseudo du joueur.
+
+        Paramètres
+        ----------
+        pseudo : str
+            Nouveau pseudo.
+
+        Renvois
+        -------
+        None
+        """
+
+        if not isinstance(pseudo, str):
+            raise TypeError(f"Le pseudo doit être de type str : {type(pseudo)}")
+
+        self.__pseudo = pseudo
+        logger.info(f"{self.pseudo} à changé de pseudo")
+
+        return 
+
+    @log
+    def changer_pays(self, pays: str) -> None:
+        """
+        Change le pays du joueur.
+
+        Paramètres
+        ----------
+        pays : str
+            Nouveau pays.
+
+        Renvois
+        -------
+        None
+        """
+
+        if not isinstance(pays, str):
+            raise TypeError(f"Le pays doit être de type str : {type(pseudo)}")
+
+        self.__pays = pays
+        logger.info(f"{self.pseudo} à changé de pays")
+
+        return 
