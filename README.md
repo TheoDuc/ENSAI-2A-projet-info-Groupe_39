@@ -151,7 +151,7 @@ To ensure that tests are **repeatable, safe, and do not affect the real database
 
 ### Test Coverage
 
-You can generate test coverage reports using [Coverage](https://coverage.readthedocs.io/en/7.4.0/index.html).
+You can generate test coverage reports using Coverage
 
 > :bulb: You can customize the settings using the `.coveragerc` file.
 
@@ -165,17 +165,22 @@ coverage report -m
 
 # Generate an HTML coverage report:
 coverage html
-
-Open `coverage_report/index.html` in your browser to view the results.
 ```
-## :arrow_forward: Launch the CLI application
+Open `coverage_report/index.html` in your browser to view the results.
 
-This application provides a very basic graphical interface for navigating between different menus.
+## :arrow_forward: Launch the CLI Application
 
-- [ ] In Git Bash: `python src/main.py`
-- [ ] On first launch, choose **Reset database**
-  - this calls the `src/utils/reset_database.py` program
-  - which will itself execute the SQL scripts in the `data` folder
+The CLI provides a simple interactive interface to navigate through different menus of the poker application.
+
+- [ ] Open Git Bash (or your terminal) and run:
+
+```bash
+python src/main.py
+```
+- [ ] On the first launch, select **Reset database**:
+  - This will run the script `src/utils/reset_database.py`.
+  - The script will execute the SQL files in the `data/` folder to initialize the database.
+
 
 
 
