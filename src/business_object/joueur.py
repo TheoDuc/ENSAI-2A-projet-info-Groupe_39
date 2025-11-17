@@ -8,16 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 class Joueur:
-    """
-    Représente un joueur de poker avec ses informations personnelles et son état de jeu.
-
-    Cette classe gère :
-    - l'identifiant et le pseudo du joueur,
-    - le crédit disponible,
-    - le pays d'origine,
-    - la table à laquelle il est associé,
-
-    """
+    """Représente un joueur de poker avec ses informations personnelles"""
 
     def __init__(self, id_joueur: int, pseudo: str, credit: int, pays: str, table=None) -> "Joueur":
         """
@@ -32,14 +23,22 @@ class Joueur:
         credit : int
             Montant de crédits possédés par le joueur.
         pays : str
-            Pays d'origine du joueur.
-        table : Table | None, optionnel
-            Table à laquelle le joueur est associé (None si aucun).
+            Pays du joueur.
+        table : Table
+            Table à laquelle le joueur est associé (None si aucune).
 
         Renvois
         -------
         Joueur
             Instance du joueur créée.
+
+        Exceptions
+        ----------
+        TypeError
+            si un paramètre n'a pas le bon type indique dans le typage
+        ValueError
+            si l'id du joueur est négatif
+            si le crédit est strictement négatif
         """
 
         if not isinstance(id_joueur, int):
@@ -102,6 +101,7 @@ class Joueur:
         return f"{self.__pseudo} : {self.__credit} crédits"
 
     def __repr__(self) -> str:
+        """Représentation formelle d'un joueur selon ses informations"""
         return f"Joueur({self.__id_joueur}, {self.__pseudo}, {self.__pays})"
 
     def __eq__(self, other) -> bool:
@@ -125,29 +125,8 @@ class Joueur:
         return self.__id_joueur == other.id_joueur
 
     def __hash__(self) -> int:
+        """Code de hachage déterminé selon la représentation officielle du joueur"""
         return hash(self.__repr__())
-
-    @log
-    def changer_identifiant(self, new_id: int):
-        """
-        Change l'identifiant du joueur.
-
-        Paramètres
-        ----------
-        new_id : int
-            Nouvel identifiant à attribuer.
-        """
-
-        if not isinstance(new_id, int):
-            raise TypeError(f"L'identifiant doit être de type int : {type(new_id)}")
-
-        if new_id < 0:
-            raise ValueError(f"L'identifiant doit être positif : {new_id}")
-
-        self.__id_joueur = new_id
-        logger.info(f"L'identifiant de {self.pseudo} devient {new_id}")
-
-        return
 
     @log
     def ajouter_credits(self, credits: int) -> int:

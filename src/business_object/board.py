@@ -15,11 +15,18 @@ class Board(AbstractListeCartes):
         ----------
         cartes : list[Carte]
             Liste de cartes
+        complet : bool
+            si le board doit contenir toutes les cartes d'un jeu de cartes
 
         Renvois
         -------
         Board
             Instance de 'Board'
+
+        Exceptions
+        ----------
+        ValueError
+            si le board contient plus de 5 cartes
         """
 
         if cartes is not None and len(cartes) > 5:
@@ -27,7 +34,7 @@ class Board(AbstractListeCartes):
 
         super().__init__(cartes, complet)
 
-    def ajouter_carte(self, carte: Carte):
+    def ajouter_carte(self, carte: Carte) -> None:
         """
         Ajoute une carte dans le board. Et vérifie que le nombre de cartes reste en dessous de 5
 
@@ -35,6 +42,15 @@ class Board(AbstractListeCartes):
         ----------
         carte : Carte
             carte à ajouter au board
+
+        Renvois
+        -------
+        None
+
+        Exceptions
+        ----------
+        ValueError
+            si le board a déjà plus de 5 cartes
         """
 
         if carte is not None and len(self.cartes) > 4:

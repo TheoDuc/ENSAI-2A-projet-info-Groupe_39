@@ -1,12 +1,11 @@
 """Implémentation de la classe MancheJoueurDAO"""
 
 import logging
+
+from business_object.info_manche import InfoManche
 from dao.db_connection import DBConnection
 from utils.log_decorator import log
 from utils.singleton import Singleton
-from business_object.joueur import Joueur
-from business_object.info_manche import InfoManche
-from business_object.manche import Manche
 
 logger = logging.getLogger(__name__)
 
@@ -19,11 +18,22 @@ class MancheJoueurDAO(metaclass=Singleton):
     def creer_manche_joueur(self, id_manche: int, info_manche: InfoManche) -> bool:
         """
         Création des entrées de la table manche_joueur pour une manche donnée.
+
+        Paramètres
+        ----------
+        id_manche : int
+            Identifiant de la manche concernée
+        info_manche : InfoManche
+            Object contenant les informations des joueurs de la partie
+
+        Renvois
+        -------
+        bool
+            True si la création est un succès, False sinon
         """
         try:
             with DBConnection().connection as connection:
                 with connection.cursor() as cursor:
-
                     # Récupération des gains depuis InfoManche si possible, sinon 0
                     try:
                         gains = info_manche.gains()
@@ -79,24 +89,23 @@ class MancheJoueurDAO(metaclass=Singleton):
             logging.error(f"[ERREUR DAO] Création manche_joueur : {e}")
             return False
 
-    # ---------------------------------------------------------------------
-    @log
     def trouver_par_ids(self, id_manche: int, id_joueur: int) -> list[dict]:
         """
         Récupère toutes les lignes de la table manche_joueur associées à une manche donnée.
 
-        Parameters
+        Paramètres
         ----------
         id_manche : int
             Identifiant de la manche concernée
         id_joueur : int
             Identifiant du joueur concernée
 
-        Returns
+        Renvois
         -------
-        participations : list[dict]
+        list[dict]
             Liste des participations des joueurs dans cette manche
         """
+
         try:
             with DBConnection().connection as connection:
                 with connection.cursor() as cursor:
@@ -106,8 +115,7 @@ class MancheJoueurDAO(metaclass=Singleton):
                           FROM manche_joueur
                          WHERE id_manche = %(id_manche)s and id_joueur = %(id_joueur)s;
                         """,
-                        {"id_manche": id_manche,
-                        "id_joueur": id_joueur},
+                        {"id_manche": id_manche, "id_joueur": id_joueur},
                     )
                     res = cursor.fetchall()
 
@@ -131,12 +139,21 @@ class MancheJoueurDAO(metaclass=Singleton):
                 )
         return participations
 
-
     # ---------------------------------------------------------------------
     @log
     def supprimer_par_id_manche(self, id_manche: int) -> bool:
         """
         Supprime toutes les participations liées à une manche.
+
+        Paramètres
+        ----------
+        id_joueur : int
+            Identifiant du joueur concernée
+
+        Renvois
+        -------
+        bool
+            True si la suppression est un succès, False sinon
         """
         try:
             with DBConnection().connection as connection:
@@ -160,6 +177,18 @@ class MancheJoueurDAO(metaclass=Singleton):
     def supprimer_participation(self, id_manche: int, id_joueur: int) -> bool:
         """
         Supprime la participation d’un joueur spécifique à une manche.
+
+        Paramètres
+        ----------
+        id_manche : int
+            Identifiant de la manche concernée
+        id_joueur : int
+            Identifiant du joueur concernée
+
+        Renvois
+        -------
+        bool
+            True si la suppression est un succès, False sinon
         """
         try:
             with DBConnection().connection as connection:
@@ -178,13 +207,3 @@ class MancheJoueurDAO(metaclass=Singleton):
             raise
 
         return res == 1
-
-
-mjdao = MancheJoueurDAO()
-joueur1 = Joueur(998, 'a', 500, 'us') 
-joueur2 = Joueur(999, 'admin', 50, 'fr')
-info_manche = InfoManche([joueur1, joueur2])
-print(mjdao.creer_manche_joueur(1, info_manche))
-print(mjdao.trouver_par_ids(997,997))
-
-

@@ -7,9 +7,7 @@ from business_object.main import Main
 
 
 class Reserve(AbstractListeCartes):
-    """
-    Modélisation de la réserve de cartes (pioche) pour une manche de poker
-    """
+    """Modélisation de la réserve de cartes (pioche) pour une manche de poker"""
 
     def __init__(self, cartes: list[Carte] = None, complet: bool = True):
         """
@@ -28,7 +26,7 @@ class Reserve(AbstractListeCartes):
 
         super().__init__(cartes, complet)
 
-    def bruler(self):
+    def bruler(self) -> None:
         """
         Positionne la premiere carte du paquet en dernier
 
@@ -43,7 +41,7 @@ class Reserve(AbstractListeCartes):
 
         self.ajouter_carte(self.retirer_carte())
 
-    def reveler(self, board):
+    def reveler(self, board: Board) -> None:
         """
         Prend une carte de le reserve et la met dans le board
 
@@ -62,7 +60,7 @@ class Reserve(AbstractListeCartes):
 
         board.ajouter_carte(self.retirer_carte())
 
-    def distribuer(self, n_joueurs):
+    def distribuer(self, n_joueurs: int) -> None:
         """
         Distribue 2 cartes de la reserve dans la Main de chaque joueur
 
@@ -75,6 +73,11 @@ class Reserve(AbstractListeCartes):
         -------
         list[Main]
             Une liste de mains
+
+        Exceptions
+        ----------
+        ValueError
+            si il n'y a pas assez de cartes à distribuer
         """
 
         # Vérification qu'il y a assez de cartes à distribuer

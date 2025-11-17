@@ -21,7 +21,7 @@ class Main(AbstractListeCartes):
         cartes : list[Carte] | None
             Cartes initiales de la main. Peut être None pour une main vide.
         complet : bool
-            Si True, initialise avec un jeu complet (cas rare pour Main).
+            Si True, initialise avec un jeu complet.
 
         Renvois
         -------
@@ -29,11 +29,7 @@ class Main(AbstractListeCartes):
             Instance de la main créée.
         """
 
-        if cartes == "vide":
-            cartes = []
-
         super().__init__(cartes, complet)
-        self._combinaison = None
 
     def intervertir_cartes(self):
         """
@@ -41,7 +37,7 @@ class Main(AbstractListeCartes):
 
         Paramètres
         ----------
-        Aucun
+        None
 
         Renvois
         -------

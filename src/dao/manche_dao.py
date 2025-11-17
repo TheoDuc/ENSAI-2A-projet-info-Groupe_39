@@ -2,30 +2,28 @@
 
 import logging
 
-from business_object.joueur import Joueur
-from business_object.info_manche import InfoManche
-from business_object.manche import Manche
 from dao.db_connection import DBConnection
 from utils.log_decorator import log
 from utils.singleton import Singleton
 
 
 class MancheDao(metaclass=Singleton):
-    """Classe contenant les méthodes pour accéder aux Manche de la base de données"""
+    """Classe contenant les méthodes pour accéder à la table Manche de la base de données"""
 
     @log
     def creer(self, manche) -> bool:
-        """Creation d'une manche dans la base de données
+        """
+        Creation d'une manche dans la base de données
 
-        Parameters
+        Paramètres
         ----------
         manche : Manche
+            la manche dont on souhaite stocker les informations
 
-        Returns
+        Renvois
         -------
-        created : bool
-            True si la création est un succès
-            False sinon
+        bool
+            True si la création est un succès, False sinon
         """
 
         res = None
@@ -43,7 +41,7 @@ class MancheDao(metaclass=Singleton):
                             "carte2": str(manche.board.cartes[1]),
                             "carte3": str(manche.board.cartes[2]),
                             "carte4": str(manche.board.cartes[3]),
-                            "carte5": str(manche.board.cartes[4])
+                            "carte5": str(manche.board.cartes[4]),
                         },
                     )
                     res = cursor.fetchone()
@@ -58,16 +56,18 @@ class MancheDao(metaclass=Singleton):
 
     @log
     def supprimer(self, manche) -> bool:
-        """Suppression d'une manche dans la base de données
+        """
+        Suppression d'une manche dans la base de données
 
-        Parameters
+        Paramètres
         ----------
         manche : Manche
             manche à supprimer de la base de données
 
-        Returns
+        Renvois
         -------
-            True si la manche a bien été supprimé
+        bool
+            True si la manche a bien été supprimée
         """
 
         try:
@@ -75,15 +75,15 @@ class MancheDao(metaclass=Singleton):
                 with connection.cursor() as cursor:
                     # Supprimer la manche de la bbd
                     cursor.execute(
-                        "DELETE FROM manche        "          
+                        "DELETE FROM manche        "
                         "WHERE carte1=%(carte1)s and carte2=%(carte2)s and carte3=%(carte3)s and "
                         "carte4=%(carte4)s and carte5=%(carte5)s   ",
                         {
-                        "carte1": str(manche.board.cartes[0]),
-                        "carte2": str(manche.board.cartes[1]),
-                        "carte3": str(manche.board.cartes[2]),
-                        "carte4": str(manche.board.cartes[3]),
-                        "carte5": str(manche.board.cartes[4]),
+                            "carte1": str(manche.board.cartes[0]),
+                            "carte2": str(manche.board.cartes[1]),
+                            "carte3": str(manche.board.cartes[2]),
+                            "carte4": str(manche.board.cartes[3]),
+                            "carte5": str(manche.board.cartes[4]),
                         },
                     )
                     res = cursor.rowcount
@@ -92,17 +92,3 @@ class MancheDao(metaclass=Singleton):
             raise
 
         return res > 0
-
-
-manchedao = MancheDao()
-joueur1 = Joueur(1, 'paul', 100, 'fr')
-joueur2 = Joueur(1, 'paul2', 1002, 'fr2')
-infomanche = InfoManche([joueur1, joueur2])
-manche = Manche(infomanche, 5)
-manche.preflop()
-manche.flop()
-manche.turn()
-manche.river()
-print(manchedao.creer(manche))
-print(manchedao.supprimer(manche))
-

@@ -15,9 +15,9 @@ class AbstractListeCartes(ABC):
     et de mélanger la liste. Elle peut également représenter un jeu complet.
     """
 
-    def __init__(self, cartes: list[Carte], complet):
+    def __init__(self, cartes: list[Carte], complet: bool):
         """
-        Initialise une liste de cartes.
+        Initialise une liste de cartes
 
         Paramètres
         ----------
@@ -31,6 +31,11 @@ class AbstractListeCartes(ABC):
         -------
         AbstractListeCartes
             Instance de la classe représentant la liste de cartes.
+
+        Exceptions
+        ----------
+        TypeError
+            si cartes n'est pas de type list ou si un élément de cette liste n'est pas de type Carte
         """
 
         if not isinstance(cartes, list) and cartes is not None:
@@ -57,7 +62,7 @@ class AbstractListeCartes(ABC):
             ]
 
     @property
-    def cartes(self) -> list:
+    def cartes(self) -> list[Carte]:
         """
         Retourne une copie profonde des cartes présentes dans la liste.
 
@@ -70,7 +75,7 @@ class AbstractListeCartes(ABC):
 
     def __str__(self) -> str:
         """
-        Représentation lisible de la liste de cartes.
+        Représentation lisible de la liste de cartes
 
         Renvois
         -------
@@ -99,7 +104,7 @@ class AbstractListeCartes(ABC):
 
     def __eq__(self, other) -> bool:
         """
-        Compare l'égalité entre deux listes de cartes.
+        Compare l'égalité entre deux listes de cartes
 
         Paramètres
         ----------
@@ -127,7 +132,7 @@ class AbstractListeCartes(ABC):
 
     def ajouter_carte(self, carte: Carte) -> None:
         """
-        Ajoute une carte à la liste.
+        Ajoute une carte à la liste
 
         Paramètres
         ----------
@@ -142,7 +147,7 @@ class AbstractListeCartes(ABC):
 
     def retirer_carte(self, indice: int = 0) -> Carte:
         """
-        Retire une carte de la liste selon son indice.
+        Retire une carte de la liste selon son indice
 
         Paramètres
         ----------
@@ -174,7 +179,5 @@ class AbstractListeCartes(ABC):
         return self.__cartes.pop(indice)
 
     def melanger(self):
-        """
-        Mélange aléatoirement les cartes de la liste.
-        """
+        """Mélange aléatoirement les cartes de la liste"""
         shuffle(self.__cartes)

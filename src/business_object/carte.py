@@ -23,6 +23,12 @@ class Carte:
         -------
         Carte
             Instance de 'Carte'
+
+        Exceptions
+        ----------
+        ValueError
+            si la valeur n'existe pas dans un jeu de cartes
+            si la couleur n'existe pas dans un jeu de cartes
         """
 
         if valeur not in self.__VALEURS:

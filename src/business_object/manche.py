@@ -8,27 +8,7 @@ from utils.log_decorator import log
 
 
 class Manche:
-    """
-    Modélise une manche complète de poker, depuis la distribution des cartes
-    jusqu'à l'attribution du pot.
-
-    Attributs principaux
-    --------------------
-    __tour : int
-        Tour actuel de la manche (0=preflop, 1=flop, 2=turn, 3=river)
-    __info : InfoManche
-        Informations sur les joueurs, leurs mains, mises et statuts
-    __reserve : Reserve
-        Pioche de cartes pour la manche
-    __board : Board
-        Cartes communes visibles sur la table
-    __indice_joueur_actuel : int
-        Indice du joueur dont c'est le tour
-    __grosse_blind : int
-        Valeur de la grosse blind
-    __fin : bool
-        Indique si la manche est terminée
-    """
+    """Modélise une manche complète de poker"""
 
     __TOURS = ("preflop", "flop", "turn", "river")
 
@@ -45,8 +25,10 @@ class Manche:
 
         Exceptions
         ----------
-        TypeError : Si info n'est pas une InfoManche ou grosse_blind n'est pas un int
-        ValueError : Si grosse_blind < 2
+        TypeError
+            si info n'est pas une InfoManche ou grosse_blind n'est pas un int
+        ValueError
+            si grosse_blind < 2
         """
 
         if not isinstance(info, InfoManche):
@@ -126,25 +108,66 @@ class Manche:
         return f"Manche(tour={self.TOURS()[self.tour]}, grosse_blind={self.grosse_blind}, board={self.board})"
 
     def indice_joueur(self, joueur) -> int:
-        """Retourne l'indice du joueur si il est présent dans la manche"""
+        """
+        Retourne l'indice du joueur si il est présent dans la manche
+
+        Paramètres
+        ----------
+        joueur : Joueur
+            Le joueur recherché dans la manche
+
+        Renvois
+        -------
+        int
+            l'indice du joueur dans InfoManche
+
+        Exceptions
+        ----------
+        ValueError
+            si le joueur n'est pas présent dans la manche
+        """
+
         for i in range(len(self.info.joueurs)):
             if self.info.joueurs[i] == joueur:
                 return i
         raise ValueError("Le joueur n'est pas dans cette manche")
 
     def est_tour(self, joueur) -> bool:
-        """Vérifie si c'est au tour du joueur"""
+        """
+        Vérifie si c'est au tour du joueur
+
+        Paramètres
+        ----------
+        joueur : Joueur
+            joueur dont on veut vérifier si c'est le tour
+
+        Renvois
+        -------
+        bool
+            True si c'est bien au tour du joueur, False sinon
+        """
+
         return self.indice_joueur_actuel == self.indice_joueur(joueur)
 
     def indice_joueur_suivant(self) -> int:
         """
         Retourne l'indice du joueur suivant à qui c'est le tour de jouer
 
+        Paramètres
+        ----------
+        None
+
         Renvois
         -------
         int
-            Indice du prochain joueur actif
+            indice du prochain joueur actif
+
+        Exceptions
+        ----------
+        ValueError
+            si tous les jouers sont couchés
         """
+
         if all(s == 3 for s in self.info.statuts):
             raise ValueError("Tous les joueurs ne peuvent être couchés")
 
@@ -164,8 +187,8 @@ class Manche:
 
         return indice
 
-    def joueur_suivant(self):
-        """Passe au joueur suivant"""
+    def joueur_suivant(self) -> None:
+        """Passe au tour du joueur actif suivant"""
         self.__indice_joueur_actuel = self.indice_joueur_suivant()
 
     def indice_nouveau_tour(self):
@@ -242,9 +265,12 @@ class Manche:
 
         Exceptions
         ----------
-        TypeError : si indice_joueur n'est pas un int
-        ValueError : si le joueur ne peut pas checker
+        TypeError
+            si indice_joueur n'est pas un int
+        ValueError
+            si le joueur ne peut pas checker
         """
+
         if not isinstance(indice_joueur, int):
             raise TypeError("indice_joueur doit être un entier")
         if self.info.statuts[indice_joueur] != 0:
@@ -270,8 +296,10 @@ class Manche:
 
         Exceptions
         ----------
-        TypeError, ValueError : si paramètres invalides
+        TypeError, ValueError
+            si paramètres invalides
         """
+
         if not isinstance(indice_joueur, int):
             raise TypeError("indice_joueur doit être un entier")
         if not isinstance(relance, int) or relance < 0:
@@ -298,7 +326,25 @@ class Manche:
 
     @log
     def all_in(self, indice_joueur: int) -> int:
-        """Mise tout le crédit d'un joueur"""
+        """
+        Mise tout le crédit d'un joueur
+
+        Paramètres
+        ----------
+        indice_joueur : int
+            l'indice du joueur qui all-in
+
+        Renvois
+        -------
+        int
+            la somme totale misée pour all-in
+
+        Exceptions
+        ----------
+        ValueError
+            si le joueur est couché ou déjà all-in
+        """
+
         if self.info.statuts[indice_joueur] in [3, 4]:
             raise ValueError("Le joueur ne peut plus all-in")
 
@@ -318,8 +364,8 @@ class Manche:
         return montant
 
     @log
-    def se_coucher(self, indice_joueur: int):
-        """ "
+    def se_coucher(self, indice_joueur: int) -> None:
+        """
         Marque un joueur comme couché  lors de la manche.
 
         Cette action met à jour :
@@ -330,19 +376,29 @@ class Manche:
         ----------
         indice_joueur : int
             Indice du joueur dans self.info.joueurs qui souhaite se coucher.
+
+        Renvois
+        -------
+        None
         """
+
         self.info.modifier_tour_couche(indice_joueur, self.tour)
         self.info.modifier_statut(indice_joueur, 3)
 
     def valeur_pot(self) -> int:
         """
-        Calcule et retourne la valeur totale du pot pour la manche.
+        Calcule et retourne la valeur totale du pot de la manche.
 
-        Retour
-        ------
+        Paramètres
+        ----------
+        None
+
+        Renvois
+        -------
         int
-            Somme des mises de tous les joueurs.
+            somme des mises de tous les joueurs
         """
+
         return sum(self.info.mises)
 
     @property
@@ -366,18 +422,24 @@ class Manche:
         Classe les joueurs selon la force de leur main combinée avec le board.
 
         Le rang 1 correspond au meilleur joueur. Les ex-aequo reçoivent le même rang.
-        Les joueurs non-actifs ou couchés reçoivent un rang après tous les joueurs actifs.
+        Les joueurs non-actifs ou couchés reçoivent le rang 0.
+
+        Paramètres
+        ----------
+        None
+
+        Renvois
+        -------
+        list[int]
+            Liste des rangs des joueurs (dans l'ordre des joueurs de InfoManche)
 
         Exceptions
         ----------
-        ValueError : si le board n'est pas complet (moins de 5 cartes) ou si le tour < 3
-
-        Retour
-        ------
-        list[int]
-            Liste des rangs des joueurs (indices correspondants à self.info.joueurs)
+        ValueError
+            si le board n'est pas complet
         """
-        if self.tour < 3 or len(self.board) < 5:
+
+        if len(self.board) != 5:
             raise ValueError("Impossible de classer : le board n'est pas complet")
 
         joueurs_actifs = self.joueurs_en_lice
@@ -432,18 +494,19 @@ class Manche:
         montant_a_recupere : int
             Montant que l'on souhaite récupérer
 
-        Retour
+        Renvois
         ------
         list[int]
             Liste de deux éléments :
             - [0] : montant restant après récupération
             - [1] : montant effectivement récupéré
         """
+
         if montant_a_recupere >= mise:
             return [0, mise]
         return [mise - montant_a_recupere, montant_a_recupere]
 
-    def gains(self) -> dict[int, float]:
+    def gains(self) -> dict:
         """
         Calcule les gains de chaque joueur à la fin de la manche.
 
@@ -451,16 +514,22 @@ class Manche:
         - Les side pots (mises différentes)
         - Les ex-aequo (partage équitable du pot)
 
+        Paramètres
+        ----------
+        None
+
+        Renvois
+        -------
+        dict[Joueur, int]
+            dictionnaire associant les joueurs en clé à leur gain en value
+
         Exceptions
         ----------
-        ValueError : si le board n'est pas complet (moins de 5 cartes) ou si le tour < 3
-
-        Retour
-        ------
-        dict[int, float]
-            Dictionnaire où la clé est le joueur et la valeur est le gain final.
+        ValueError
+            si le board n'est pas complet
         """
-        if self.tour < 3 or len(self.board.cartes) < 5:
+
+        if len(self.board.cartes) != 5:
             raise ValueError("Le board n'est pas complet, impossible de calculer les gains.")
 
         mises_restantes = self.info.mises[:]
@@ -495,7 +564,7 @@ class Manche:
         return gains
 
     @log
-    def action(self, joueur, action: str, relance: int = 0):
+    def action(self, joueur, action: str, relance: int = 0) -> dict:
         """
         Effectue l'action souhaitée d'un joueur et met à jour la manche
 
@@ -510,14 +579,18 @@ class Manche:
 
         Renvois
         -------
-        int ou dict[int, float]
-            Montant misé si tour non terminé, sinon gains si fin de manche
+        int ou dict[joueur, int]
+            Montant misé si tour non terminé
+            gains si fin de manche
 
         Exceptions
         ----------
-        Exception : si ce n'est pas au joueur de jouer ou si la manche est terminée
-        ValueError : si l'action est invalide
+        Exception
+            si ce n'est pas au joueur de jouer ou si la manche est terminée
+        ValueError
+            si l'action est invalide
         """
+
         indice_joueur = self.indice_joueur(joueur)
 
         if indice_joueur != self.indice_joueur_actuel:

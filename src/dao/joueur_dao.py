@@ -9,21 +9,24 @@ from utils.singleton import Singleton
 
 
 class JoueurDao(metaclass=Singleton):
-    """Classe contenant les méthodes pour accéder aux Joueurs de la base de données"""
+    """Classe contenant les méthodes pour intéragir avec la table des Joueurs de la base de données"""
 
     @log
-    def creer(self, pseudo, pays) -> bool:
-        """Creation d'un joueur dans la base de données
+    def creer(self, pseudo: str, pays: str) -> bool:
+        """
+        Création d'un joueur dans la base de données
 
-        Parameters
+        Paramètres
         ----------
-        joueur : Joueur
+        pseudo : str
+            Le pseudo du joueur
+        pays : str
+            Le pays du joueur
 
-        Returns
+        Renvois
         -------
-        created : bool
-            True si la création est un succès
-            False sinon
+        bool
+            True si la création est un succès, False sinon
         """
 
         res = None
@@ -46,25 +49,25 @@ class JoueurDao(metaclass=Singleton):
 
         created = False
         if res:
-            joueur = Joueur(id_joueur=res["id_joueur"], pseudo=pseudo, credit=2000, pays=pays)
             created = True
 
         return created
 
-    @log
-    def trouver_par_id(self, id_joueur) -> Joueur:
-        """trouver un joueur grace à son id
+    def trouver_par_id(self, id_joueur: int) -> Joueur:
+        """
+        Trouver un joueur grace à son id
 
-        Parameters
+        Paramètres
         ----------
         id_joueur : int
-            numéro id du joueur que l'on souhaite trouver
+            id du joueur que l'on souhaite trouver
 
-        Returns
+        Renvois
         -------
-        joueur : Joueur
-            renvoie le joueur que l'on cherche par id
+        Joueur
+            renvoie le joueur correspondant si il existe
         """
+
         try:
             with DBConnection().connection as connection:
                 with connection.cursor() as cursor:
@@ -86,20 +89,21 @@ class JoueurDao(metaclass=Singleton):
             )
         return joueur
 
-    @log
-    def trouver_par_pseudo(self, pseudo) -> Joueur:
-        """trouver un joueur grace à son pseudo
+    def trouver_par_pseudo(self, pseudo: str) -> Joueur:
+        """
+        Trouver un joueur grace à son pseudo
 
-        Parameters
+        Paramètres
         ----------
-        pseudo : int
+        pseudo : str
             pseudo du joueur que l'on souhaite trouver
 
-        Returns
+        Renvois
         -------
-        joueur : Joueur
-            renvoie le joueur que l'on cherche par pseudo
+        Joueur
+            renvoie le joueur correspondant si il existe
         """
+
         try:
             with DBConnection().connection as connection:
                 with connection.cursor() as cursor:
@@ -121,18 +125,17 @@ class JoueurDao(metaclass=Singleton):
             )
         return joueur
 
-
-    @log
     def lister_tous(self) -> list[Joueur]:
-        """lister tous les joueurs
+        """
+        Lister tous les joueurs
 
-        Parameters
+        Paramètres
         ----------
         None
 
-        Returns
+        Renvois
         -------
-        liste_joueurs : list[Joueur]
+        list[Joueur]
             renvoie la liste de tous les joueurs dans la base de données
         """
 
@@ -168,18 +171,19 @@ class JoueurDao(metaclass=Singleton):
         return texte[:-2] + "]"
 
     @log
-    def modifier(self, joueur) -> bool:
-        """Modification d'un joueur dans la base de données
+    def modifier(self, joueur: Joueur) -> bool:
+        """
+        Modification d'un joueur dans la base de données
 
-        Parameters
+        Paramètres
         ----------
         joueur : Joueur
+            Le joueur dont on souhaite mettre à jour les informations
 
-        Returns
+        Renvois
         -------
-        created : bool
-            True si la modification est un succès
-            False sinon
+        bool
+            True si la modification est un succès, False sinon
         """
 
         res = None
@@ -207,17 +211,19 @@ class JoueurDao(metaclass=Singleton):
         return res == 1
 
     @log
-    def supprimer(self, joueur) -> bool:
-        """Suppression d'un joueur dans la base de données
+    def supprimer(self, joueur: Joueur) -> bool:
+        """
+        Suppression d'un joueur dans la base de données
 
-        Parameters
+        Paramètres
         ----------
         joueur : Joueur
             joueur à supprimer de la base de données
 
-        Returns
+        Renvois
         -------
-            True si le joueur a bien été supprimé
+        bool
+            True si le joueur a bien été supprimé, False sinon
         """
 
         try:
@@ -236,19 +242,21 @@ class JoueurDao(metaclass=Singleton):
         return res > 0
 
     @log
-    def se_connecter(self, pseudo) -> Joueur:
-        """se connecter grâce à son pseudo
+    def se_connecter(self, pseudo: str) -> Joueur:
+        """
+        Se connecter grâce à son pseudo
 
-        Parameters
+        Paramètres
         ----------
         pseudo : str
             pseudo du joueur que l'on souhaite trouver
 
-        Returns
+        Renvois
         -------
-        joueur : Joueur
+        Joueur
             renvoie le joueur que l'on cherche
         """
+
         res = None
         try:
             with DBConnection().connection as connection:
@@ -274,13 +282,3 @@ class JoueurDao(metaclass=Singleton):
             )
 
         return joueur
-
-
-# joueur1 = Joueur(1, 'paul', 100, 'fr')
-# joueur2 = Joueur(1, 'paul2', 1002, 'fr2')
-# joueurDao = JoueurDao()
-# print(joueurDao.creer('paul','fr'))
-# print(joueurDao.trouver_par_pseudo('marine'))
-# print(joueurDao.lister_tous())
-# print(joueurDao.modifier(joueur1))
-# joueurDao.supprimer(joueur=joueur1)
