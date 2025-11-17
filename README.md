@@ -82,11 +82,15 @@ In most cases, **you do not need to modify these files**, except for:
 
 
 
-### Settings files
+### Settings Files
 
-This repository contains a large number of configuration files for setting the parameters of the various tools used.
+This project includes several configuration files used to set up tools, workflows, and project parameters.  
 
-Normally, for the purposes of your project, you won't need to modify these files, except for `.env` and `requirements.txt`.
+In most cases, **you do not need to modify these files**, except for:
+
+- `.env` → to configure environment variables such as database connection and webservice host  
+- `requirements.txt` → to manage Python dependencies
+
 
 
 ## :arrow_forward: Install required packages
