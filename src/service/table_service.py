@@ -1,7 +1,8 @@
-from business_object.joueur import Joueur
+"""Implémentation de la classe TableService"""
+
 from business_object.manche import Manche
 from business_object.table import Table
-from service.action_service import ActionService
+from service.joueur_service import JoueurService
 from utils.log_decorator import log
 
 
@@ -16,9 +17,45 @@ class TableService:
     tables: list[Table] = []
     compteur_tables: int = 0
 
+    def liste_tables(self) -> list[Table]:
+        """
+        Ajoute un joeuur à une table
+
+        Paramètres
+        ----------
+        ...
+
+        Renvois
+        -------
+        ...
+        """
+        return self.tables
+
+    def table_par_numero(self, numero_table: int) -> Table:
+        """Blabla"""
+        pass
+
     @log
     def creer_table(self, joueur_max: int, grosse_blind: int, mode_jeu: int = 1) -> Table:
-        TableService.compteur_tables += 1
+        """
+        Créer une table de jeu de poker
+
+        Paramètres
+        ----------
+        joueur_max : int
+            le nombre de joueurs maximum que la table peut accueillir
+        hrosse_blind : int
+            la valeur de la grosse blind
+        mode_jeu : int
+            le code du mode de jeu de la table
+
+        Renvois
+        -------
+        Table
+            la table créée
+        """
+
+        self.compteur_tables += 1
         numero = TableService.compteur_tables
 
         table = Table(
@@ -28,106 +65,94 @@ class TableService:
             mode_jeu=mode_jeu,
         )
 
-        TableService.tables.append(table)
+        self.tables.append(table)
         return table
 
     @log
-    def ajouter_joueur(self, table: Table, joueur: Joueur) -> None:
-        table.ajouter_joueur(joueur)
-        joueur.rejoindre_table(table)
-
-    @log
-    def retirer_joueur(self, table: Table, joueur: Joueur) -> None:
-        if joueur not in table.joueurs:
-            raise ValueError(f"Le joueur {joueur.pseudo} n'est pas sur la table.")
-        joueur.quitter_table()
-
-    @log
     def supprimer_table(self, table: Table) -> None:
+        """
+        Ajoute un joeuur à une table
+
+        Paramètres
+        ----------
+        ...
+
+        Renvois
+        -------
+        ...
+        """
+
         for joueur in list(table.joueurs):
             joueur.quitter_table()
         if table in self.tables:
             self.tables.remove(table)
 
     @log
-    def rotation_dealer(self, table: Table) -> None:
-        if not table.joueurs or len(table.joueurs) < 2:
-            print("Pas de rotation possible : moins de 2 joueurs.")
-            return
+    def ajouter_joueur(self, numero_table: int, id_joueur: int) -> None:
+        """
+        Ajoute un joeuur à une table
 
-        nb_joueurs = len(table.joueurs)
-        index_actuel = getattr(table, "dealer_index", 0)  # On part de 0 si non défini
+        Paramètres
+        ----------
+        ...
 
-        # Cherche le prochain joueur actif
-        for i in range(1, nb_joueurs + 1):
-            suivant_index = (index_actuel + i) % nb_joueurs
-            suivant = table.joueurs[suivant_index]
-            if suivant.est_actif:
-                table.dealer_index = suivant_index
-                return
+        Renvois
+        -------
+        ...
+        """
 
-        print("Aucun joueur actif trouvé pour devenir dealer.")
+        joueur = JoueurService().trouver_par_id(id_joueur)
+        table = self.table_par_numero(numero_table)
+
+        joueur.rejoindre_table(table)
 
     @log
+    def retirer_joueur(self, id_joueur: int) -> None:
+        """
+        Ajoute un joeuur à une table
+
+        Paramètres
+        ----------
+        ...
+
+        Renvois
+        -------
+        ...
+        """
+
+        joueur = JoueurService().trouver_par_id(id_joueur)
+
+        joueur.quitter_table()
+
     def affichages_tables(self) -> list[str]:
+        """
+        Ajoute un joeuur à une table
+
+        Paramètres
+        ----------
+        ...
+
+        Renvois
+        -------
+        ...
+        """
+
         return [str(table) for table in self.tables]
 
     @log
-    def liste_tables(self) -> list[Table]:
-        return self.tables
-
-    @log
-    def action_joueur(self, table: Table, joueur: Joueur, action: str, montant: int = 0) -> None:
-        action_service = ActionService()
-        if action == "all_in":
-            action_service.all_in(table.manche, joueur)
-            joueur.est_actif = False
-            joueur.all_in = True
-        elif action == "checker":
-            action_service.checker(table.manche, joueur)
-            joueur.a_checke = True
-        elif action == "suivre":
-            action_service.suivre(table.manche, joueur, montant)
-        elif action == "se_coucher":
-            action_service.se_coucher(table.manche, joueur)
-            joueur.est_actif = False
-            joueur.est_couche = True
-        else:
-            raise ValueError(f"Action inconnue pour le joueur : {action}")
-
-    def demander_action(self, joueur: Joueur, table: Table) -> str:
-        """
-        Demande au joueur quelle action il souhaite effectuer.
-        Retourne une action valide sous forme de chaîne.
-        """
-        actions_possibles = ["checker", "suivre", "se_coucher", "all_in"]
-        while True:
-            print(f"\nJoueur {joueur.pseudo} — Crédit: {joueur.credit}")
-            print("Actions possibles : ")
-            for a in actions_possibles:
-                print(f"- {a}")
-            action = input("Choisissez votre action : ").strip().lower()
-            if action in actions_possibles:
-                return action
-            print("Action invalide. Réessayez.")
-
-    def demander_montant(self, action: str, joueur: Joueur, table: Table) -> int:
-        if action == "suivre":
-            while True:
-                try:
-                    montant = int(input(f"Montant à suivre (max {joueur.credit}) : "))
-                    if 0 < montant <= joueur.credit:
-                        return montant
-                    else:
-                        print("Montant invalide.")
-                except ValueError:
-                    print("Veuillez entrer un nombre valide.")
-        elif action == "all_in":
-            return joueur.credit
-        return 0
-
-    @log
     def jouer(self, table: Table) -> None:
+        """
+        Ajoute un joeuur à une table
+
+        Paramètres
+        ----------
+        ...
+
+        Renvois
+        -------
+        ...
+        """
+
         if len(table.joueurs) < 2:
             raise ValueError("Impossible de démarrer une manche avec moins de deux joueurs.")
         # Réinitialisation des joueurs pour la manche
@@ -151,7 +176,7 @@ class TableService:
                 for i in range(len(table.joueurs)):
                     if not joueur.est_actif:
                         continue  # Passe les joueurs couchés ou all-in
-                    
+
                     print(f"Votre main est : {manche.info.mains[i]}")
                     print(f"Le board est : {manche.board}")
 
