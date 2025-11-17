@@ -140,13 +140,13 @@ python -m pytest -v
 ```
 
 
-### TU DAO
+### DAO Unit Tests
 
-To ensure tests are repeatable, safe, and **do not interfere with the real database**, we use a dedicated schema for unit testing.
+To ensure that tests are **repeatable, safe, and do not affect the real database**, we use a dedicated schema for unit testing.
 
-The DAO unit tests use data from the `data/pop_db_test.sql` file.
+- The DAO tests use sample data from `data/pop_db_test.sql`.
+- This data is loaded into a separate schema named `projet_test_dao` to prevent any impact on the main database.
 
-This data is loaded into a separate schema (projet_test_dao) so as not to pollute the other data.
 
 
 ### Test coverage
