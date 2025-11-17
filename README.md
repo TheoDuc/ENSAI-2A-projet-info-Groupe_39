@@ -127,10 +127,17 @@ POSTGRES_PASSWORD=idxxxx
 POSTGRES_SCHEMA=projet
 
 ```
-## :arrow_forward: Unit tests
+## :arrow_forward: Unit Tests
 
-- [ ] In Git Bash: `pytest -v` 
-  - or `python -m pytest -v` if *pytest* has not been added to *PATH*
+- [ ] Open Git Bash (or your terminal) and run the unit tests:
+
+```bash
+# Standard command
+pytest -v
+
+# If pytest is not in your PATH
+python -m pytest -v
+```
 
 
 ### TU DAO
