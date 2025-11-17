@@ -189,92 +189,47 @@ python src/main.py
 
 ## :arrow_forward: Launch the webservice
 
-This application can also be used to create a webservice.
-
-- [ ] `python src/app.py`
-
-Documentation :
-
-- /docs
-- /redoc
 
 ### Endpoints
 
 Examples of endpoints (to be tested, for example, with *Insomnia* or a browser):
 
 
-- `GET http://localhost/joueur`
-- `GET http://localhost/joueur/3`
-- ```
-  POST http://localhost/joueur/
-  JSON body :
-    {
-      "pseudo": "patapouf",
-      "mdp": "9999",
-      "age": "95",
-      "mail": "patapouf@mail.fr",
-      "fan_pokemon": true
-    }
-  ```
-- ```
-  PUT http://localhost/joueur/3
-  JSON body :
-    {
-       "pseudo": "maurice_new",
-       "mdp": null,
-       "age": 20,
-       "mail": "maurice@ensai.fr",
-       "fan_pokemon": true
-    }
-  ```
-- `DELETE http://localhost/joueur/5`
-
-
 
 ## :arrow_forward: Logs
 
-It is initialised in the `src/utils/log_init.py` module:
+Logging is initialized in the `src/utils/log_init.py` module:
 
-- This is called when the application or webservice is started.
+- This setup runs whenever the CLI application or webservice is started.
 - It uses the `logging_config.yml` file for configuration.
-  - to change the log level :arrow_right: *level* tag
+  - To change the log level, modify the `level` tag in the configuration file.
 
-A decorator has been created in `src/utils/log_decorator.py`.
+A decorator is available in `src/utils/log_decorator.py`.
 
-When applied to a method, it will display in the logs :
+- When applied to a method, it automatically logs:
+  - The input parameters
+  - The output of the method
 
-- input parameters
-- the output
-
-The logs can be viewed in the `logs` folder.
+All logs are saved in the `logs/` folder for review.
 
 Example of logs :
 
-```
-07/08/2024 09:07:07 - INFO     - ConnexionVue
-07/08/2024 09:07:08 - INFO     -     JoueurService.se_connecter('a', '*****') - DEBUT
-07/08/2024 09:07:08 - INFO     -         JoueurDao.se_connecter('a', '*****') - DEBUT
-07/08/2024 09:07:08 - INFO     -         JoueurDao.se_connecter('a', '*****') - FIN
-07/08/2024 09:07:08 - INFO     -            └─> Sortie : Joueur(a, 20 ans)
-07/08/2024 09:07:08 - INFO     -     JoueurService.se_connecter('a', '*****') - FIN
-07/08/2024 09:07:08 - INFO     -        └─> Sortie : Joueur(a, 20 ans)
-07/08/2024 09:07:08 - INFO     - MenuJoueurVue
-```
 
 
 
-## :arrow_forward: Continuous integration (CI)
 
-The repository contains a `.github/workflow/main.yml' file.
+## :arrow_forward: Continuous Integration (CI)
 
-When you *push* on GitHub, it triggers a pipeline that will perform the following steps:
+This repository includes a CI workflow defined in `.github/workflows/main.yml`.
 
-- Creating a container from an Ubuntu (Linux) image
-  - In other words, it creates a virtual machine with just a Linux kernel.
-- Install Python
-- Install the required packages
-- Run the unit tests (only the service tests, as it's more complicated to run the dao tests)
-- Analyse the code with *pylint*
-  - If the score is less than 7.5, the step will fail
+Whenever you *push* changes to GitHub, it triggers a pipeline that performs the following steps:
 
-You can check how this pipeline is progressing on your repository's GitHub page, *Actions* tab.
+- Creates a container based on an Ubuntu (Linux) image
+  - Essentially, this sets up a virtual machine with only the Linux kernel.
+- Installs Python
+- Installs the required packages
+- Runs the unit tests (only service tests, as DAO tests are more complex to run)
+- Analyzes the code using *pylint*
+  - If the pylint score is below 7.5, the step will fail
+
+You can monitor the pipeline's progress on your repository's GitHub page under the *Actions* tab.
