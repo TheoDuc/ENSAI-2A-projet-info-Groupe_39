@@ -173,7 +173,7 @@ coverage html
 
 ## :arrow_forward: Launch the CLI Application
 
-The CLI provides a simple interactive interface to navigate through different menus of the poker application.
+The CLI provides a simple interactive interface to navigate through the different menus of the poker application.
 
 - [ ] Open Git Bash (or your terminal) and run:
 
