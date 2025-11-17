@@ -126,6 +126,7 @@ POSTGRES_USER=idxxxx
 POSTGRES_PASSWORD=idxxxx
 POSTGRES_SCHEMA=projet
 
+```
 ## :arrow_forward: Unit tests
 
 - [ ] In Git Bash: `pytest -v` 
