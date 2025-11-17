@@ -93,17 +93,16 @@ In most cases, **you do not need to modify these files**, except for:
 
 
 
-## :arrow_forward: Install required packages
+## :arrow_forward: Install Required Packages
 
-- [ ] In Git Bash, run the following commands to:
-  - install all packages from file `requirements.txt`
-  - list all packages
+- [ ] Open Git Bash (or your terminal) and run the following commands to install all necessary packages and check the installed packages:
 
 ```bash
+# Install packages from requirements.txt
 pip install -r requirements.txt
-pip list
-```
 
+# List installed packages
+pip list
 
 ## :arrow_forward: Environment variables
 
