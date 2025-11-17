@@ -1,14 +1,17 @@
-# ENSAI-2A-projet-info-template
+# ENSAI 2A - Poker Server Project (Group 39)
 
-Template for the ENSAI 2nd year IT project.
+This project is a **Python-based poker server** organized with a **layered architecture**. It includes both a **command-line interface (CLI)** for interactive play and a **webservice** for programmatic access.
 
-This very simple application includes a few elements that may help with the info 2A project:
+It was developed as part of a **2nd-year ENSAI project** and demonstrates all the key elements of a professional application, including:
 
-- Layer programming (DAO, service, view, business_object)
-- Connection to a database
-- Terminal interface (view layer) with [inquirerPy](https://inquirerpy.readthedocs.io/en/latest/)
-- Calling a Webservice
-- Creating a webservice
+
+- **Layered architecture**: DAO, Service, Business Object, View
+- **PostgreSQL database** connection
+- CLI interface with InquirerPy
+- Webservice creation and consumption using **FastAPI**
+- Logging with decorator and configuration file
+- Unit tests and test coverage
+- **CI/CD pipeline** via GitHub Actions
 
 
 ## :arrow_forward: Software and tools
@@ -16,7 +19,11 @@ This very simple application includes a few elements that may help with the info
 - [Visual Studio Code](https://code.visualstudio.com/)
 - [Python 3.13](https://www.python.org/)
 - [Git](https://git-scm.com/)
-- A [PostgreSQL](https://www.postgresql.org/) database
+- [PostgreSQL](https://www.postgresql.org/)
+- [FastAPI](https://fastapi.tiangolo.com/)
+- [InquirerPy](https://inquirerpy.readthedocs.io/en/latest/)
+- [pytest](https://docs.pytest.org/)
+- [Coverage](https://coverage.readthedocs.io/)
 
 
 ## :arrow_forward: Clone the repository
@@ -24,25 +31,24 @@ This very simple application includes a few elements that may help with the info
 - [ ] Open VSCode
 - [ ] Open **Git Bash**
 - [ ] Clone the repo
-  - `git clone https://github.com/ludo2ne/ENSAI-2A-projet-info-template.git`
+  - `git clone https://github.com/TheoDuc/ENSAI-2A-projet-info-Groupe_39`
 
 
-### Open Folder
+### Open the Project Folder
 
-- [ ] Open **Visual Studio Code**
-- [ ] File > Open Folder
-- [ ] Select folder *ENSAI-2A-projet-info-template*
-  - *ENSAI-2A-projet-info-template* should be the root of your Explorer
-  - :warning: if not the application will not launch. Retry open folder
+- [ ] Launch **Visual Studio Code**
+- [ ] Go to `File > Open Folder`
+- [ ] Select the folder `ENSAI-2A-projet-info-Groupe_39`
+  - This folder should be the **root** of your VSCode Explorer.
+  - :warning: If it is not, the application may not start. In that case, try opening the folder again.
 
 
 ## Repository Files Overview
 
-
-| Item                       | Description                                                              |
-| -------------------------- | ------------------------------------------------------------------------ |
-| `README.md`                | Provides useful information to present, install, and use the application |
-| `LICENSE`                  | Specifies the usage rights and licensing terms for the repository        |
+| File / Item                | Description                                                                 |
+| -------------------------- | --------------------------------------------------------------------------- |
+| `README.md`                | Contains all the information needed to understand, install, and use the project |
+| `LICENSE`                  | Defines the usage rights and licensing terms for this repository             |
 
 ### Configuration files
 
