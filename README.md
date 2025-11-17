@@ -153,8 +153,6 @@ To ensure that tests are **repeatable, safe, and do not affect the real database
 
 You can generate test coverage reports using Coverage
 
-> :bulb: You can customize the settings using the `.coveragerc` file.
-
 - [ ] Run tests with coverage:
 
 ```bash
