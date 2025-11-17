@@ -106,6 +106,7 @@ pip list
 
 ## :arrow_forward: Environment variables
 
+```
 You are now going to define environment variables to declare the database and webservice to which you are going to connect your python application.
 
 At the root of the project :
