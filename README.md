@@ -105,26 +105,26 @@ pip install -r requirements.txt
 pip list
 
 ```
-## :arrow_forward: Environment variables
+## :arrow_forward: Environment Variables
 
-You are now going to define environment variables to declare the database and webservice to which you are going to connect your python application.
+You need to define environment variables to configure the database and webservice that your Python application will connect to.
 
-At the root of the project :
+At the root of the project:
 
-- [ ] Create a file called `.env`
-- [ ] Paste in and complete the elements below
+- [ ] Create a file named `.env`
+- [ ] Copy and fill in the following variables:
 
-```default
-WEBSERVICE_HOST=https://pokeapi.co/api/v2
+```env
+# Webservice host
+WEBSERVICE_HOST= à completer
 
+# PostgreSQL database configuration
 POSTGRES_HOST=sgbd-eleves.domensai.ecole
 POSTGRES_PORT=5432
 POSTGRES_DATABASE=idxxxx
 POSTGRES_USER=idxxxx
 POSTGRES_PASSWORD=idxxxx
 POSTGRES_SCHEMA=projet
-```
-
 
 ## :arrow_forward: Unit tests
 
