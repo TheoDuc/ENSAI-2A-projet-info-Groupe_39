@@ -50,24 +50,26 @@ It was developed as part of a **2nd-year ENSAI project** and demonstrates all th
 | `README.md`                | Contains all the information needed to understand, install, and use the project |
 | `LICENSE`                  | Defines the usage rights and licensing terms for this repository             |
 
-### Configuration files
+### Configuration Files
 
-This repository contains a large number of configuration files for setting the parameters of the various tools used.
+This project includes several configuration files used to set up tools, workflows, and project parameters.  
 
-Normally, for the purposes of your project, you won't need to modify these files, except for `.env` and `requirements.txt`.
+In most cases, **you do not need to modify these files**, except for:
 
+- `.env` → to configure environment variables like database connection and webservice host  
+- `requirements.txt` → to manage Python dependencies
 
-| Item                       | Description                                                              |
-| -------------------------- | ------------------------------------------------------------------------ |
-| `.github/workflows/ci.yml` | Automated workflow that runs predefined tasks (like testing, linting, or deploying) |
-| `.vscode/settings.json`    | Contains VS Code settings specific to this project                       |
-| `.coveragerc`              | Setup for test coverage                                                  |
-| `.gitignore`               | Lists the files and folders that should not be tracked by Git            |
-| `logging_config.yml`       | Setup for logging                                                        |
-| `requirements.txt`         | Lists the required Python packages for the project                       |
+| File / Item                  | Description                                                                 |
+| ---------------------------- | --------------------------------------------------------------------------- |
+| `.github/workflows/ci.yml`   | GitHub Actions workflow for automated tasks such as testing, linting, and deployment |
+| `.vscode/settings.json`      | Project-specific Visual Studio Code settings                                 |
+| `.coveragerc`                | Configuration for test coverage reporting                                    |
+| `.gitignore`                 | Lists files and folders to exclude from version control                     |
+| `logging_config.yml`         | Configuration for logging, including log levels and formatting              |
+| `requirements.txt`           | List of Python packages required by the project                             |
+| `.env`                       | Environment variables for database, webservice, and other settings          |
 
-You will also need a `.env` file. See below.
-
+> :information_source: Make sure to create and configure the `.env` file as described below before running the project.
 
 ### Folders
 
