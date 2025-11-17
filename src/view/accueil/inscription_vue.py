@@ -1,7 +1,13 @@
+import os
+
+import requests
 from InquirerPy import inquirer
 
 from service.joueur_service import JoueurService
 from view.vue_abstraite import VueAbstraite
+
+host = os.environ["HOST_WEBSERVICE"]
+END_POINT = "/joueur/"
 
 
 class InscriptionVue(VueAbstraite):
@@ -16,17 +22,17 @@ class InscriptionVue(VueAbstraite):
 
         pays = inquirer.text(message="Entrez votre pays : ").execute()
 
-        # Appel du service pour créer le joueur
-        joueur = JoueurService().creer(pseudo, pays)
+        # Appel de l'app pour créer le joueur
+        joueur = {"id_joueur": 8, "pseudo": pseudo, "pays": pays, "credit": 0}
+        
+        req = requests.post(f"{host}{END_POINT}", json=joueur)
 
-        # Si le joueur a été créé
-        if joueur:
-            message = (
-                f"Votre compte {joueur.pseudo} a été créé. Vous pouvez maintenant vous connecter."
-            )
+        if req.status_code == 200:
+            message = f"Votre compte {joueur['pseudo']} a été créé. Vous pouvez maintenant vous connecter."
         else:
-            message = "Erreur de connexion (pseudo ou mot de passe invalide)"
+            message = f"{req.status_code} {req.text} Erreur de connexion (pseudo ou pays invalide)"
 
         from view.accueil.accueil_vue import AccueilVue
 
         return AccueilVue(message)
+

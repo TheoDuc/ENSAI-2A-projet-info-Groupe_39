@@ -1,9 +1,13 @@
 from InquirerPy import inquirer
+import os
+import requests
 
-from service.joueur_service import JoueurService
+from business_object.joueur import Joueur
 from view.session import Session
 from view.vue_abstraite import VueAbstraite
 
+host = os.environ["HOST_WEBSERVICE"]
+END_POINT = "/joueur/connection"
 
 class ConnexionVue(VueAbstraite):
     """Vue de Connexion (saisie de pseudo et mdp)"""
@@ -13,13 +17,20 @@ class ConnexionVue(VueAbstraite):
         pseudo = inquirer.text(message="Entrez votre pseudo : ").execute()
 
         # Appel du service pour trouver le joueur
-        joueur = JoueurService().se_connecter(pseudo)
+        url = f"{host}{END_POINT}/{pseudo}"
+        req = requests.get(url)
 
         # Si le joueur a été trouvé à partir des ses identifiants de connexion
-        if joueur:
+        if req.status_code == 200:
+            reponse = req.json()
+            joueur = Joueur(
+                id_joueur=reponse["_Joueur__id_joueur"],
+                pseudo=reponse["_Joueur__pseudo"],
+                credit=reponse["_Joueur__credit"],
+                pays=reponse["_Joueur__pays"],
+            )
             message = f"Vous êtes connecté sous le pseudo {joueur.pseudo}"
             Session().connexion(joueur)
-
             from view.menu_joueur_vue import MenuJoueurVue
 
             return MenuJoueurVue(message)
@@ -28,3 +39,5 @@ class ConnexionVue(VueAbstraite):
         from view.accueil.accueil_vue import AccueilVue
 
         return AccueilVue(message)
+
+

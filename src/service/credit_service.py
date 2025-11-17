@@ -2,6 +2,7 @@
 
 import logging
 
+from business_object.joueur import Joueur
 from dao.joueur_dao import JoueurDao
 from service.joueur_service import JoueurService
 
@@ -11,7 +12,7 @@ logger = logging.getLogger(__name__)
 class CreditService:
     """Service de gestion des crédits des joueurs"""
 
-    def crediter(self, id_joueur: int, montant: int) -> None:
+    def crediter(self, joueur: Joueur, montant: int) -> None:
         """
         Crédite un joueur dans la RAM et dans la DAO
 
@@ -29,11 +30,7 @@ class CreditService:
         ValueError
             si le montant à créditer est incorrect
 
-
-        joueur = self.joueur_par_id(id_joueur)
         """
-
-        joueur = JoueurService().trouver_par_id(id_joueur)
 
         if montant <= 0:
             raise ValueError("Le montant à créditer doit être positif.")

@@ -1,12 +1,11 @@
 from InquirerPy import inquirer
+import os
+import requests
 
 from view.vue_abstraite import VueAbstraite
 from view.session import Session
 
-from service.joueur_service import JoueurService
-from service.credit_service import CreditService
-from business_object.joueur import Joueur
-
+host = os.environ["HOST_WEBSERVICE"]
 
 class MenuJoueurVue(VueAbstraite):
     """Vue du menu du joueur
@@ -57,19 +56,34 @@ class MenuJoueurVue(VueAbstraite):
                 return MenuJoueurVue(Session().afficher())
 
             case "Afficher les joueurs de la base de données":
-                joueurs_str = JoueurService().lister_tous()
-                return MenuJoueurVue(joueurs_str)
+                END_POINT = "/joueur/liste/"
+                url = f"{host}{END_POINT}"
+                req = requests.get(url)
+
+                reponse = None
+
+                # Si la requete à fonctionné
+                if req.status_code == 200:
+                    reponse = req.json()
+                return MenuJoueurVue(reponse)
 
             case "Changer ses informations":
+                END_POINT = "/joueur"
                 joueur = Session().joueur
                 
                 nouveau_pseudo = inquirer.text(message="Entrez votre  nouveau pseudo : ").execute()
                 nouveau_pays = inquirer.text(message="Entrez votre nouveau pays : ").execute()
 
-                nouveau_joueur = Joueur(joueur.id_joueur, nouveau_pseudo, joueur.credit, nouveau_pays)
-                joueur_n = JoueurService().modifier(nouveau_joueur)
-                
-                return MenuJoueurVue(joueur_n)
+                req = requests.put(
+                    f"{host}{END_POINT}/{joueur.id_joueur}/{nouveau_pseudo}/{nouveau_pays}")
+
+                reponse = False
+                if req.status_code == 200:
+                    reponse = req.json()
+                print(reponse)
+
+                # Session().joueur = un truc mais je sais pas quoi
+                return MenuJoueurVue(reponse)
 
             case "Tables":
                 from view.menu_table import MenuTable
@@ -77,8 +91,22 @@ class MenuJoueurVue(VueAbstraite):
 
             case "Se créditer":
                 joueur = Session().joueur
+                admin = inquirer.text(message="Etes vous un administrateur : (oui/non)").execute()
+                if admin == "non":
+                    return MenuJoueurVue(Session().joueur)
                 credit = inquirer.text(message="Entrez votre montant à ajouter : ").execute()
-                nouveau_credit = CreditService().crediter(joueur, int(credit))
+                credit = int(credit)
+                END_POINT = "/admin/crediter"
+
+                req = requests.put(
+                    f"{host}{END_POINT}/{joueur.pseudo}/{credit}")
+
+                reponse = False
+                if req.status_code == 200:
+                    reponse = req.json()
+                print(reponse)                
+                
+                # Session().joueur = un truc mais je sais pas quoi
                 return MenuJoueurVue(Session().joueur)
                 
             case "Lire les regles":

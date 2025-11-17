@@ -285,3 +285,4 @@ class Joueur:
 
         self.__pays = pays
         logger.info(f"{self.pseudo} à changé de pays")
+        return
