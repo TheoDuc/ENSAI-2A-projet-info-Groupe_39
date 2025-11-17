@@ -59,7 +59,7 @@ In most cases, **you do not need to modify these files**, except for:
 - `.env` → to configure environment variables like database connection and webservice host  
 - `requirements.txt` → to manage Python dependencies
 
-| File / Item                  | Description                                                                 |
+| File                   | Description                                                                 |
 | ---------------------------- | --------------------------------------------------------------------------- |
 | `.github/workflows/ci.yml`   | GitHub Actions workflow for automated tasks such as testing, linting, and deployment |
 | `.vscode/settings.json`      | Project-specific Visual Studio Code settings                                 |
@@ -149,19 +149,25 @@ To ensure that tests are **repeatable, safe, and do not affect the real database
 
 
 
-### Test coverage
+### Test Coverage
 
-It is also possible to generate test coverage using [Coverage](https://coverage.readthedocs.io/en/7.4.0/index.html)
+You can generate test coverage reports using [Coverage](https://coverage.readthedocs.io/en/7.4.0/index.html).
 
-:bulb: The `.coveragerc` file can be used to modify the settings
+> :bulb: You can customize the settings using the `.coveragerc` file.
 
-- [ ] `coverage run -m pytest`
-- [ ] `coverage report -m`
-- [ ] `coverage html`
-  - Download and open coverage_report/index.html
+- [ ] Run tests with coverage:
 
+```bash
+coverage run -m pytest
 
+# Display a coverage report in the terminal:
+coverage report -m
 
+# Generate an HTML coverage report:
+coverage html
+
+Open `coverage_report/index.html` in your browser to view the results.
+```
 ## :arrow_forward: Launch the CLI application
 
 This application provides a very basic graphical interface for navigating between different menus.
