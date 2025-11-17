@@ -71,14 +71,14 @@ In most cases, **you do not need to modify these files**, except for:
 
 > :information_source: Make sure to create and configure the `.env` file as described below before running the project.
 
-### Folders
+### Project Folders
 
-| Item                       | Description                                                              |
-| -------------------------- | ------------------------------------------------------------------------ |
-| `data`                     | SQL script containing data sets                                          |
-| `doc`                      | UML diagrams, project status...                                          |
-| `logs`                     | Containing logs files (once you have launched the application)           |
-| `src`                      | Folder containing Python files organized using a layered architecture    |
+| Folder  | Description                                                                 |
+| ------------- | --------------------------------------------------------------------------- |
+| `data/`       | SQL scripts to initialize and populate the database                         |
+| `doc/`        | UML diagrams, design documents, and project-related documentation          |
+| `logs/`       | Log files generated during application or webservice execution             |
+| `src/`        | Python source code organized in a layered architecture (DAO, Service, BO, View) |
 
 
 
