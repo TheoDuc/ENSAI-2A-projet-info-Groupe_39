@@ -171,17 +171,8 @@ coverage report -m
 coverage html
 ```
 - [ ] Open the HTML coverage report in your browser to view the results:
-```text
-coverage_report/index.html
-```
-
-
-
-
-# Generate an HTML coverage report:
-coverage html
-
 Open `coverage_report/index.html` in your browser to view the results.
+
 
 ## :arrow_forward: Launch the CLI Application
 
