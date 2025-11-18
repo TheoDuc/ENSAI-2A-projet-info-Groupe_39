@@ -174,21 +174,20 @@ coverage html
 ```
 - [ ] Ouvrez le ficher `coverage_report/index.html` dans votre navigateur pour visualiser les résultats.
 
-## :arrow_forward: Launch the CLI Application
+## :arrow_forward: Lancer l’application CLI
 
-The CLI provides a simple interactive interface to navigate through the different menus of the poker application.
+L’application en ligne de commande (CLI) offre une interface **interactive simple** pour naviguer dans les différents menus du serveur de poker.
 
-- [ ] Open Git Bash (or your terminal) and run:
+### Étapes
+
+1. Ouvrez votre terminal (Git Bash, PowerShell, ou autre) et lancez l’application :
 
 ```bash
 python src/main.py
 ```
-- [ ] On the first launch, select **Reset database**:
-  - This will run the script `src/utils/reset_database.py`.
-  - The script will execute the SQL files in the `data/` folder to initialize the database.
-
-
-
+- [ ] Lors du premier lancement, sélectionnez **Reset database** :
+  - Cela exécutera le script `src/utils/reset_database.py`.
+  - Le script initialise la base de données en exécutant les fichiers SQL présents dans le dossier `data/`.
 
 ## :arrow_forward: Launch the webservice
 
