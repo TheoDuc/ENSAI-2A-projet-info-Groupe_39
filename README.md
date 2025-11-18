@@ -157,6 +157,12 @@ Vous pouvez générer un rapport de couverture de code avec **Coverage** pour v�
 
 #### Étapes
 
+
+Pour que Python saches que src contient les modules,Faire dans le terminal:
+
+```bash
+export PYTHONPATH=$(pwd)/src
+```
 1. Exécutez les tests avec Coverage :
 
 ```bash

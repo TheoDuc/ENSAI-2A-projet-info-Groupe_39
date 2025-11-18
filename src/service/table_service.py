@@ -47,6 +47,7 @@ class TableService:
         """
 
         for table in self.__tables:
+            print(table.numero_table)
             if table.numero_table == numero_table:
                 return table
 
@@ -104,7 +105,7 @@ class TableService:
 
         for joueur in list(table.joueurs):
             joueur.quitter_table()
-        if table in self.tables:
+        if table in self.__tables:
             self.__tables.remove(table)
 
     @log
