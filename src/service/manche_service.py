@@ -7,7 +7,7 @@ from dao.manche_dao import MancheDao
 class MancheService:
     """Gère le stockage des manches dans la base de données"""
 
-    def creer_manche(self, manche: Manche) -> None:
+    def sauvegarder_manche(self, manche: Manche) -> None:
         """Crée une manche et l’enregistre via le DAO."""
         MancheDao().creer(manche)
 

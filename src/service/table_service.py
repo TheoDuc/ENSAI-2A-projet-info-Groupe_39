@@ -184,6 +184,6 @@ class TableService:
 
         table = self.table_par_numero(numero_table)
 
-        id_manche = MancheService().creer_manche(table.manche)
-        MancheJoueurService().creer_manche_joueur(id_manche, table.manche.info)
+        id_manche = MancheService().sauvegarder_manche(table.manche)
+        MancheJoueurService().sauvegarder_manche_joueur(id_manche, table.manche.info)
         table.rotation_dealer()
