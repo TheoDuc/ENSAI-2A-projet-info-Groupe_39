@@ -1,11 +1,13 @@
-from InquirerPy import inquirer
 import os
-import requests
 
-from view.vue_abstraite import VueAbstraite
+import requests
+from InquirerPy import inquirer
+
 from view.session import Session
+from view.vue_abstraite import VueAbstraite
 
 host = os.environ["HOST_WEBSERVICE"]
+
 
 class MenuJoueurVue(VueAbstraite):
     """Vue du menu du joueur
@@ -53,7 +55,7 @@ class MenuJoueurVue(VueAbstraite):
                 return AccueilVue()
 
             case "Infos de session":
-                return MenuJoueurVue(Session().afficher())
+                return MenuJoueurVue(Session().afficher(), temps_attente=2)
 
             case "Afficher les joueurs de la base de données":
                 END_POINT = "/joueur/liste/"
@@ -70,12 +72,13 @@ class MenuJoueurVue(VueAbstraite):
             case "Changer ses informations":
                 END_POINT = "/joueur"
                 joueur = Session().joueur
-                
+
                 nouveau_pseudo = inquirer.text(message="Entrez votre  nouveau pseudo : ").execute()
                 nouveau_pays = inquirer.text(message="Entrez votre nouveau pays : ").execute()
 
                 req = requests.put(
-                    f"{host}{END_POINT}/{joueur.id_joueur}/{nouveau_pseudo}/{nouveau_pays}")
+                    f"{host}{END_POINT}/{joueur.id_joueur}/{nouveau_pseudo}/{nouveau_pays}"
+                )
 
                 reponse = False
                 if req.status_code == 200:
@@ -87,6 +90,7 @@ class MenuJoueurVue(VueAbstraite):
 
             case "Tables":
                 from view.menu_table import MenuTable
+
                 return MenuTable()
 
             case "Se créditer":
@@ -98,17 +102,16 @@ class MenuJoueurVue(VueAbstraite):
                 credit = int(credit)
                 END_POINT = "/admin/crediter"
 
-                req = requests.put(
-                    f"{host}{END_POINT}/{joueur.pseudo}/{credit}")
+                req = requests.put(f"{host}{END_POINT}/{joueur.pseudo}/{credit}")
 
                 reponse = False
                 if req.status_code == 200:
                     reponse = req.json()
-                print(reponse)                
-                
+                print(reponse)
+
                 # Session().joueur = un truc mais je sais pas quoi
                 return MenuJoueurVue(Session().joueur)
-                
+
             case "Lire les regles":
                 texte = """
 1. Les cartes :
@@ -150,4 +153,4 @@ class MenuJoueurVue(VueAbstraite):
 
 Le but du poker est d'obtenir la meilleure main possible ou de convaincre les autres joueurs que vous avez la meilleure main pour les amener à se coucher.
 """
-                return MenuJoueurVue(texte)
+                return MenuJoueurVue(texte, input_attente=True)

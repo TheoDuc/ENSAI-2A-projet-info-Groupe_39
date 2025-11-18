@@ -1,6 +1,7 @@
-from InquirerPy import inquirer
 import os
+
 import requests
+from InquirerPy import inquirer
 
 from business_object.joueur import Joueur
 from view.session import Session
@@ -8,6 +9,7 @@ from view.vue_abstraite import VueAbstraite
 
 host = os.environ["HOST_WEBSERVICE"]
 END_POINT = "/joueur/connection"
+
 
 class ConnexionVue(VueAbstraite):
     """Vue de Connexion (saisie de pseudo et mdp)"""
@@ -33,11 +35,9 @@ class ConnexionVue(VueAbstraite):
             Session().connexion(joueur)
             from view.menu_joueur_vue import MenuJoueurVue
 
-            return MenuJoueurVue(message)
+            return MenuJoueurVue(message, temps_attente=1)
 
         message = "Erreur de connexion (pseudo innexistant, essayez de créer un compte.)"
         from view.accueil.accueil_vue import AccueilVue
 
-        return AccueilVue(message)
-
-
+        return AccueilVue(message, temps_attente=1)
