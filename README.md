@@ -1,8 +1,10 @@
-# ENSAI 2A - Projet Serveur Poker (Groupe 39)
+# 🎲 ENSAI 2A — Projet Serveur Poker (Groupe 39)
 
-Ce projet est un **serveur poker basé sur Python** organisé avec une **architecture en couches**. Il inclut à la fois une **interface en ligne de commande (CLI)** pour jouer interactivement et un **webservice** pour un accès programmatique.
+Ce projet a pour objectif de créer un **serveur de poker fonctionnel**, capable de gérer des tables et de faire jouer des parties de **Texas Hold’em**.  
+Les joueurs peuvent interagir avec le serveur via des requêtes **HTTP**, tandis que toutes les données importantes sont sauvegardées dans une base de données **PostgreSQL**.
 
-Il a été développé dans le cadre d'un **projet de 2ème année à l'ENSAI** et démontre tous les éléments clés d'une application professionnelle, incluant :
+L’application a été conçue pour être **modulaire et professionnelle**, grâce à une **architecture en couches** qui sépare clairement la logique métier, l’accès aux données et les interfaces utilisateur.  
+Cette organisation facilite non seulement la maintenance et l’évolution du serveur, mais permet également d’intégrer facilement des fonctionnalités supplémentaires, comme un CLI interactif et  un webservice accessible à distance. Le projet propose :
 
 - **Architecture en couches** : DAO, Service, Objet Métier, Vue
 - Connexion à une base de données **PostgreSQL**
