@@ -11,7 +11,7 @@ class MancheJoueurService:
     dao = MancheJoueurDAO()
 
     @log
-    def creer_manche_joueur(self, id_manche: int, info_manche) -> bool:
+    def sauvegarder_manche_joueur(self, id_manche: int, info_manche) -> bool:
         """Crée les participations des joueurs à une manche."""
         return self.MancheJoueurDAO().creer_manche_joueur(id_manche, info_manche)
 

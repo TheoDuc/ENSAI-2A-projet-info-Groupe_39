@@ -94,7 +94,7 @@ async def creer_joueur(j: JoueurModel):
         raise HTTPException(status_code=404, detail="Pseudo déjà utilisé")
 
     joueur = joueur_service.creer(j.pseudo, j.pays)
-    if not joueur:
+    if joueur == None:
         raise HTTPException(status_code=404, detail="Erreur lors de la création du joueur")
 
     return joueur
@@ -131,10 +131,6 @@ def supprimer_joueur(pseudo: str):
     joueur_service.supprimer(joueur)
     return f"Joueur {joueur.pseudo} supprimé"
 
-
-# les fonctions de room_services me semble pas fini ou bizarre
-
-
 class TableModel(BaseModel):
     """Définir un modèle Pydantic pour les Table"""
 
@@ -144,23 +140,27 @@ class TableModel(BaseModel):
     mode_jeu: int | None = None  # Champ optionnel
 
 
-# creer la table mais renvoie une erreur
+# fonctionne
 @app.post("/table/", tags=["Table"])
 async def creer_table(t: TableModel):
     """Créer une table"""
     logging.info("Créer une table")
 
     table = table_service.creer_table(t.joueur_max, t.grosse_blind)
-    return table
+    return TableModel(
+        numero_table=table.numero_table,
+        joueur_max=table.joueur_max,
+        grosse_blind=table.grosse_blind,
+        mode_jeu=table.mode_jeu)
 
 
-@app.put("/table/ajouter/{pseudo}", tags=["Table"])
-async def ajouter_joueur(pseudo):
+@app.put("/table/ajouter/{id_table}/{pseudo}", tags=["Table"])
+async def ajouter_joueur(id_table,pseudo):
     """ajoute un joueur a la table"""
     logging.info("ajoute un joueur a la table")
     joueur = joueur_service.trouver_par_pseudo(pseudo)
-    table_service.ajouter_joueur(joueur)
-    return f"le joueur {joueur.pseudo} a été ajouté à la table"
+    table_service.ajouter_joueur(id_table,joueur)
+    return f"le joueur {joueur.pseudo} a été ajouté à la table {table.numero_table}"
 
 
 @app.put("/table/retirer/{pseudo}", tags=["Table"])
@@ -172,10 +172,11 @@ async def retirer_un_joueur(pseudo):
     return f"le joueur {joueur.pseudo} a été retiré de la table"
 
 
-@app.delete("/table/", tags=["Table"])
-def supprimer_table(table: TableModel):
+@app.delete("/table/{numero_table}", tags=["Table"])
+def supprimer_table(numero_table):
     """Supprimer une table"""
     logging.info("Supprimer une table")
+    table = table_service.table_par_numero(numero_table=numero_table)
     table_service.supprimer(table)
     return f"Table {table.numero_table} supprimé"
 
@@ -187,12 +188,12 @@ async def rotation_dealer(table: TableModel):
     table_service.rotation_dealer(table)
     return "le dealer de la table tourné"
 
-
+# fonctionne
 @app.get("/table/", tags=["Table"])
 async def liste_tables():
     """liste les tables"""
     logging.info("liste les tables")
-    return table_service.liste_tables()
+    return table_service.affichages_tables()
 
 
 # peut etre créer un joueur model car aucune ne fonctionne avec un argument joueur
