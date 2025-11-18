@@ -143,36 +143,36 @@ python -m pytest -v
 ```
 
 
-### DAO Unit Tests
+### Tests unitaires DAO
 
-To ensure that tests are **repeatable, safe, and do not affect the real database**, we use a dedicated schema for unit testing.
+Pour garantir que les tests soient **répétables, sûrs et sans impact sur la base de données principale**, nous utilisons un **schéma dédié** pour les tests unitaires.
 
-- The DAO tests use sample data from `data/pop_db_test.sql`.
-- This data is loaded into a separate schema named `projet_test_dao` to prevent any impact on the main database.
+- Les tests DAO utilisent des données d’exemple provenant de `data/pop_db_test.sql`.
+- Ces données sont chargées dans un schéma séparé nommé `projet_test_dao`, afin de **préserver la base de données principale**.
 
 
+### Couverture des tests
 
-### Test Coverage
+Vous pouvez générer un rapport de couverture de code avec **Coverage** pour vérifier quelles parties du code sont testées.
 
-You can generate test coverage reports using Coverage
+#### Étapes
 
-- [ ] Run tests with coverage:
+1. Exécutez les tests avec Coverage :
 
 ```bash
 coverage run -m pytest
 ```
-- [ ] Display a coverage report in the terminal:
+2. Affichez un rapport de couverture directement dans le terminal :
 
 ```bash
 coverage report -m
 ```
-- [ ] Generate an HTML coverage report:
+3. Générez un rapport HTML détaillé :
 
 ```bash
 coverage html
 ```
-- [ ] Open `coverage_report/index.html` in your browser to view the results.
-
+- [ ] Ouvrez le ficher `coverage_report/index.html` dans votre navigateur pour visualiser les résultats.
 
 ## :arrow_forward: Launch the CLI Application
 
