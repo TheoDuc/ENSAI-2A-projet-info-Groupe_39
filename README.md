@@ -1,20 +1,18 @@
-# ENSAI 2A - Poker Server Project (Group 39)
+# ENSAI 2A - Projet Serveur Poker (Groupe 39)
 
-This project is a **Python-based poker server** organized with a **layered architecture**. It includes both a **command-line interface (CLI)** for interactive play and a **webservice** for programmatic access.
+Ce projet est un **serveur poker basé sur Python** organisé avec une **architecture en couches**. Il inclut à la fois une **interface en ligne de commande (CLI)** pour jouer interactivement et un **webservice** pour un accès programmatique.
 
-It was developed as part of a **2nd-year ENSAI project** and demonstrates all the key elements of a professional application, including:
+Il a été développé dans le cadre d'un **projet de 2ème année à l'ENSAI** et démontre tous les éléments clés d'une application professionnelle, incluant :
 
+- **Architecture en couches** : DAO, Service, Objet Métier, Vue
+- Connexion à une base de données **PostgreSQL**
+- Interface CLI avec InquirerPy
+- Création et consommation de webservice utilisant **FastAPI**
+- Journalisation (logging) avec décorateur et fichier de configuration
+- Tests unitaires et couverture de code
+- Pipeline **CI/CD** via GitHub Actions
 
-- **Layered architecture**: DAO, Service, Business Object, View
-- **PostgreSQL database** connection
-- CLI interface with InquirerPy
-- Webservice creation and consumption using **FastAPI**
-- Logging with decorator and configuration file
-- Unit tests and test coverage
-- **CI/CD pipeline** via GitHub Actions
-
-
-## :arrow_forward: Software and tools
+## :arrow_forward: Logiciels et outils
 
 - [Visual Studio Code](https://code.visualstudio.com/)
 - [Python 3.13](https://www.python.org/)
@@ -25,83 +23,76 @@ It was developed as part of a **2nd-year ENSAI project** and demonstrates all th
 - [pytest](https://docs.pytest.org/)
 - [Coverage](https://coverage.readthedocs.io/)
 
+## :arrow_forward: Cloner le dépôt
 
-## :arrow_forward: Clone the repository
-
-- [ ] Open VSCode
-- [ ] Open **Git Bash**
-- [ ] Clone the repo
+- [ ] Ouvrir VSCode
+- [ ] Ouvrir **Git Bash**
+- [ ] Cloner le dépôt
   - `git clone https://github.com/TheoDuc/ENSAI-2A-projet-info-Groupe_39`
 
+### Ouvrir le dossier du projet
 
-### Open the Project Folder
+- [ ] Lancer **Visual Studio Code**
+- [ ] Aller dans `Fichier > Ouvrir un dossier`
+- [ ] Sélectionner le dossier `ENSAI-2A-projet-info-Groupe_39`
+  - Ce dossier devrait être la **racine** de l'Explorateur VSCode.
+  - :warning: Si ce n'est pas le cas, l'application risque de ne pas démarrer. Dans ce cas, essayez de rouvrir le dossier.
 
-- [ ] Launch **Visual Studio Code**
-- [ ] Go to `File > Open Folder`
-- [ ] Select the folder `ENSAI-2A-projet-info-Groupe_39`
-  - This folder should be the **root** of your VSCode Explorer.
-  - :warning: If it is not, the application may not start. In that case, try opening the folder again.
+## Aperçu des fichiers du dépôt
 
-
-## Repository Files Overview
-
-| File / Item                | Description                                                                 |
+| Fichier / Élément          | Description                                                                 |
 | -------------------------- | --------------------------------------------------------------------------- |
-| `README.md`                | Contains all the information needed to understand, install, and use the project |
-| `LICENSE`                  | Defines the usage rights and licensing terms for this repository             |
+| `README.md`                | Contient toutes les informations nécessaires pour comprendre, installer et utiliser le projet |
+| `LICENSE`                  | Définit les droits d'usage et les termes de licence pour ce dépôt           |
 
-### Configuration Files
+### Fichiers de configuration
 
-This project includes several configuration files used to set up tools, workflows, and project parameters.  
+Ce projet inclut plusieurs fichiers de configuration utilisés pour configurer les outils, workflows et paramètres du projet.
 
-In most cases, **you do not need to modify these files**, except for:
+Dans la plupart des cas, **vous n'avez pas besoin de modifier ces fichiers**, sauf :
 
-- `.env` → to configure environment variables like database connection and webservice host  
-- `requirements.txt` → to manage Python dependencies
+- `.env` → pour configurer les variables d'environnement comme la connexion à la base de données et l'hôte du webservice
+- `requirements.txt` → pour gérer les dépendances Python
 
-| File                   | Description                                                                 |
+| Fichier                   | Description                                                                 |
 | ---------------------------- | --------------------------------------------------------------------------- |
-| `.github/workflows/ci.yml`   | GitHub Actions workflow for automated tasks such as testing, linting, and deployment |
-| `.vscode/settings.json`      | Project-specific Visual Studio Code settings                                 |
-| `.coveragerc`                | Configuration for test coverage reporting                                    |
-| `.gitignore`                 | Lists files and folders to exclude from version control                     |
-| `logging_config.yml`         | Configuration for logging, including log levels and formatting              |
-| `requirements.txt`           | List of Python packages required by the project                             |
-| `.env`                       | Environment variables for database, webservice, and other settings          |
+| `.github/workflows/ci.yml`   | Workflow GitHub Actions pour les tâches automatisées comme les tests, le linting et le déploiement |
+| `.vscode/settings.json`      | Paramètres spécifiques au projet pour Visual Studio Code                    |
+| `.coveragerc`                | Configuration pour le rapport de couverture de tests                        |
+| `.gitignore`                 | Liste les fichiers et dossiers à exclure du contrôle de version             |
+| `logging_config.yml`         | Configuration pour la journalisation, incluant les niveaux de log et le formatage |
+| `requirements.txt`           | Liste des packages Python requis par le projet                              |
+| `.env`                       | Variables d'environnement pour la base de données, le webservice et autres paramètres |
 
-> :information_source: Make sure to create and configure the `.env` file as described below before running the project.
+> :information_source: Assurez-vous de créer et configurer le fichier `.env` comme décrit ci-dessous avant d'exécuter le projet.
 
-### Project Folders
+### Dossiers du projet
 
-| Folder  | Description                                                                 |
+| Dossier | Description                                                                 |
 | ------------- | --------------------------------------------------------------------------- |
-| `data/`       | SQL scripts to initialize and populate the database                         |
-| `doc/`        | UML diagrams, design documents, and project-related documentation          |
-| `logs/`       | Log files generated during application or webservice execution             |
-| `src/`        | Python source code organized in a layered architecture (DAO, Service, BO, View) |
+| `data/`       | Scripts SQL pour initialiser et peupler la base de données                  |
+| `doc/`        | Diagrammes UML, documents de conception et documentation liée au projet    |
+| `logs/`       | Fichiers de log générés pendant l'exécution de l'application ou du webservice |
+| `src/`        | Code source Python organisé en architecture en couches (DAO, Service, BO, View) |
 
+### Fichiers de paramètres
 
+Ce projet inclut plusieurs fichiers de configuration utilisés pour configurer les outils, workflows et paramètres du projet.
 
-### Settings Files
+Dans la plupart des cas, **vous n'avez pas besoin de modifier ces fichiers**, sauf :
 
-This project includes several configuration files used to set up tools, workflows, and project parameters.  
+- `.env` → pour configurer les variables d'environnement comme la connexion à la base de données et l'hôte du webservice
+- `requirements.txt` → pour gérer les dépendances Python
 
-In most cases, **you do not need to modify these files**, except for:
+## :arrow_forward: Installer les packages requis
 
-- `.env` → to configure environment variables such as database connection and webservice host  
-- `requirements.txt` → to manage Python dependencies
-
-
-
-## :arrow_forward: Install Required Packages
-
-- [ ] Open Git Bash (or your terminal) and run the following commands to install all necessary packages and check the installed packages:
+- [ ] Ouvrir Git Bash (ou votre terminal) et exécuter les commandes suivantes pour installer tous les packages nécessaires et vérifier les packages installés :
 
 ```bash
-# Install packages from requirements.txt
+# Installer les packages depuis requirements.txt
 pip install -r requirements.txt
 
-# List installed packages
+# Lister les packages installés
 pip list
 
 ```
