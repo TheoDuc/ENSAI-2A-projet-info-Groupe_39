@@ -153,32 +153,31 @@ async def creer_table(t: TableModel):
         grosse_blind=table.grosse_blind,
         mode_jeu=table.mode_jeu)
 
-
-@app.put("/table/ajouter/{id_table}/{pseudo}", tags=["Table"])
-async def ajouter_joueur(id_table,pseudo):
+# fonctionne
+@app.put("/table/ajouter/{numero_table}/{pseudo}", tags=["Table"])
+async def ajouter_joueur(numero_table: int ,pseudo: str):
     """ajoute un joueur a la table"""
     logging.info("ajoute un joueur a la table")
     joueur = joueur_service.trouver_par_pseudo(pseudo)
-    table_service.ajouter_joueur(id_table,joueur)
-    return f"le joueur {joueur.pseudo} a été ajouté à la table {table.numero_table}"
+    table_service.ajouter_joueur(numero_table,joueur.id_joueur)
+    return f"le joueur {joueur.pseudo} a été ajouté à la table {numero_table}"
 
 
 @app.put("/table/retirer/{pseudo}", tags=["Table"])
-async def retirer_un_joueur(pseudo):
+async def retirer_un_joueur(pseudo:str):
     """retire un joueur a la table"""
     logging.info("retire un joueur a la table")
     joueur = joueur_service.trouver_par_pseudo(pseudo)
-    table_service.retirer_joueur(joueur)
+    table_service.retirer_joueur(joueur.id_joueur)
     return f"le joueur {joueur.pseudo} a été retiré de la table"
 
-
+#fonctionne
 @app.delete("/table/{numero_table}", tags=["Table"])
-def supprimer_table(numero_table):
+def supprimer_table(numero_table:int):
     """Supprimer une table"""
     logging.info("Supprimer une table")
-    table = table_service.table_par_numero(numero_table=numero_table)
-    table_service.supprimer(table)
-    return f"Table {table.numero_table} supprimé"
+    table_service.supprimer_table(numero_table)
+    return f"Table {numero_table} supprimé"
 
 
 @app.put("/table/rotation_dealer", tags=["Table"])

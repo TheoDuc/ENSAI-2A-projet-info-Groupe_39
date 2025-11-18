@@ -237,10 +237,11 @@ class Joueur:
         if self.table is None:
             raise Exception(f"Le joueur {self.pseudo} n'est actuellement à aucune table")
 
-        indice = indice = self.__table.joueurs.index(self)
+        indice = self.__table.joueurs.index(self)
         self.__table.retirer_joueur(indice)
+        table = self.table
         self.__table = None
-        logger.info(f"Le joueur {self.pseudo} a quitté sa table")
+        logger.info(f"Le joueur {self.pseudo} a quitté sa table {table.numero_table}")
 
     @log
     def changer_pseudo(self, pseudo: str) -> None:
