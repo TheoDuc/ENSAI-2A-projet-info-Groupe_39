@@ -1,13 +1,13 @@
-import pytest
+"""Implémentation des tests pour la classe MancheDAO"""
 
-from utils.reset_database import ResetDatabase
-from dao.manche_dao import MancheDao
-from business_object.joueur import Joueur
 from business_object.info_manche import InfoManche
+from business_object.joueur import Joueur
 from business_object.manche import Manche
+from dao.manche_dao import MancheDao
+from utils.reset_database import ResetDatabase
+
 
 class TestMancheDao:
-
     def creer_manche(self):
         # Crée une instance de Manche prête à être utilisée
         joueur1 = Joueur(1, "paul", 100, "fr")
@@ -20,19 +20,19 @@ class TestMancheDao:
         manche.river()
         return manche
 
-    def test_creer_succes(self):
+    def test_sauvegarder_succes(self):
         if ResetDatabase().lancer(True):
             # GIVEN
             mancheDao = MancheDao()
             manche = self.creer_manche()
 
             # WHEN
-            resultat = mancheDao.creer(manche)
+            resultat = mancheDao.sauvegarder(manche)
 
             # THEN
-            assert resultat is True
+            assert resultat > 0
 
-    def test_creer_echec(self):
+    def test_sauvegarder_echec(self):
         if ResetDatabase().lancer(True):
             # GIVEN
             mancheDao = MancheDao()
@@ -44,18 +44,17 @@ class TestMancheDao:
             # on ne va PAS jusqu’à river -> cartes incomplètes
 
             # WHEN
-            resultat = mancheDao.creer(manche)
+            resultat = mancheDao.sauvegarder(manche)
 
             # THEN
-            assert resultat is False
-
+            assert resultat is None
 
     def test_supprimer_succes(self):
         if ResetDatabase().lancer(True):
             # GIVEN
             mancheDao = MancheDao()
             manche = self.creer_manche()
-            mancheDao.creer(manche)
+            mancheDao.sauvegarder(manche)
 
             # WHEN
             resultat = mancheDao.supprimer(manche)

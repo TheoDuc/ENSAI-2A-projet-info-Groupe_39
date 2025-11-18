@@ -1,12 +1,15 @@
-import pytest
+"""Implémenation des tests de la classe MancheJoueurDAO"""
+
 from unittest.mock import MagicMock, patch
-from dao.manche_joueur_dao import MancheJoueurDAO
+
+import pytest
+
 from business_object.info_manche import InfoManche
 from business_object.joueur import Joueur
+from dao.manche_joueur_dao import MancheJoueurDAO
 
 
 class TestMancheJoueurDAO:
-
     @pytest.fixture
     def setup_data(self):
         dao = MancheJoueurDAO()
@@ -15,14 +18,13 @@ class TestMancheJoueurDAO:
         j2 = Joueur(id_joueur=2, pseudo="Bob", credit=800, pays="Belgique")
 
         info = InfoManche([j1, j2])
-        info.modifier_mise(0, 100)          # Alice mise 100
-        info.modifier_tour_couche(1, 2)     # Bob s'est couché au tour 2
+        info.modifier_mise(0, 100)
+        info.modifier_tour_couche(1, 2)
 
         return dao, info
 
         return dao, info
 
-    # ---------------------------------------------------------
     @patch("dao.manche_joueur_dao.DBConnection")
     def test_creer_manche_joueur_succes(self, mock_db, setup_data):
         dao, info_manche = setup_data
@@ -38,7 +40,6 @@ class TestMancheJoueurDAO:
         assert result is True
         assert mock_cursor.execute.call_count == 2
 
-    # ---------------------------------------------------------
     @patch("dao.manche_joueur_dao.DBConnection")
     def test_creer_manche_joueur_exception(self, mock_db, setup_data):
         dao, info_manche = setup_data
@@ -49,7 +50,6 @@ class TestMancheJoueurDAO:
 
         assert result is False
 
-    # ---------------------------------------------------------
     @patch("dao.manche_joueur_dao.DBConnection")
     def test_trouver_par_ids(self, mock_db, setup_data):
         dao, _ = setup_data
@@ -78,7 +78,6 @@ class TestMancheJoueurDAO:
         assert result[0]["id_joueur"] == 1
         mock_cursor.execute.assert_called_once()
 
-    # ---------------------------------------------------------
     @patch("dao.manche_joueur_dao.DBConnection")
     def test_supprimer_par_id_manche(self, mock_db, setup_data):
         dao, _ = setup_data
@@ -95,7 +94,6 @@ class TestMancheJoueurDAO:
         assert result is True
         mock_cursor.execute.assert_called_once()
 
-    # ---------------------------------------------------------
     @patch("dao.manche_joueur_dao.DBConnection")
     def test_supprimer_participation(self, mock_db, setup_data):
         dao, _ = setup_data
@@ -111,4 +109,3 @@ class TestMancheJoueurDAO:
 
         assert result is True
         mock_cursor.execute.assert_called_once()
-

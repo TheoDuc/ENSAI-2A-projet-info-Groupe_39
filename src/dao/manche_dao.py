@@ -1,4 +1,4 @@
-"""Implémentation de la classe JoueurDAO"""
+"""Implémentation de la classe MancheDAO"""
 
 import logging
 
@@ -11,7 +11,7 @@ class MancheDao(metaclass=Singleton):
     """Classe contenant les méthodes pour accéder à la table Manche de la base de données"""
 
     @log
-    def creer(self, manche) -> bool:
+    def sauvegarder(self, manche) -> int:
         """
         Creation d'une manche dans la base de données
 
@@ -22,8 +22,8 @@ class MancheDao(metaclass=Singleton):
 
         Renvois
         -------
-        bool
-            True si la création est un succès, False sinon
+        int
+            l'identifiant de la manche nouvellement créée
         """
 
         res = None
@@ -48,11 +48,10 @@ class MancheDao(metaclass=Singleton):
         except Exception as e:
             logging.info(e)
 
-        created = False
         if res:
-            created = True
+            return res["id_manche"]
 
-        return created
+        return None
 
     @log
     def supprimer(self, manche) -> bool:

@@ -1,8 +1,9 @@
 """Implémentation de la classe TableService"""
 
-from business_object.manche import Manche
 from business_object.table import Table
 from service.joueur_service import JoueurService
+from service.manche_joueur_service import MancheJoueurService
+from service.manche_service import MancheService
 from utils.log_decorator import log
 
 
@@ -14,26 +15,42 @@ class TableService:
     - Gestion du déroulement des manches
     """
 
-    tables: list[Table] = []
+    __tables: list[Table] = []
     compteur_tables: int = 0
 
     def liste_tables(self) -> list[Table]:
+        """Liste l'ensemble des tables disponibles"""
+        return self.__tables
+
+    def affichages_tables(self) -> list[str]:
+        """Affichage de l'ensemble des tables créées"""
+        return [str(table) for table in self.__tables]
+
+    def table_par_numero(self, numero_table: int) -> Table:
         """
-        Ajoute un joeuur à une table
+        Renvoie la table correspondant au numéro si elle existe
 
         Paramètres
         ----------
-        ...
+        numero_table : int
+            le numéro de la table recherchée
 
         Renvois
         -------
-        ...
-        """
-        return self.tables
+        Table
+            la table recherchée si elle existe
 
-    def table_par_numero(self, numero_table: int) -> Table:
-        """Blabla"""
-        pass
+        Exceptions
+        ----------
+        ValueError
+            si aucune table n'est trouvée avec ce numéro
+        """
+
+        for table in self.__tables:
+            if table.numero_table == numero_table:
+                return table
+
+        raise ValueError(f"Aucune table existante ne porte le numéro {numero_table}")
 
     @log
     def creer_table(self, joueur_max: int, grosse_blind: int, mode_jeu: int = 1) -> Table:
@@ -65,27 +82,30 @@ class TableService:
             mode_jeu=mode_jeu,
         )
 
-        self.tables.append(table)
+        self.__tables.append(table)
         return table
 
     @log
-    def supprimer_table(self, table: Table) -> None:
+    def supprimer_table(self, numero_table: int) -> None:
         """
-        Ajoute un joeuur à une table
+        Supprime une table
 
         Paramètres
         ----------
-        ...
+        numero_table : int
+            le numéro de la table à supprimer
 
         Renvois
         -------
-        ...
+        None
         """
+
+        table = self.table_par_numero(numero_table)
 
         for joueur in list(table.joueurs):
             joueur.quitter_table()
         if table in self.tables:
-            self.tables.remove(table)
+            self.__tables.remove(table)
 
     @log
     def ajouter_joueur(self, numero_table: int, id_joueur: int) -> None:
@@ -94,11 +114,14 @@ class TableService:
 
         Paramètres
         ----------
-        ...
+        numero_table : int
+            le numéro de la table où ajouter un joueur
+        id_joueur : int
+            l'identifiant du joueur à ajouter à la table
 
         Renvois
         -------
-        ...
+        None
         """
 
         joueur = JoueurService().trouver_par_id(id_joueur)
@@ -113,88 +136,54 @@ class TableService:
 
         Paramètres
         ----------
-        ...
+        id_joueur : int
+            l'identifiant du joueur à retirer de sa table
 
         Renvois
         -------
-        ...
+        None
         """
 
         joueur = JoueurService().trouver_par_id(id_joueur)
 
         joueur.quitter_table()
 
-    def affichages_tables(self) -> list[str]:
+    @log
+    def lancer_manche(self, numero_table: int) -> None:
         """
         Ajoute un joeuur à une table
 
         Paramètres
         ----------
-        ...
+        numero_table : int
+            le numéro de la table où lancer la manche
 
         Renvois
         -------
-        ...
+        None
         """
 
-        return [str(table) for table in self.tables]
+        table = self.table_par_numero(numero_table)
+
+        table.nouvelle_manche()
 
     @log
-    def jouer(self, table: Table) -> None:
+    def terminer_manche(self, numero_table: int) -> None:
         """
         Ajoute un joeuur à une table
 
         Paramètres
         ----------
-        ...
+        numero_table : int
+            le numéro de la table où lancer la manche
 
         Renvois
         -------
-        ...
+        None
         """
 
-        if len(table.joueurs) < 2:
-            raise ValueError("Impossible de démarrer une manche avec moins de deux joueurs.")
-        # Réinitialisation des joueurs pour la manche
-        for joueur in table.joueurs:
-            joueur.est_actif = True
-            joueur.a_checke = False
-            joueur.est_couche = False
-            joueur.all_in = False
+        table = self.table_par_numero(numero_table)
 
-        # Création et initialisation de la manche
-        table.nouvelle_manche()
-        manche: Manche = table.manche
-
-        # Phases du jeu
-        for phase in ["preflop", "flop", "turn", "river"]:
-            getattr(manche, phase)()
-            print(f" Phase {phase.capitalize()} terminée")
-
-            # Boucle sur les joueurs actifs
-            while not manche.fin_du_tour():
-                for i in range(len(table.joueurs)):
-                    if not joueur.est_actif:
-                        continue  # Passe les joueurs couchés ou all-in
-
-                    print(f"Votre main est : {manche.info.mains[i]}")
-                    print(f"Le board est : {manche.board}")
-
-                    action = self.demander_action(joueur, table)
-                    montant = self.demander_montant(action, joueur, table)
-
-                    try:
-                        self.action_joueur(table, joueur, action, montant)
-                    except ValueError as e:
-                        print(f"Erreur : {e}")
-                        continue
-
-        # Distribution du pot
-
-        gains = manche.distribuer_pot()
-        for pseudo, montant in gains.items():
-            print(f"{pseudo} reçoit {montant} crédits")
-
-        # Rotation du dealer
-        self.rotation_dealer(table)
-        print("--- Manche terminée ---")
+        id_manche = MancheService().creer_manche(table.manche)
+        MancheJoueurService().creer_manche_joueur(id_manche, table.manche.info)
+        table.rotation_dealer()

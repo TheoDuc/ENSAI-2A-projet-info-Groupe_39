@@ -52,12 +52,14 @@ def debiter(pseudo, montant: int):
     credit_service.debiter(joueur, montant)
     return f"l'admin a bien debiter {montant} à {joueur}"
 
+
 # fonctionne
 @app.get("/joueur/connection/{pseudo}", tags=["Joueurs"])
-async def joueur_connection(pseudo:str):
+async def joueur_connection(pseudo: str):
     """Connecte le joueur"""
     logging.info("Connecte le joueur")
     return joueur_service.se_connecter(pseudo)
+
 
 # fonctionne
 @app.get("/joueur/liste/", tags=["Joueurs"])
