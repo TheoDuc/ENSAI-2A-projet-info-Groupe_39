@@ -205,34 +205,36 @@ Vous pouvez tester les endpoints avec un client comme **Insomnia**, **Postman**,
 
 > 💡 Astuce : FastAPI fournit une documentation interactive à l’adresse `/docs` lorsque le serveur est lancé.
 
-## :arrow_forward: Logs
+## :arrow_forward: Journalisation (Logs)
 
-Logging is initialized in the `src/utils/log_init.py` module:
+La journalisation est initialisée dans le module `src/utils/log_init.py` :
 
-- This setup runs whenever the CLI application or webservice is started.
-- It uses the `logging_config.yml` file for configuration.
-  - To change the log level, modify the `level` tag in the configuration file.
+- Cette configuration est exécutée automatiquement au démarrage de l’application CLI ou du webservice.
+- Elle utilise le fichier `logging_config.yml` pour définir le format et le niveau des logs.
+  - Pour changer le niveau de log, modifiez la valeur de `level` dans ce fichier.
 
-A decorator is available in `src/utils/log_decorator.py`.
+Un **décorateur** est également disponible dans `src/utils/log_decorator.py` :
 
-- When applied to a method, it automatically logs:
-  - The input parameters
-  - The output of the method
+- Lorsqu’il est appliqué à une fonction ou méthode, il enregistre automatiquement :
+  - Les paramètres d’entrée
+  - La valeur de retour
 
-All logs are saved in the `logs/` folder for review.
+Tous les logs sont sauvegardés dans le dossier `logs/` pour consultation et analyse.
 
-Example of logs :
+### Exemple de logs
+
+
 
 ```
 18/11/2025 19:11:34 - INFO     - AccueilVue
 18/11/2025 19:11:51 - INFO     - ConnexionVue
 18/11/2025 19:11:54 - INFO     - Connecte le joueur
-18/11/2025 19:11:54 - INFO     -     JoueurService.se_connecter('amala',) - DEBUT
-18/11/2025 19:11:54 - INFO     -         JoueurDao.se_connecter('amala',) - DEBUT
-18/11/2025 19:11:54 - INFO     -         JoueurDao.se_connecter('amala',) - FIN
-18/11/2025 19:11:54 - INFO     -            └─> Sortie : amala : 2000 crédits
-18/11/2025 19:11:54 - INFO     -     JoueurService.se_connecter('amala',) - FIN
-18/11/2025 19:11:54 - INFO     -        └─> Sortie : amala : 2000 crédits
+18/11/2025 19:11:54 - INFO     -     JoueurService.se_connecter('marine',) - DEBUT
+18/11/2025 19:11:54 - INFO     -         JoueurDao.se_connecter('marine',) - DEBUT
+18/11/2025 19:11:54 - INFO     -         JoueurDao.se_connecter('marine',) - FIN
+18/11/2025 19:11:54 - INFO     -            └─> Sortie : marine : 2000 crédits
+18/11/2025 19:11:54 - INFO     -     JoueurService.se_connecter('marine',) - FIN
+18/11/2025 19:11:54 - INFO     -        └─> Sortie : marine : 2000 crédits
 18/11/2025 19:11:54 - INFO     - MenuJoueurVue
 18/11/2025 19:12:02 - INFO     - Liste tous les joueurs
 18/11/2025 19:12:02 - INFO     - MenuJoueurVue
@@ -240,12 +242,12 @@ Example of logs :
 18/11/2025 19:13:20 - INFO     - AccueilVue
 18/11/2025 19:14:05 - INFO     - ConnexionVue
 18/11/2025 19:14:08 - INFO     - Connecte le joueur
-18/11/2025 19:14:08 - INFO     -     JoueurService.se_connecter('amala',) - DEBUT
-18/11/2025 19:14:08 - INFO     -         JoueurDao.se_connecter('amala',) - DEBUT
-18/11/2025 19:14:08 - INFO     -         JoueurDao.se_connecter('amala',) - FIN
-18/11/2025 19:14:08 - INFO     -            └─> Sortie : amala : 2000 crédits
-18/11/2025 19:14:08 - INFO     -     JoueurService.se_connecter('amala',) - FIN
-18/11/2025 19:14:08 - INFO     -        └─> Sortie : amala : 2000 crédits
+18/11/2025 19:14:08 - INFO     -     JoueurService.se_connecter('marine',) - DEBUT
+18/11/2025 19:14:08 - INFO     -         JoueurDao.se_connecter('marine',) - DEBUT
+18/11/2025 19:14:08 - INFO     -         JoueurDao.se_connecter('marine',) - FIN
+18/11/2025 19:14:08 - INFO     -            └─> Sortie : marine : 2000 crédits
+18/11/2025 19:14:08 - INFO     -     JoueurService.se_connecter('marine',) - FIN
+18/11/2025 19:14:08 - INFO     -        └─> Sortie : marine : 2000 crédits
 18/11/2025 19:14:08 - INFO     - MenuJoueurVue
 18/11/2025 19:14:12 - INFO     - MenuJoueurVue
 18/11/2025 19:14:26 - INFO     - MenuJoueurVue
