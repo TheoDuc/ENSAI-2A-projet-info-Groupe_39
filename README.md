@@ -87,13 +87,18 @@ Dans la plupart des cas, **vous n'avez pas besoin de modifier ces fichiers**, sa
 
 ## :arrow_forward: Installer les packages requis
 
-- [ ] Ouvrir Git Bash (ou votre terminal) et exécuter les commandes suivantes pour installer tous les packages nécessaires et vérifier les packages installés :
+Pour que le projet fonctionne correctement, vous devez installer toutes les dépendances Python nécessaires.
+
+### Étapes
+
+1. Ouvrez votre terminal (Git Bash, PowerShell, ou autre).
+2. Installez les packages listés dans `requirements.txt` :
 
 ```bash
-# Installer les packages depuis requirements.txt
 pip install -r requirements.txt
-
-# Lister les packages installés
+```
+3. Vérifiez que les packages ont bien été installés
+```bash
 pip list
 
 ```
@@ -108,7 +113,7 @@ Pour que votre application Python fonctionne correctement, vous devez définir c
 
 ```env
 # Adresse du webservice
-WEBSERVICE_HOST=à compléter
+WEBSERVICE_HOST=https://user-cheikna-966547-user.user.lab.sspcloud.fr/docs#/
 
 # Configuration de la base de données PostgreSQL
 POSTGRES_HOST=sgbd-eleves.domensai.ecole
