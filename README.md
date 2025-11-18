@@ -256,18 +256,3 @@ Tous les logs sont sauvegardés dans le dossier `logs/` pour consultation et ana
 
 
 
-## :arrow_forward: Continuous Integration (CI)
-
-This repository includes a CI workflow defined in `.github/workflows/main.yml`.
-
-Whenever you *push* changes to GitHub, it triggers a pipeline that performs the following steps:
-
-- Creates a container based on an Ubuntu (Linux) image
-  - Essentially, this sets up a virtual machine with only the Linux kernel.
-- Installs Python
-- Installs the required packages
-- Runs the unit tests (only service tests, as DAO tests are more complex to run)
-- Analyzes the code using *pylint*
-  - If the pylint score is below 7.5, the step will fail
-
-You can monitor the pipeline's progress on your repository's GitHub page under the *Actions* tab.
