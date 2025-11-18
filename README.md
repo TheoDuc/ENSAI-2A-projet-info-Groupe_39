@@ -1,4 +1,4 @@
-# 🎲 ENSAI 2A — Projet Serveur Poker (Groupe 39)
+# 🎲 ENSAI 2A — Projet Serveur de Poker (Groupe 39)
 
 Ce projet a pour objectif de créer un **serveur de poker fonctionnel**, capable de gérer des tables et de faire jouer des parties de **Texas Hold’em**.  
 Les joueurs peuvent interagir avec le serveur via des requêtes **HTTP**, tandis que toutes les données importantes sont sauvegardées dans une base de données **PostgreSQL**.
@@ -189,14 +189,21 @@ python src/main.py
   - Cela exécutera le script `src/utils/reset_database.py`.
   - Le script initialise la base de données en exécutant les fichiers SQL présents dans le dossier `data/`.
 
-## :arrow_forward: Launch the webservice
+## :arrow_forward: Lancer le Webservice
+
+Le webservice permet d’interagir avec le serveur de poker via des requêtes **HTTP**.  
+Vous pouvez tester les endpoints avec un client comme **Insomnia**, **Postman**, ou même directement depuis un navigateur pour certaines requêtes GET.
+
+### Exemples d’Endpoints
+
+- `/create` : créer une nouvelle partie et ajouter des joueurs
 
 
-### Endpoints
+- `/start` : démarrer une partie
+- `/state` : récupérer l’état actuel de la partie
+- `/fold/{player_id}` : faire passer un joueur
 
-Examples of endpoints (to be tested, for example, with *Insomnia* or a browser):
-
-
+> 💡 Astuce : FastAPI fournit une documentation interactive à l’adresse `/docs` lorsque le serveur est lancé.
 
 ## :arrow_forward: Logs
 
@@ -216,7 +223,34 @@ All logs are saved in the `logs/` folder for review.
 
 Example of logs :
 
-
+```
+18/11/2025 19:11:34 - INFO     - AccueilVue
+18/11/2025 19:11:51 - INFO     - ConnexionVue
+18/11/2025 19:11:54 - INFO     - Connecte le joueur
+18/11/2025 19:11:54 - INFO     -     JoueurService.se_connecter('amala',) - DEBUT
+18/11/2025 19:11:54 - INFO     -         JoueurDao.se_connecter('amala',) - DEBUT
+18/11/2025 19:11:54 - INFO     -         JoueurDao.se_connecter('amala',) - FIN
+18/11/2025 19:11:54 - INFO     -            └─> Sortie : amala : 2000 crédits
+18/11/2025 19:11:54 - INFO     -     JoueurService.se_connecter('amala',) - FIN
+18/11/2025 19:11:54 - INFO     -        └─> Sortie : amala : 2000 crédits
+18/11/2025 19:11:54 - INFO     - MenuJoueurVue
+18/11/2025 19:12:02 - INFO     - Liste tous les joueurs
+18/11/2025 19:12:02 - INFO     - MenuJoueurVue
+18/11/2025 19:12:53 - INFO     - AccueilVue
+18/11/2025 19:13:20 - INFO     - AccueilVue
+18/11/2025 19:14:05 - INFO     - ConnexionVue
+18/11/2025 19:14:08 - INFO     - Connecte le joueur
+18/11/2025 19:14:08 - INFO     -     JoueurService.se_connecter('amala',) - DEBUT
+18/11/2025 19:14:08 - INFO     -         JoueurDao.se_connecter('amala',) - DEBUT
+18/11/2025 19:14:08 - INFO     -         JoueurDao.se_connecter('amala',) - FIN
+18/11/2025 19:14:08 - INFO     -            └─> Sortie : amala : 2000 crédits
+18/11/2025 19:14:08 - INFO     -     JoueurService.se_connecter('amala',) - FIN
+18/11/2025 19:14:08 - INFO     -        └─> Sortie : amala : 2000 crédits
+18/11/2025 19:14:08 - INFO     - MenuJoueurVue
+18/11/2025 19:14:12 - INFO     - MenuJoueurVue
+18/11/2025 19:14:26 - INFO     - MenuJoueurVue
+18/11/2025 19:14:53 - INFO     - Modifier un joueur
+```
 
 
 
