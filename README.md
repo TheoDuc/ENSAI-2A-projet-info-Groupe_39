@@ -12,7 +12,6 @@ Cette organisation facilite non seulement la maintenance et l’évolution du se
 - Création et consommation de webservice utilisant **FastAPI**
 - Journalisation (logging) avec décorateur et fichier de configuration
 - Tests unitaires et couverture de code
-- Pipeline **CI/CD** via GitHub Actions
 
 ## :arrow_forward: Logiciels et outils
 
@@ -98,27 +97,27 @@ pip install -r requirements.txt
 pip list
 
 ```
-## :arrow_forward: Environment Variables
+## :arrow_forward: Variables d'environnement
 
-You need to define environment variables to configure the database and webservice that your Python application will connect to.
+Pour que votre application Python fonctionne correctement, vous devez définir certaines **variables d’environnement** afin de configurer la connexion à la base de données et au webservice.
 
-At the root of the project:
+### Étapes
 
-- [ ] Create a file named `.env`
-- [ ] Copy and fill in the following variables:
+1. À la racine du projet, créez un fichier nommé `.env`.
+2. Copiez-y les variables suivantes et complétez-les avec vos informations :
 
 ```env
-# Webservice host
-WEBSERVICE_HOST= à completer
+# Adresse du webservice
+WEBSERVICE_HOST=à compléter
 
-# PostgreSQL database configuration
+# Configuration de la base de données PostgreSQL
 POSTGRES_HOST=sgbd-eleves.domensai.ecole
 POSTGRES_PORT=5432
 POSTGRES_DATABASE=idxxxx
 POSTGRES_USER=idxxxx
 POSTGRES_PASSWORD=idxxxx
 POSTGRES_SCHEMA=projet
-
+HOST_WEBSERVICE=https://xxx.fr
 ```
 ## :arrow_forward: Unit Tests
 
