@@ -124,16 +124,22 @@ POSTGRES_PASSWORD=idxxxx
 POSTGRES_SCHEMA=projet
 HOST_WEBSERVICE=https://xxx.fr
 ```
-## :arrow_forward: Unit Tests
+## :arrow_forward: Tests unitaires
 
-- [ ] Open Git Bash (or your terminal) and run the unit tests:
+Pour vérifier que toutes les fonctionnalités du projet fonctionnent correctement, vous pouvez exécuter les tests unitaires fournis.
+
+### Étapes
+
+1. Ouvrez votre terminal (Git Bash, PowerShell, ou autre).
+2. Lancez les tests avec `pytest` :
 
 ```bash
-# Standard command
+# Commande standard
 pytest -v
 
-# If pytest is not in your PATH
+# Si pytest n'est pas dans votre PATH
 python -m pytest -v
+
 ```
 
 
