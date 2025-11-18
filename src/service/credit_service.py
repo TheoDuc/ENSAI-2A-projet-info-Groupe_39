@@ -6,12 +6,15 @@ from business_object.joueur import Joueur
 from dao.joueur_dao import JoueurDao
 from service.joueur_service import JoueurService
 
+from utils.log_decorator import log
+
 logger = logging.getLogger(__name__)
 
 
 class CreditService:
     """Service de gestion des crédits des joueurs"""
 
+    @log
     def crediter(self, joueur: Joueur, montant: int) -> None:
         """
         Crédite un joueur dans la RAM et dans la DAO
@@ -48,6 +51,7 @@ class CreditService:
             logger.error(f"Échec du crédit pour {joueur.pseudo} : {e}")
             raise Exception(f"Échec du crédit pour {joueur.pseudo} : {e}")
 
+    @log
     def debiter(self, id_joueur: int, montant: int) -> None:
         """
         Crédite un joueur dans la RAM et dans la DAO

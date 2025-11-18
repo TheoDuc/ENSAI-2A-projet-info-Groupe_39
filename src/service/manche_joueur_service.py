@@ -1,7 +1,8 @@
-from logs.logger import log
+"""Implémentation de la classe MancheJoeuurService"""
 
 from business_object.joueur import Joueur
 from dao.manche_joueur_dao import MancheJoueurDAO
+from utils.log_decorator import log
 
 
 class MancheJoueurService:
