@@ -73,7 +73,7 @@ class TableService:
         """
 
         self.compteur_tables += 1
-        numero = TableService.compteur_tables
+        numero = self.compteur_tables
 
         table = Table(
             numero_table=numero,
