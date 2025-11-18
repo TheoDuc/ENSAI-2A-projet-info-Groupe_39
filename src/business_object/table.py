@@ -122,7 +122,9 @@ class Table:
             raise ValueError("Nombre maximum de joueurs atteint")
 
         self.__joueurs.append(joueur)
-        logger.info(f"{joueur.pseudo} rejoint la table ({len(self.joueurs)}/{self.joueur_max})")
+        logger.info(
+            f"{joueur.pseudo} rejoint la table {self.numero_table} ({len(self.joueurs)}/{self.joueur_max})"
+        )
 
     @log
     def retirer_joueur(self, indice: int) -> Joueur:
