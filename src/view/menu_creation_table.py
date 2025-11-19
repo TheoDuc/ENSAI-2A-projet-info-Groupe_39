@@ -1,8 +1,13 @@
+import os
+
+import requests
 from InquirerPy import inquirer
 
 from business_object.table import Table
-from service.table_service import TableService
 from view.vue_abstraite import VueAbstraite
+
+host = os.environ["HOST_WEBSERVICE"]
+END_POINT = "/table/"
 
 
 class MenuCreationTable(VueAbstraite):
@@ -22,12 +27,17 @@ class MenuCreationTable(VueAbstraite):
         ).execute()
         grosse_blind = int(grosse_blind)
 
-        # Appel du service pour créer la table
-        table = TableService().creer_table(joueur_max, grosse_blind)
+        table = {
+            "numero_table": 0,
+            "joueur_max": joueur_max,
+            "grosse_blind": grosse_blind,
+            "mode_jeu": 0,
+        }
+        req = requests.post(f"{host}{END_POINT}", json=table)
 
         # Si le joueur a été créé
-        if table is not None:
-            message = f"Votre table a été créé (n°{table.numero_table}). Vous pouvez maintenant la rejoindre"
+        if req.status_code == 200:
+            message = "Votre table a été créé. Vous pouvez maintenant la rejoindre"
         else:
             message = "Erreur de création de la table (les paramètres de la table sont incorrects)"
 

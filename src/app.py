@@ -131,6 +131,7 @@ def supprimer_joueur(pseudo: str):
     joueur_service.supprimer(joueur)
     return f"Joueur {joueur.pseudo} supprimé"
 
+
 class TableModel(BaseModel):
     """Définir un modèle Pydantic pour les Table"""
 
@@ -151,20 +152,22 @@ async def creer_table(t: TableModel):
         numero_table=table.numero_table,
         joueur_max=table.joueur_max,
         grosse_blind=table.grosse_blind,
-        mode_jeu=table.mode_jeu)
+        mode_jeu=table.mode_jeu,
+    )
+
 
 # fonctionne
 @app.put("/table/ajouter/{numero_table}/{pseudo}", tags=["Table"])
-async def ajouter_joueur(numero_table: int ,pseudo: str):
+async def ajouter_joueur(numero_table: int, pseudo: str):
     """ajoute un joueur a la table"""
     logging.info("ajoute un joueur a la table")
     joueur = joueur_service.trouver_par_pseudo(pseudo)
-    table_service.ajouter_joueur(numero_table,joueur.id_joueur)
+    table_service.ajouter_joueur(numero_table, joueur.id_joueur)
     return f"le joueur {joueur.pseudo} a été ajouté à la table {numero_table}"
 
 
 @app.put("/table/retirer/{pseudo}", tags=["Table"])
-async def retirer_un_joueur(pseudo:str):
+async def retirer_un_joueur(pseudo: str):
     """retire un joueur a la table"""
     logging.info("retire un joueur a la table")
     joueur = joueur_service.trouver_par_pseudo(pseudo)
@@ -173,9 +176,10 @@ async def retirer_un_joueur(pseudo:str):
     table_service.retirer_joueur(joueur)
     return f"le joueur {joueur.pseudo} a été retiré de la table"
 
-#fonctionne
+
+# fonctionne
 @app.delete("/table/{numero_table}", tags=["Table"])
-def supprimer_table(numero_table:int):
+def supprimer_table(numero_table: int):
     """Supprimer une table"""
     logging.info("Supprimer une table")
     table_service.supprimer_table(numero_table)
@@ -189,21 +193,24 @@ async def liste_tables():
     logging.info("liste les tables")
     return table_service.affichages_tables()
 
+
 # fonctionne
 @app.get("/table/lancer/{numero_table}", tags=["Table"])
-async def lancer_manche(numero_table:int):
+async def lancer_manche(numero_table: int):
     """lance une manche"""
     logging.info("lance une manche")
     table_service.lancer_manche(numero_table=numero_table)
     return f"la manche est lancé sur la table {numero_table}"
 
+
 # fonctionne
 @app.get("/table/terminer/{numero_table}", tags=["Table"])
-async def terminer_manche(numero_table:int):
+async def terminer_manche(numero_table: int):
     """termine une manche"""
     logging.info("termine une manche")
     table_service.terminer_manche(numero_table=numero_table)
     return f"la manche est terminé sur la table {numero_table}"
+
 
 @app.get("/action/{pseudo}", tags=["Action"])
 async def manche_joueur(pseudo: str):

@@ -1,10 +1,15 @@
 """Menu des tables"""
 
+import os
+
+import requests
 from InquirerPy import inquirer
 
-from service.table_service import TableService
 from view.session import Session
 from view.vue_abstraite import VueAbstraite
+
+host = os.environ["HOST_WEBSERVICE"]
+END_POINT = "/table/"
 
 
 class MenuTable(VueAbstraite):
@@ -12,7 +17,8 @@ class MenuTable(VueAbstraite):
 
     def choisir_menu(self):
         action_table = ["Retour au Menu Joueur", "Créer une Table"]
-        boutons_tables = TableService().affichages_tables()
+        reponse = requests.get(f"{host}{END_POINT}")
+        boutons_tables = reponse.json()
         action_table += boutons_tables
 
         choix = inquirer.select(
@@ -31,10 +37,16 @@ class MenuTable(VueAbstraite):
             return MenuCreationTable()
 
         if choix in boutons_tables:
-            table = TableService().table_par_affichage(choix)
+            table = None  # je sais pas comment récupérer la table
 
-            TableService().ajouter_joueur(table.numero_table, Session().joueur.id_joueur)
+            numero_table = table.numero_table
+            pseudo = Session().joueur.pseudo
 
+            req = requests.put(f"{host}{END_POINT}/ajouter/{numero_table}/{pseudo}")
+
+            if req.status_code != 200:
+                message = "La connexion à la table n'a pas fonctionné"
+                return MenuJoueurVue(message)
             from view.game_menu_view import GameMenu
 
             return GameMenu()
