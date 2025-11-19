@@ -68,7 +68,7 @@ class Session(metaclass=Singleton):
 
             # Récupère depuis le service / DB
             joueurs_table = table_service.get_joueurs(joueur.table.numero_table)
-            print("Joueurs récupérés :", joueurs_table)
+
             for j in joueurs_table:
                 res += f"{j.pseudo} : {j.credit} crédits\n"
             res += "\n"
