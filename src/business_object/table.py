@@ -61,6 +61,9 @@ class Table:
         else:
             self.__joueurs = joueurs
 
+        for j in self.__joueurs:
+            j.table = self
+
     @property
     def joueur_max(self):
         """Retourne l'attribut 'joueur_max'"""
@@ -121,8 +124,6 @@ class Table:
             logger.warning(f"Table pleine : impossible d'ajouter {joueur.pseudo}")
             raise ValueError("Nombre maximum de joueurs atteint")
 
-        self.__joueurs.append(joueur)
-        joueur.table = self
         logger.info(
             f"{joueur.pseudo} rejoint la table {self.numero_table} ({len(self.joueurs)}/{self.joueur_max})"
         )

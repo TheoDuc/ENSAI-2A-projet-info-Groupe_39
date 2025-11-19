@@ -22,7 +22,7 @@ class Session(metaclass=Singleton):
     def connexion(self, joueur):
         """Enregistrement des données en session et mise à jour des joueurs de la table"""
         self.joueur = joueur
-        # Horodatage de connexion
+
         debut = datetime.now(pytz.timezone("Europe/Paris")).strftime("%d/%m/%Y %H:%M:%S")
         self.debut_connexion = debut
         joueur.debut_connexion = debut
@@ -30,13 +30,6 @@ class Session(metaclass=Singleton):
         # Ajout du joueur à la liste globale des connectés
         if joueur not in Session.joueurs_connectes:
             Session.joueurs_connectes.append(joueur)
-
-        # Si le joueur est à une table, mettre à jour joueur.table pour tous les joueurs de la table
-        if joueur.table:
-            for j in joueur.table.joueurs:
-                j.table = joueur.table  # s'assure que tous ont la table renseignée
-                if j not in Session.joueurs_connectes:
-                    Session.joueurs_connectes.append(j)
 
     def deconnexion(self):
         if self.joueur in Session.joueurs_connectes:
@@ -50,19 +43,18 @@ class Session(metaclass=Singleton):
         res = "Actuellement en session :\n"
         res += "-------------------------\n"
 
-        joueur = self.joueur
-        if not joueur:
+        if not self.joueur:
             return res + "Aucun joueur connecté.\n"
 
-        res += f"joueur connecté : {joueur.pseudo} : {joueur.credit} crédits\n"
-        if getattr(joueur, "debut_connexion", None):
-            res += f"debut_connexion : {joueur.debut_connexion}\n"
+        res += f"joueur connecté : {self.joueur.pseudo} : {self.joueur.credit} crédits\n"
+        if getattr(self.joueur, "debut_connexion", None):
+            res += f"debut_connexion : {self.joueur.debut_connexion}\n"
         res += "\n"
 
-        if joueur.table:
-            res += f"Joueurs à la table {joueur.table.numero_table} :\n"
+        if self.joueur.table:
+            res += f"Joueurs à la table {self.joueur.table.numero_table} :\n"
             res += "-------------------------\n"
-            for j in joueur.table.joueurs:
+            for j in self.joueur.table.joueurs:
                 res += f"{j.pseudo} : {j.credit} crédits\n"
             res += "\n"
 
