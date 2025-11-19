@@ -22,9 +22,9 @@ class Session(metaclass=Singleton):
     def connexion(self, joueur):
         """Enregistement des données en session"""
         self.joueur = joueur
-        self.debut_connexion = datetime.now(pytz.timezone("Europe/Paris")).strftime(
-            "%d/%m/%Y %H:%M:%S"
-        )
+        debut = datetime.now(pytz.timezone("Europe/Paris")).strftime("%d/%m/%Y %H:%M:%S")
+        self.debut_connexion = debut
+        joueur.debut_connexion = debut
         if joueur not in Session.joueurs_connectes:
             Session.joueurs_connectes.append(joueur)
 
