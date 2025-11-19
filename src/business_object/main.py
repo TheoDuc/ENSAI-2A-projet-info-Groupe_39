@@ -31,6 +31,17 @@ class Main(AbstractListeCartes):
 
         super().__init__(cartes, complet)
 
+    def affichage_main(self) -> str:
+        """Retourne un affichage plus joli des cartes d'une main"""
+        texte = ""
+        for carte in self.cartes:
+            texte += f"  {carte}  "
+
+        for _ in range(2 - len(self)):
+            texte += "   [?]   "
+
+        return texte
+
     def intervertir_cartes(self):
         """
         Déplace la première carte de la main à la fin, inversant ainsi l'ordre.

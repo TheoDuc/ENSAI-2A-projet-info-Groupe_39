@@ -101,10 +101,18 @@ class Manche:
 
     def __str__(self) -> str:
         """Représentation informelle d'un objet de type 'Manche'"""
+        return f"Manche(tour={self.TOURS()[self.tour]}, grosse_blind={self.grosse_blind}, board={self.board})"
+
+    def __repr__(self) -> str:
+        """Représentation informelle d'un objet de type 'Manche'"""
+        return f"Manche(tour={self.TOURS()[self.tour]}, grosse_blind={self.grosse_blind}, board={self.board})"
+
+    def affichage_complet(self) -> str:
+        """Représentation des informations globales de la manche"""
 
         tour = f"｡.｡:+* ﾟ ゜ﾟ *+:｡.｡:+* ﾟ ゜ﾟ *+:｡.｡.｡:+[ {self.TOURS()[self.tour]} ]+:｡.｡:+* ﾟ ゜ﾟ *+:｡.｡.｡:+* ﾟ ゜ﾟ *+:｡.｡\n\n"
-        info = str(self.info) + "\n"
-        board = str(self.board) + "\n"
+        info = self.info.affichage_tout_joueur() + "\n\n\n"
+        board = "Board :" + self.board.affichage_board + "\n\n"
         if self.fin:
             indication = "La manche est terminée !"
         else:
@@ -112,10 +120,6 @@ class Manche:
             indication = f"C'est à {pseudo} de jouer !"
 
         return tour + info + board + indication
-
-    def __repr__(self) -> str:
-        """Représentation informelle d'un objet de type 'Manche'"""
-        return f"Manche(tour={self.TOURS()[self.tour]}, grosse_blind={self.grosse_blind}, board={self.board})"
 
     def indice_joueur(self, joueur) -> int:
         """
@@ -141,6 +145,24 @@ class Manche:
             if self.info.joueurs[i] == joueur:
                 return i
         raise ValueError("Le joueur n'est pas dans cette manche")
+
+    def regarder_cartes(self, joueur) -> str:
+        """
+        Renvoie les cartes d'un joeuur au format texte
+
+        Paramètres
+        ----------
+        joueur : Joueur
+            joueur dont on veut renvoyer la main
+
+        Renvois
+        -------
+        str
+            les cartes du joeuur
+        """
+
+        indice = self.indice_joueur(joueur)
+        return self.info.mains[indice].affichage_main()
 
     def est_tour(self, joueur) -> bool:
         """

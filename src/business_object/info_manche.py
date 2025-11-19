@@ -134,6 +134,39 @@ class InfoManche:
             f"tour_couche={self.tour_couche})"
         )
 
+    def affichage_tout_joueur(self) -> str:
+
+        pseudos = [j.pseudo for j in self.__joueurs]
+        statuts = [self.__STATUTS[s] for s in self.__statuts]
+        mises = [str(m) for m in self.__mises]
+        couches = [str(t) if t is not None else "-" for t in self.__tour_couche]
+
+        col_widths = [
+            max(len(pseudo), len(statut), len(mise), len(couche), 7)
+            for pseudo, statut, mise, couche in zip(pseudos, statuts, mises, couches)
+        ]
+
+        def row(label, values):
+            """Construit une ligne du tableau, en centrant les valeurs."""
+            cells = [
+                f"{v:^{col_widths[i]}}"
+                for i, v in enumerate(values)
+            ]
+            return f"{label:<12} | " + " | ".join(cells) + " |"
+
+        lines = []
+        separator = "-" * (14 + sum(col_widths) + 3 * len(col_widths))
+
+        lines.append(separator)
+        lines.append(row("Joueurs", pseudos))
+        lines.append(separator)
+        lines.append(row("Statuts", statuts))
+        lines.append(row("Mises", mises))
+        lines.append(row("Couché au", couches))
+        lines.append(separator)
+
+        return "\n".join(lines)
+
     def modifier_statut(self, indice_joueur, statut: int) -> None:
         """
         Modifie le statut d'un joueur.

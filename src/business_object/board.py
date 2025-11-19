@@ -34,6 +34,17 @@ class Board(AbstractListeCartes):
 
         super().__init__(cartes, complet)
 
+    def affichage_board(self) -> str:
+        """Retourne un affichge plus joli des cartes d'un board"""
+        texte = ""
+        for carte in self.cartes:
+            texte += f"  {carte}  "
+
+        for _ in range(5 - len(self)):
+            texte += "   [?]   "
+
+        return texte
+
     def ajouter_carte(self, carte: Carte) -> None:
         """
         Ajoute une carte dans le board. Et vérifie que le nombre de cartes reste en dessous de 5
