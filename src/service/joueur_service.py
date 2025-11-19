@@ -16,11 +16,15 @@ class JoueurService:
     """
 
     dao = JoueurDao()
+    _joueurs_connectes: dict[int, Joueur] = {}
 
     @log
     def se_connecter(self, pseudo: str) -> Joueur | None:
         """Simule la connexion d’un joueur via son pseudo"""
-        return self.dao.se_connecter(pseudo)
+        joueur = self.dao.se_connecter(pseudo)
+        if joueur:
+            self._joueurs_connectes[joueur.id_joueur] = joueur
+        return joueur
 
     @log
     def pseudo_deja_utilise(self, pseudo: str) -> bool:
@@ -59,7 +63,12 @@ class JoueurService:
 
     def trouver_par_id(self, id_joueur: int) -> Joueur | None:
         """Récupère un joueur par ID"""
-        return self.dao.trouver_par_id(id_joueur)
+        if id_joueur in self._joueurs_connectes:
+            return self._joueurs_connectes[id_joueur]
+        joueur = self.dao.trouver_par_id(id_joueur)
+        if joueur:
+            self._joueurs_connectes[joueur.id_joueur] = joueur
+        return joueur
 
     def trouver_par_pseudo(self, pseudo: str) -> Joueur | None:
         """Récupère un joueur par pseudo"""
