@@ -14,10 +14,11 @@ class MenuCreationTable(VueAbstraite):
             message="Saisissez le nombre de joueurs maximum dans la table",
             min_allowed=2,
             max_allowed=10,
+            default=5,
         ).execute()
         joueur_max = int(joueur_max)
         grosse_blind = inquirer.number(
-            message="Saisissez la valeur de la grosse blind", min_allowed=2
+            message="Saisissez la valeur de la grosse blind", min_allowed=2, default=40
         ).execute()
         grosse_blind = int(grosse_blind)
 
@@ -25,14 +26,14 @@ class MenuCreationTable(VueAbstraite):
         table = TableService().creer_table(joueur_max, grosse_blind)
 
         # Si le joueur a été créé
-        if table:
+        if table is not None:
             message = f"Votre table a été créé (n°{table.numero_table}). Vous pouvez maintenant la rejoindre"
         else:
             message = "Erreur de création de la table (les paramètres de la table sont incorrects)"
 
         from view.menu_table import MenuTable
 
-        return MenuTable()
+        return MenuTable(message, temps_attente=3)
 
 
 class InfosTable(VueAbstraite):
