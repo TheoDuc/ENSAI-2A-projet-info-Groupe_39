@@ -11,7 +11,7 @@ class MenuTable(VueAbstraite):
     """Vue qui affiche les tables"""
 
     def choisir_menu(self):
-        action_table = ["Retour au Menu Joueur", "Créer une Table"] 
+        action_table = ["Retour au Menu Joueur", "Créer une Table"]
         boutons_tables = TableService().affichages_tables()
         action_table += boutons_tables
 
@@ -31,9 +31,9 @@ class MenuTable(VueAbstraite):
             return MenuCreationTable()
 
         if choix in boutons_tables:
-            indice_table = boutons_tables.index(choix)
+            table = TableService().table_par_affichage(choix)
 
-            TableService().ajouter_joueur(TableService.tables[indice_table], Session().joueur)
+            TableService().ajouter_joueur(table.numero_table, Session().joueur.id_joueur)
 
             from view.game_menu_view import GameMenu
 

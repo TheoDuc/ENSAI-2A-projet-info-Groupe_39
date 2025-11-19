@@ -26,6 +26,11 @@ class TableService:
         """Affichage de l'ensemble des tables créées"""
         return [str(table) for table in self.__tables]
 
+    def table_par_affichage(self, affichage: str) -> Table:
+        """Renvoie la table correspondante à l'affichage"""
+        indice_table = self.affichages_tables().index(affichage)
+        return self.__tables[indice_table]
+
     def table_par_numero(self, numero_table: int) -> Table:
         """
         Renvoie la table correspondant au numéro si elle existe

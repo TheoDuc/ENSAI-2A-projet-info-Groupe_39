@@ -1,11 +1,8 @@
 from InquirerPy import inquirer
 
-from view.vue_abstraite import VueAbstraite
-from view.session import Session
-
 from service.table_service import TableService
-from business_object.table import Table
-from business_object.joueur import Joueur
+from view.session import Session
+from view.vue_abstraite import VueAbstraite
 
 
 class GameMenu(VueAbstraite):
@@ -33,10 +30,13 @@ class GameMenu(VueAbstraite):
         match choix:
             case "Lancer manche":
                 table = Session().joueur.table
-               
-                TableService().jouer(table)
+
+                TableService().lancer_manche(table)
                 return GameMenu("")
 
             case "Quitter table":
-                TableService().retirer_joueur(Session().joueur.table, Session().joueur)
+                TableService().retirer_joueur(Session().joueur.id_joueur)
+
+                from view.menu_joueur_vue import MenuJoueurVue
+
                 return MenuJoueurVue(Session().afficher())

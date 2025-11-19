@@ -67,7 +67,7 @@ class MenuJoueurVue(VueAbstraite):
                 # Si la requete à fonctionné
                 if req.status_code == 200:
                     reponse = req.json()
-                return MenuJoueurVue(reponse)
+                return MenuJoueurVue(reponse, temps_attente=3)
 
             case "Changer ses informations":
                 END_POINT = "/joueur"
