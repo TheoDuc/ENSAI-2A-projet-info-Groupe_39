@@ -94,7 +94,7 @@ async def creer_joueur(j: JoueurModel):
         raise HTTPException(status_code=404, detail="Pseudo déjà utilisé")
 
     joueur = joueur_service.creer(j.pseudo, j.pays)
-    if joueur == None:
+    if joueur is None:
         raise HTTPException(status_code=404, detail="Erreur lors de la création du joueur")
 
     return joueur
@@ -219,6 +219,20 @@ async def terminer_manche(numero_table: int):
     logging.info("termine une manche")
     table_service.terminer_manche(numero_table=numero_table)
     return f"la manche est terminé sur la table {numero_table}"
+
+
+@app.get("/table/affichage/{numero_table}", tags=["Table"])
+async def affichage_general(numero_table: int):
+    """affichage general"""
+    logging.info("affichage general")
+    return table_service.affichage_general(numero_table=numero_table)
+
+
+@app.get("/table/main/{numero_table}/{id_joueur}", tags=["Table"])
+async def regarder_main(numero_table: int, id_joueur: int):
+    """regarder sa main"""
+    logging.info("regarder sa main")
+    return table_service.regarder_main(numero_table=numero_table, id_joueur=id_joueur)
 
 
 @app.get("/action/{pseudo}", tags=["Action"])

@@ -42,7 +42,9 @@ class GameMenu(VueAbstraite):
                 numero_table = 1
                 req = requests.get(f"{host}{END_POINT}lancer/{numero_table}")
 
-                return GameMenu("")
+                from view.menu_manche import MenuManche
+
+                return MenuManche("")
 
                 """
                 TableService().lancer_manche(table.numero_table)
