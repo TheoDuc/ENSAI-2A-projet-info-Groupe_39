@@ -214,6 +214,8 @@ class TableService:
         joueur = JoueurService().trouver_par_id(id_joueur)
         table = self.table_par_numero(numero_table)
 
+        table.manche.preflop()
+
         return table.manche.regarder_cartes(joueur)
 
     @log

@@ -162,7 +162,10 @@ class Manche:
         """
 
         indice = self.indice_joueur(joueur)
-        return self.info.mains[indice].affichage_main()
+        if self.info.mains[indice] is None :
+            return "   [?]      [?]   "
+        else:
+            return self.info.mains[indice].affichage_main()
 
     def est_tour(self, joueur) -> bool:
         """
