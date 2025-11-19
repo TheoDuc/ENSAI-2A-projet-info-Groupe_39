@@ -41,20 +41,13 @@ class Session(metaclass=Singleton):
         res += "-------------------------\n"
 
         # Joueurs connectés
+
         for j in Session.joueurs_connectes:
             res += f"joueur connecté : {j.pseudo} : {j.credit} crédits\n"
-            debut = getattr(j, "debut_connexion", None)
-            if debut:
-                res += f"debut_connexion : {debut}\n"
-            res += "\n"
-
-        # Joueurs à la table du joueur actuel
-        joueur = self.joueur
-        if joueur and joueur.table:
-            res += f"Joueurs à la table {joueur.table.numero_table} :\n"
-            res += "-------------------------\n"
-            for j in joueur.table.joueurs:
-                res += f"{j.pseudo} : {j.credit} crédits\n"
+            if getattr(j, "debut_connexion", None):
+                res += f"debut_connexion : {j.debut_connexion}\n"
+            if getattr(j, "table", None):
+                res += f"table : {j.table.numero_table}\n"
             res += "\n"
 
         return res
