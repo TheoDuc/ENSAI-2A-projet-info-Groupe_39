@@ -43,7 +43,11 @@ class Session(metaclass=Singleton):
         self.joueur = None
         self.debut_connexion = None
 
-    def afficher(self) -> str:
+    def afficher(self, table_service) -> str:
+        """
+        Affiche le joueur connecté et tous les joueurs présents sur la même table.
+        table_service : instance d'un service permettant de récupérer les joueurs d'une table.
+        """
         res = "Actuellement en session :\n"
         res += "-------------------------\n"
 
@@ -51,13 +55,21 @@ class Session(metaclass=Singleton):
         if not joueur:
             return res + "Aucun joueur connecté.\n"
 
+        # Joueur connecté sur ce terminal
         res += f"joueur connecté : {joueur.pseudo} : {joueur.credit} crédits\n"
-        res += f"debut_connexion : {joueur.debut_connexion}\n\n"
+        if getattr(joueur, "debut_connexion", None):
+            res += f"debut_connexion : {joueur.debut_connexion}\n"
+        res += "\n"
 
+        # Joueurs présents sur la même table
         if joueur.table:
             res += f"Joueurs à la table {joueur.table.numero_table} :\n"
             res += "-------------------------\n"
-            for j in joueur.table.joueurs:
+
+            # Récupère depuis le service / DB
+            joueurs_table = table_service.get_joueurs(joueur.table.numero_table)
+            print("Joueurs récupérés :", joueurs_table)
+            for j in joueurs_table:
                 res += f"{j.pseudo} : {j.credit} crédits\n"
             res += "\n"
 
