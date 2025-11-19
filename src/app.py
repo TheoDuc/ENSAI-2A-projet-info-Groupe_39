@@ -168,7 +168,9 @@ async def retirer_un_joueur(pseudo:str):
     """retire un joueur a la table"""
     logging.info("retire un joueur a la table")
     joueur = joueur_service.trouver_par_pseudo(pseudo)
-    table_service.retirer_joueur(joueur.id_joueur)
+    print(joueur.table)
+    # pourquoi c'est None ??
+    table_service.retirer_joueur(joueur)
     return f"le joueur {joueur.pseudo} a été retiré de la table"
 
 #fonctionne
@@ -180,13 +182,6 @@ def supprimer_table(numero_table:int):
     return f"Table {numero_table} supprimé"
 
 
-@app.put("/table/rotation_dealer", tags=["Table"])
-async def rotation_dealer(table: TableModel):
-    """change le dealer"""
-    logging.info("change le dealer")
-    table_service.rotation_dealer(table)
-    return "le dealer de la table tourné"
-
 # fonctionne
 @app.get("/table/", tags=["Table"])
 async def liste_tables():
@@ -194,44 +189,61 @@ async def liste_tables():
     logging.info("liste les tables")
     return table_service.affichages_tables()
 
+# fonctionne
+@app.get("/table/lancer/{numero_table}", tags=["Table"])
+async def lancer_manche(numero_table:int):
+    """lance une manche"""
+    logging.info("lance une manche")
+    table_service.lancer_manche(numero_table=numero_table)
+    return f"la manche est lancé sur la table {numero_table}"
 
-# peut etre créer un joueur model car aucune ne fonctionne avec un argument joueur
-@app.get("/action/{joueur}", tags=["Action"])
-async def manche_joueur(joueur):
+# fonctionne
+@app.get("/table/terminer/{numero_table}", tags=["Table"])
+async def terminer_manche(numero_table:int):
+    """termine une manche"""
+    logging.info("termine une manche")
+    table_service.terminer_manche(numero_table=numero_table)
+    return f"la manche est terminé sur la table {numero_table}"
+
+@app.get("/action/{pseudo}", tags=["Action"])
+async def manche_joueur(pseudo: str):
     """Trouver la manche auquel joue le joueur"""
     logging.info("Trouver la manche auquel joue le joueur")
+    joueur = joueur_service.trouver_par_pseudo(pseudo)
     return action_service.manche_joueur(joueur)
 
 
-@app.put("/action/all_in/{joueur}", tags=["Action"])
-async def all_in(joueur):
+@app.put("/action/all_in/{pseudo}", tags=["Action"])
+async def all_in(pseudo: str):
     """Joue all_in pour le joueur"""
     logging.info("Joue all_in pour le joueur")
+    joueur = joueur_service.trouver_par_pseudo(pseudo)
     return action_service.all_in(joueur)
 
 
-@app.put("/action/checker/{joueur}", tags=["Action"])
-async def checker(joueur):
+@app.put("/action/checker/{pseudo}", tags=["Action"])
+async def checker(pseudo: str):
     """Joue checker pour le joueur"""
     logging.info("Joue checker pour le joueur")
+    joueur = joueur_service.trouver_par_pseudo(pseudo)
     return action_service.checker(joueur)
 
 
-@app.put("/action/se_coucher/{joueur}", tags=["Action"])
-async def se_coucher(joueur):
+@app.put("/action/se_coucher/{pseudo}", tags=["Action"])
+async def se_coucher(pseudo: str):
     """Joue se_coucher pour le joueur"""
     logging.info("Joue se_coucher pour le joueur")
+    joueur = joueur_service.trouver_par_pseudo(pseudo)
     return action_service.se_coucher(joueur)
 
 
-@app.put("/action/suivre/{joueur}", tags=["Action"])
-async def suivre(joueur):
+@app.put("/action/suivre/{pseudo}", tags=["Action"])
+async def suivre(pseudo: str):
     """Joue suivre pour le joueur"""
     logging.info("Joue suivre pour le joueur")
+    joueur = joueur_service.trouver_par_pseudo(pseudo)
     return action_service.suivre(joueur)
 
-
-# il manque peut etre miser mais il est pas dans actionservice
 
 # Run the FastAPI application
 if __name__ == "__main__":

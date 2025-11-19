@@ -9,7 +9,7 @@ class MancheService:
 
     def sauvegarder_manche(self, manche: Manche) -> None:
         """Crée une manche et l’enregistre via le DAO."""
-        MancheDao().creer(manche)
+        MancheDao().sauvegarder(manche)
 
     def supprimer_manche(self, manche: Manche) -> bool:
         """
