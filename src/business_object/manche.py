@@ -112,7 +112,7 @@ class Manche:
 
         tour = f"｡.｡:+* ﾟ ゜ﾟ *+:｡.｡:+* ﾟ ゜ﾟ *+:｡.｡.｡:+[ {self.TOURS()[self.tour]} ]+:｡.｡:+* ﾟ ゜ﾟ *+:｡.｡.｡:+* ﾟ ゜ﾟ *+:｡.｡\n\n"
         info = self.info.affichage_tout_joueur() + "\n\n\n"
-        board = "Board :" + self.board.affichage_board + "\n\n"
+        board = "Board :" + self.board.affichage_board() + "\n\n"
         if self.fin:
             indication = "La manche est terminée !"
         else:

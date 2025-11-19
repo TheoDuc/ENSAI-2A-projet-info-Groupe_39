@@ -47,9 +47,9 @@ class GameMenu(VueAbstraite):
             case "Lancer manche":
                 logger.debug(f"{Session().joueur.table}")
                 # numero_table = Session().joueur.table.numero_table
-                # numero_table = 1
-                # req = requests.get(f"{host}{END_POINT}lancer/{numero_table}")
-                requests.get(f"{host}{END_POINT}lancer/{id_table}")
+                numero_table = 1
+                req = requests.get(f"{host}{END_POINT}lancer/{numero_table}")
+
                 return GameMenu("")
 
                 """
