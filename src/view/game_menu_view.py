@@ -49,7 +49,7 @@ class GameMenu(VueAbstraite):
                 return GameMenu("")
                 """
 
-            case "Quitter table": # fonctionne pas 
+            case "Quitter table":  # fonctionne pas
                 pseudo = Session().joueur.pseudo
                 req = requests.put(f"{host}{END_POINT}quiter/{pseudo}")
 

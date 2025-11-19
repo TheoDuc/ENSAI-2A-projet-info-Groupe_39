@@ -165,6 +165,7 @@ async def ajouter_joueur(numero_table: int, pseudo: str):
     table_service.ajouter_joueur(numero_table, joueur.id_joueur)
     return f"le joueur {joueur.pseudo} a été ajouté à la table {numero_table}"
 
+
 # fonctionne pas, le joueur ne garde pas en mémoire la table dans laquel il est
 @app.put("/table/retirer/{pseudo}", tags=["Table"])
 async def retirer_un_joueur(pseudo: str):
