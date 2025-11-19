@@ -31,7 +31,7 @@ class GameMenu(VueAbstraite):
             case "Lancer manche":
                 table = Session().joueur.table
 
-                TableService().lancer_manche(table)
+                TableService().lancer_manche(table.numero_table)
                 return GameMenu("")
 
             case "Quitter table":
