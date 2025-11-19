@@ -1,6 +1,7 @@
 """Menu des tables"""
 
 import os
+
 import requests
 from InquirerPy import inquirer
 
@@ -17,7 +18,9 @@ class MenuTable(VueAbstraite):
     def choisir_menu(self):
         action_table = ["Retour au Menu Joueur", "Créer une Table"]
         reponse = requests.get(f"{host}{END_POINT}")
-        boutons_tables = reponse.json()
+        tables = reponse.json()
+        boutons_tables = [f"Table {t['numero_table']}" for t in tables]
+
         action_table += boutons_tables
 
         choix = inquirer.select(
@@ -36,7 +39,10 @@ class MenuTable(VueAbstraite):
             return MenuCreationTable()
 
         if choix in boutons_tables:
-            numero_table = int(choix[6])
+            index = boutons_tables.index(choix)
+            table = tables[index]
+            numero_table = table["numero_table"]
+            # numero_table = int(choix[6])
             pseudo = Session().joueur.pseudo
             req = requests.put(f"{host}{END_POINT}ajouter/{numero_table}/{pseudo}")
 

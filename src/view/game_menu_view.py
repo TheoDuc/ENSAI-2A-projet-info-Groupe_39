@@ -27,6 +27,14 @@ class GameMenu(VueAbstraite):
 
         print("\n" + "-" * 50 + "\nMenu de jeu Joueur\n" + "-" * 50 + "\n")
 
+        # Rafraîchir la table depuis l’API --- LA LIGNE QUI MANQUAIT !!!
+        id_table = Session().joueur.id_table
+        req = requests.get(f"{host}{END_POINT}{id_table}")
+        req_j = requests.get(f"{host}{END_POINT}{id_table}/joueurs")
+        joueurs = req_j.json()
+        for j in joueurs:
+            print(f"- {j['pseudo']} : {j['credit']} crédits")
+
         choix = inquirer.select(
             message="Faites votre choix : ",
             choices=[
@@ -39,9 +47,9 @@ class GameMenu(VueAbstraite):
             case "Lancer manche":
                 logger.debug(f"{Session().joueur.table}")
                 # numero_table = Session().joueur.table.numero_table
-                numero_table = 1
-                req = requests.get(f"{host}{END_POINT}lancer/{numero_table}")
-
+                # numero_table = 1
+                # req = requests.get(f"{host}{END_POINT}lancer/{numero_table}")
+                requests.get(f"{host}{END_POINT}lancer/{id_table}")
                 return GameMenu("")
 
                 """
