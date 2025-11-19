@@ -40,26 +40,27 @@ class Session(metaclass=Singleton):
         self.debut_connexion = None
 
     def afficher(self) -> str:
-        """Afficher tous les joueurs connectés et ceux présents aux tables"""
+        """Afficher le joueur connecté et les autres joueurs à la même table"""
         res = "Actuellement en session :\n"
         res += "-------------------------\n"
 
-        # Joueurs connectés globalement
-        for j in Session.joueurs_connectes:
-            res += f"joueur connecté : {j.pseudo} : {j.credit} crédits\n"
-            if getattr(j, "debut_connexion", None):
-                res += f"debut_connexion : {j.debut_connexion}\n"
-            res += "\n"
+        joueur = self.joueur
+        if not joueur:
+            return res + "Aucun joueur connecté.\n"
 
-        # Joueurs par table
-        tables_affichees = set()
-        for j in Session.joueurs_connectes:
-            if j.table and j.table not in tables_affichees:
-                tables_affichees.add(j.table)
-                res += f"Table {j.table.numero_table} :\n"
-                res += "-------------------------\n"
-                for joueur_table in j.table.joueurs:
-                    res += f"{joueur_table.pseudo} : {joueur_table.credit} crédits\n"
-                res += "\n"
+        # Joueur connecté
+        res += f"joueur connecté : {joueur.pseudo} : {joueur.credit} crédits\n"
+        if getattr(joueur, "debut_connexion", None):
+            res += f"debut_connexion : {joueur.debut_connexion}\n"
+        res += "\n"
+
+        # Joueurs à la même table
+        if joueur.table:
+            res += f"Joueurs à la table {joueur.table.numero_table} :\n"
+            res += "-------------------------\n"
+            for j in joueur.table.joueurs:
+                if j != joueur:  # ne pas répéter le joueur connecté
+                    res += f"{j.pseudo} : {j.credit} crédits\n"
+            res += "\n"
 
         return res
