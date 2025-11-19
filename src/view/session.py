@@ -20,15 +20,21 @@ class Session(metaclass=Singleton):
         self.debut_connexion = None
 
     def connexion(self, joueur):
-        """Enregistement des données en session"""
+        """Enregistrement des données en session et mise à jour des joueurs de la table"""
         self.joueur = joueur
+        # Horodatage de connexion
         debut = datetime.now(pytz.timezone("Europe/Paris")).strftime("%d/%m/%Y %H:%M:%S")
         self.debut_connexion = debut
         joueur.debut_connexion = debut
+
+        # Ajout du joueur à la liste globale des connectés
         if joueur not in Session.joueurs_connectes:
             Session.joueurs_connectes.append(joueur)
+
+        # Si le joueur est à une table, mettre à jour joueur.table pour tous les joueurs de la table
         if joueur.table:
             for j in joueur.table.joueurs:
+                j.table = joueur.table  # s'assure que tous ont la table renseignée
                 if j not in Session.joueurs_connectes:
                     Session.joueurs_connectes.append(j)
 
