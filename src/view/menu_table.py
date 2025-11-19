@@ -1,7 +1,6 @@
 """Menu des tables"""
 
 import os
-
 import requests
 from InquirerPy import inquirer
 

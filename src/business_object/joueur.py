@@ -219,8 +219,8 @@ class Joueur:
         if not isinstance(table, Table):
             raise TypeError(f"le paramètre table doit être de type Table : {type(table)}")
 
-        table.ajouter_joueur(self)
         self.__table = table
+        table.ajouter_joueur(self)
         logger.info(f"Le joueur {self.pseudo} a rejoint une table")
 
     @log

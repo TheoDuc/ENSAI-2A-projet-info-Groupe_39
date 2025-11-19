@@ -1,12 +1,16 @@
 import logging
+import os
 
+import requests
 from InquirerPy import inquirer
 
-from service.table_service import TableService
 from view.session import Session
 from view.vue_abstraite import VueAbstraite
 
 logger = logging.getLogger(__name__)
+
+host = os.environ["HOST_WEBSERVICE"]
+END_POINT = "/table/"
 
 
 class GameMenu(VueAbstraite):
@@ -33,7 +37,10 @@ class GameMenu(VueAbstraite):
 
         match choix:
             case "Lancer manche":
-                logger.debug(f"{Session.joueur.table}")
+                logger.debug(f"{Session().joueur.table}")
+                numero_table = Session().joueur.table.numero_table
+                req = requests.put(f"{host}{END_POINT}lancer/{numero_table}")
+                print(req.status_code)
 
                 return GameMenu("")
 
@@ -42,8 +49,12 @@ class GameMenu(VueAbstraite):
                 return GameMenu("")
                 """
 
-            case "Quitter table":
-                TableService().retirer_joueur(Session().joueur.id_joueur)
+            case "Quitter table": # fonctionne pas 
+                pseudo = Session().joueur.pseudo
+                req = requests.put(f"{host}{END_POINT}quiter/{pseudo}")
+
+                if req.status_code == 200:
+                    print("vous avez quité la table")
 
                 from view.menu_joueur_vue import MenuJoueurVue
 
