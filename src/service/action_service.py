@@ -169,3 +169,22 @@ class ActionService:
 
         montant = manche.info.suivre(indice_joueur, relance)
         CreditService().debiter(joueur, montant)
+
+    def test_checker_ok(self):
+        joueur = Mock()
+        joueur.pseudo = "A"
+
+        manche = Mock()
+        manche.est_tour.return_value = True
+        manche.indice_joueur.return_value = 0
+        manche.info.statuts = [2]  # joueur peut checker
+
+        service = ActionService()
+        service.manche_joueur = Mock(return_value=manche)
+
+        with patch("src.service.action_service.JoueurService") as MockJoueurService:
+            MockJoueurService.return_value.trouver_par_id.return_value = joueur
+
+            service.checker(id_joueur=1)
+
+            manche.info
