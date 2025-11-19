@@ -127,6 +127,8 @@ class Table:
         logger.info(
             f"{joueur.pseudo} rejoint la table {self.numero_table} ({len(self.joueurs)}/{self.joueur_max})"
         )
+        self.__joueurs.append(joueur)
+        joueur.table = self
 
     @log
     def retirer_joueur(self, indice: int) -> Joueur:
