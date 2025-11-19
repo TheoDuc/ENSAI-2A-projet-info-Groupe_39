@@ -17,23 +17,11 @@ class MenuTable(VueAbstraite):
 
     def choisir_menu(self):
         action_table = ["Retour au Menu Joueur", "Créer une Table"]
-
-        # Récupère la liste des tables depuis l'API
-        try:
-            reponse = requests.get(f"{host}{END_POINT}")
-            reponse.raise_for_status()
-            tables = reponse.json()
-        except requests.RequestException as e:
-            print(f"Erreur lors de la récupération des tables : {e}")
-            from view.menu_joueur_vue import MenuJoueurVue
-
-            return MenuJoueurVue()
-
-        # Crée les boutons pour chaque table
-        boutons_tables = [f"Table {t['numero_table']}" for t in tables]
+        reponse = requests.get(f"{host}{END_POINT}")
+        tables = reponse.json()
+        boutons_tables = reponse.json()
         action_table += boutons_tables
 
-        # Menu interactif
         choix = inquirer.select(
             message="Choisissez votre action : ",
             choices=action_table,
@@ -53,25 +41,14 @@ class MenuTable(VueAbstraite):
             index = boutons_tables.index(choix)
             table = tables[index]
             numero_table = table["numero_table"]
-            pseudo = getattr(Session().joueur, "pseudo", None)
+            # numero_table = int(choix[6])
+            pseudo = Session().joueur.pseudo
+            req = requests.put(f"{host}{END_POINT}ajouter/{numero_table}/{pseudo}")
 
-            if not pseudo:
-                print("Aucun joueur connecté.")
-                from view.menu_joueur_vue import MenuJoueurVue
-
-                return MenuJoueurVue()
-
-            # Requête pour rejoindre la table
-            try:
-                req = requests.put(f"{host}{END_POINT}ajouter/{numero_table}/{pseudo}")
-                req.raise_for_status()
-            except requests.RequestException:
+            if req.status_code != 200:
                 print("La connexion à la table n'a pas fonctionné")
-                from view.menu_joueur_vue import MenuJoueurVue
-
                 return MenuJoueurVue()
-
-            print(f"Vous êtes connecté sur la table {numero_table}")
             from view.game_menu_view import GameMenu
 
+            print(f"Vous etes connecté sur la table {numero_table}")
             return GameMenu()
