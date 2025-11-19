@@ -96,6 +96,10 @@ class Joueur:
         """Retourne la table où se trouve le joueur"""
         return self.__table
 
+    @table.setter
+    def table(self, table):
+        self.__table = table
+
     def __str__(self) -> str:
         """Permet d'afficher le pseudo et les crédits du joueur"""
         return f"{self.__pseudo} : {self.__credit} crédits"

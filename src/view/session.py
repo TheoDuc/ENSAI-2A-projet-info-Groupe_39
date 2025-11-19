@@ -59,8 +59,7 @@ class Session(metaclass=Singleton):
             res += f"Joueurs à la table {joueur.table.numero_table} :\n"
             res += "-------------------------\n"
             for j in joueur.table.joueurs:
-                if j != joueur:  # ne pas répéter le joueur connecté
-                    res += f"{j.pseudo} : {j.credit} crédits\n"
+                res += f"{j.pseudo} : {j.credit} crédits\n"
             res += "\n"
 
         return res
