@@ -40,7 +40,7 @@ class Session(metaclass=Singleton):
         self.debut_connexion = None
 
     def afficher(self) -> str:
-        """Afficher le joueur connecté et les autres joueurs à la même table"""
+        """Afficher le joueur connecté et tous les joueurs à sa table"""
         res = "Actuellement en session :\n"
         res += "-------------------------\n"
 
@@ -48,13 +48,12 @@ class Session(metaclass=Singleton):
         if not joueur:
             return res + "Aucun joueur connecté.\n"
 
-        # Joueur connecté
         res += f"joueur connecté : {joueur.pseudo} : {joueur.credit} crédits\n"
         if getattr(joueur, "debut_connexion", None):
             res += f"debut_connexion : {joueur.debut_connexion}\n"
         res += "\n"
 
-        # Joueurs à la même table
+        # Vérifie si le joueur est dans une table
         if joueur.table:
             res += f"Joueurs à la table {joueur.table.numero_table} :\n"
             res += "-------------------------\n"
