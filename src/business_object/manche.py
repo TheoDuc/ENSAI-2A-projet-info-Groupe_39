@@ -52,10 +52,6 @@ class Manche:
         self.__grosse_blind = grosse_blind
         self.__fin = False
 
-    # ---------------------------------------
-    # Property
-    # ---------------------------------------
-
     @property
     def tour(self) -> int:
         """Renvoie le tour de jeu actuel"""
@@ -104,6 +100,20 @@ class Manche:
         return cls.__TOURS
 
     def __str__(self) -> str:
+        """Représentation informelle d'un objet de type 'Manche'"""
+
+        tour = f"｡.｡:+* ﾟ ゜ﾟ *+:｡.｡:+* ﾟ ゜ﾟ *+:｡.｡.｡:+[ {self.TOURS()[self.tour]} ]+:｡.｡:+* ﾟ ゜ﾟ *+:｡.｡.｡:+* ﾟ ゜ﾟ *+:｡.｡\n\n"
+        info = str(self.info) + "\n"
+        board = str(self.board) + "\n"
+        if self.fin:
+            indication = "La manche est terminée !"
+        else:
+            pseudo = self.info.joueurs[self.indice_joueur_actuel].pseudo
+            indication = f"C'est à {pseudo} de jouer !"
+
+        return tour + info + board + indication
+
+    def __repr__(self) -> str:
         """Représentation informelle d'un objet de type 'Manche'"""
         return f"Manche(tour={self.TOURS()[self.tour]}, grosse_blind={self.grosse_blind}, board={self.board})"
 

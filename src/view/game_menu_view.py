@@ -1,8 +1,12 @@
+import logging
+
 from InquirerPy import inquirer
 
 from service.table_service import TableService
 from view.session import Session
 from view.vue_abstraite import VueAbstraite
+
+logger = logging.getLogger(__name__)
 
 
 class GameMenu(VueAbstraite):
@@ -29,10 +33,14 @@ class GameMenu(VueAbstraite):
 
         match choix:
             case "Lancer manche":
-                table = Session().joueur.table
+                logger.debug(f"{Session.joueur.table}")
 
+                return GameMenu("")
+
+                """
                 TableService().lancer_manche(table.numero_table)
                 return GameMenu("")
+                """
 
             case "Quitter table":
                 TableService().retirer_joueur(Session().joueur.id_joueur)
