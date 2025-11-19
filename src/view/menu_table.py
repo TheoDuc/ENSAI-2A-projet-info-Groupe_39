@@ -37,16 +37,14 @@ class MenuTable(VueAbstraite):
             return MenuCreationTable()
 
         if choix in boutons_tables:
-            table = None  # je sais pas comment récupérer la table
-
-            numero_table = table.numero_table
+            numero_table = int(choix[6])
             pseudo = Session().joueur.pseudo
-
-            req = requests.put(f"{host}{END_POINT}/ajouter/{numero_table}/{pseudo}")
+            req = requests.put(f"{host}{END_POINT}ajouter/{numero_table}/{pseudo}")
 
             if req.status_code != 200:
-                message = "La connexion à la table n'a pas fonctionné"
-                return MenuJoueurVue(message)
+                print("La connexion à la table n'a pas fonctionné")
+                return MenuJoueurVue()
             from view.game_menu_view import GameMenu
 
+            print(f"Vous etes connecté sur la table {numero_table}")
             return GameMenu()

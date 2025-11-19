@@ -194,6 +194,14 @@ async def liste_tables():
     return table_service.affichages_tables()
 
 
+# fonctionne pas
+@app.get("/table/par_affichage/{affichage}", tags=["Table"])
+async def table_par_affichage(affichage: str):
+    """trouve une table par affichage"""
+    logging.info("trouve une table par affichage")
+    return table_service.table_par_affichage(affichage)
+
+
 # fonctionne
 @app.get("/table/lancer/{numero_table}", tags=["Table"])
 async def lancer_manche(numero_table: int):
