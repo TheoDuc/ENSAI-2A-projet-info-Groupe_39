@@ -53,7 +53,6 @@ class Session(metaclass=Singleton):
             res += f"debut_connexion : {joueur.debut_connexion}\n"
         res += "\n"
 
-        # Vérifie si le joueur est dans une table
         if joueur.table:
             res += f"Joueurs à la table {joueur.table.numero_table} :\n"
             res += "-------------------------\n"
