@@ -173,6 +173,49 @@ class TableService:
 
         table.nouvelle_manche()
 
+    def affichage_general(self, numero_table: int) -> str:
+        """
+        Affiche la main d'un joueur
+
+        Paramètres
+        ----------
+        numero_table : int
+            le numéro de la table où le joueur se trouve
+        id_joueur : int
+            le joueur qui souhaite regarder sa main
+
+        Renvois
+        -------
+        str
+            les cartes de la main du joueur
+        """
+
+        table = self.table_par_numero(numero_table)
+
+        return table.manche.affichage_complet()
+
+    def regarder_main(self, numero_table: int, id_joueur: int) -> str:
+        """
+        Affiche la main d'un joueur
+
+        Paramètres
+        ----------
+        numero_table : int
+            le numéro de la table où le joueur se trouve
+        id_joueur : int
+            le joueur qui souhaite regarder sa main
+
+        Renvois
+        -------
+        str
+            les cartes de la main du joueur
+        """
+
+        joueur = JoueurService().trouver_par_id(id_joueur)
+        table = self.table_par_numero(numero_table)
+
+        return table.manche.regarder_cartes(joueur)
+
     @log
     def terminer_manche(self, numero_table: int) -> None:
         """
