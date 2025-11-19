@@ -47,3 +47,20 @@ class TestMain(AbstractListeCartesTest):
 
         # THEN
         assert main.cartes == resultat
+
+    @pytest.mark.parametrize(
+        "cartes, resultat",
+        [
+            (None, "   [?]      [?]   "),
+            ([pytest.dix_coeur, pytest.six_pique], "  10 de coeur    6 de pique  "),
+        ],
+    )
+    def test_affichage_board(self, cartes, resultat):
+        # GIVEN
+        main = Main(cartes)
+
+        # WHEN
+        affichage = main.affichage_main()
+
+        # THEN
+        assert affichage == resultat

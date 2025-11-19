@@ -84,6 +84,17 @@ class Test_Manche:
         with pytest.raises(ValueError):
             manche.indice_joueur(joueur_inexistant)
 
+    def test_manche_regarder_cartes(self, manche):
+        # GIVEN
+        joueur = manche.info.joueurs[1]
+        resultat = "  4 de trêfle    5 de trêfle  "
+
+        # WHEN
+        affichage = manche.regarder_cartes(joueur)
+
+        # THEN
+        assert resultat == affichage
+
     def test_manche_est_tour(self, manche, joueurs):
         # GIVEN/WHEN
         j0, j1, j2 = joueurs
