@@ -18,7 +18,6 @@ class MenuTable(VueAbstraite):
     def choisir_menu(self):
         action_table = ["Retour au Menu Joueur", "Créer une Table"]
         reponse = requests.get(f"{host}{END_POINT}")
-        tables = reponse.json()
         boutons_tables = reponse.json()
         action_table += boutons_tables
 
@@ -38,10 +37,7 @@ class MenuTable(VueAbstraite):
             return MenuCreationTable()
 
         if choix in boutons_tables:
-            index = boutons_tables.index(choix)
-            table = tables[index]
-            numero_table = table["numero_table"]
-            # numero_table = int(choix[6])
+            numero_table = int(choix[6])
             pseudo = Session().joueur.pseudo
             req = requests.put(f"{host}{END_POINT}ajouter/{numero_table}/{pseudo}")
 
