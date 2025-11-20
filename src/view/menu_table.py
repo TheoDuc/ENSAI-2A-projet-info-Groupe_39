@@ -45,6 +45,8 @@ class MenuTable(VueAbstraite):
 
             # Ajout du joueur sur le serveur
             req = requests.put(f"{host}{END_POINT}ajouter/{numero_table}/{pseudo}")
+            print(req.status_code)
+            print(req.text)
             if req.status_code != 200:
                 from view.menu_joueur_vue import MenuJoueurVue
 
