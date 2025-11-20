@@ -6,6 +6,7 @@ from InquirerPy import inquirer
 
 from view.session import Session
 from view.vue_abstraite import VueAbstraite
+from view.menu_manche import MenuManche
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +43,7 @@ class GameMenu(VueAbstraite):
                 numero_table = 1
                 req = requests.get(f"{host}{END_POINT}lancer/{numero_table}")
 
-                return GameMenu("")
+                return MenuManche("")
 
                 """
                 TableService().lancer_manche(table.numero_table)
