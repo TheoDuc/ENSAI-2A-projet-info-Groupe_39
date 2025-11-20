@@ -41,15 +41,26 @@ class MenuTable(VueAbstraite):
 
         if choix in boutons_tables:
             numero_table = int(choix.split()[1].replace(",", ""))
+            identifiant = Session().id  # ce que l’utilisateur entre (id ou pseudo)
 
-            # Si on a l'id du joueur dans la session, on essaie avec l'ID
-            if hasattr(Session(), "id") and Session().id is not None:
-                id_joueur = Session().id
-                req = requests.put(f"{host}{END_POINT}ajouter/{numero_table}/{id_joueur}")
+            # 1️⃣ CAS : l’utilisateur a entré un ID numérique
+            if identifiant.isdigit():
+                id_joueur = int(identifiant)
+
+            # 2️⃣ CAS : l’utilisateur a entré un pseudo
             else:
-                # Sinon on utilise le pseudo pour récupérer l'ID et connecter le joueur automatiquement
-                pseudo = Session().pseudo
-                req = requests.put(f"{host}{END_POINT}ajouter/{numero_table}/pseudo/{pseudo}")
+                # On récupère l'id correspondant
+                res = requests.get(f"{host}/joueur/connection/{identifiant}")
+                if res.status_code != 200:
+                    print("Pseudo inconnu !")
+                    from view.menu_joueur_vue import MenuJoueurVue
+
+                    return MenuJoueurVue()
+
+                id_joueur = res.json()["id"]  # ou ["id_joueur"] selon ton modèle
+
+            # 3️⃣ On appelle ta route actuelle
+            req = requests.put(f"{host}{END_POINT}ajouter/{numero_table}/{id_joueur}")
 
             if req.status_code == 200:
                 from view.menu_lancement_manche import GameMenu
