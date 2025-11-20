@@ -3,6 +3,7 @@
 import logging
 
 from business_object.table import Table
+from dao.joueur_dao import JoueurDao
 from service.joueur_service import JoueurService
 from service.manche_joueur_service import MancheJoueurService
 from service.manche_service import MancheService
@@ -134,7 +135,7 @@ class TableService:
         None
         """
 
-        joueur = JoueurService().trouver_par_id(id_joueur)
+        joueur = JoueurDao().trouver_par_id(id_joueur)
         table = self.table_par_numero(numero_table)
 
         joueur.rejoindre_table(table)

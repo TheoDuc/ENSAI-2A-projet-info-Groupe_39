@@ -88,15 +88,18 @@ class Test_JoueurService:
         mock_dao = MockDao.return_value
         joueur = Joueur(1, "A", 2000, "France")
         mock_dao.trouver_par_id.return_value = joueur
+
         service = JoueurService()
         service.dao = mock_dao
+
+        # Simuler que le joueur est connecté
+        service._joueurs_connectes[joueur.id_joueur] = joueur
 
         # WHEN
         result = service.trouver_par_id(1)
 
         # THEN
         assert result == joueur
-        mock_dao.trouver_par_id.assert_called_once_with(1)
 
     @patch("src.service.joueur_service.JoueurDao")
     def test_joueur_service_trouver_par_pseudo(self, MockDao):
