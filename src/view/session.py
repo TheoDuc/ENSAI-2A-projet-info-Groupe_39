@@ -38,11 +38,6 @@ class Session(metaclass=Singleton):
                     Session.joueurs_connectes.append(j)
 
     def deconnexion(self):
-
-        from service.joueur_service import JoueurService
-
-        JoueurService().deconnexion(id_joueur)
-
         """Suppression des données de la session"""
         self.joueur = None
         self.debut_connexion = None

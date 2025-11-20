@@ -60,6 +60,11 @@ async def joueur_connection(pseudo: str):
     logging.info("Connecte le joueur")
     return joueur_service.se_connecter(pseudo)
 
+@app.get("/joueur/deconnection/{id_joueur}", tags=["Joueurs"])
+async def joueur_connection(id_joueur: int):
+    """Deconnecte le joueur"""
+    logging.info("Deconnecte le joueur")
+    return joueur_service.deconnexion(id_joueur)
 
 # fonctionne
 @app.get("/joueur/liste/", tags=["Joueurs"])
