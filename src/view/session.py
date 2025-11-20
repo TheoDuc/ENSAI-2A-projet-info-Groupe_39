@@ -1,9 +1,12 @@
 from datetime import datetime
 
+import os
+import requests
 import pytz
 
 from utils.singleton import Singleton
 from service.joueur_service import JoueurService
+from business_object.joueur import Joueur
 
 
 class Session(metaclass=Singleton):
@@ -47,7 +50,20 @@ class Session(metaclass=Singleton):
         res = "Actuellement en session :\n"
         res += "-------------------------\n"
 
-        joueur = JoueurService().trouver_par_id(self.id)
+        host = os.environ["HOST_WEBSERVICE"]
+        END_POINT = "/joueur/id"
+
+        url = f"{host}{END_POINT}/{self.id}"
+        req = requests.get(url)
+        
+        reponse = req.json()
+        joueur = Joueur(
+            id_joueur=reponse["_Joueur__id_joueur"],
+            pseudo=reponse["_Joueur__pseudo"],
+            credit=reponse["_Joueur__credit"],
+            pays=reponse["_Joueur__pays"],
+        )
+
         if not joueur:
             return res + "Aucun joueur connecté.\n"
 

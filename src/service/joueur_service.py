@@ -28,6 +28,7 @@ class JoueurService:
 
         if joueur:
             self._joueurs_connectes[joueur.id_joueur] = joueur
+            
         return self._joueurs_connectes[joueur.id_joueur]
 
     @log
