@@ -164,7 +164,7 @@ async def creer_table(t: TableModel):
 
 
 # fonctionne
-@app.put("/table/ajouter/{numero_table}/{pseudo}", tags=["Table"])
+@app.put("/table/ajouter/{numero_table}/{id_joueur}", tags=["Table"])
 async def ajouter_joueur(numero_table: int, id_joueur: int):
     """ajoute un joueur a la table"""
     logging.info("ajoute un joueur a la table")
@@ -174,7 +174,7 @@ async def ajouter_joueur(numero_table: int, id_joueur: int):
 
 
 # fonctionne pas, le joueur ne garde pas en mémoire la table dans laquel il est
-@app.put("/table/retirer/{pseudo}", tags=["Table"])
+@app.put("/table/retirer/{id_joueur}", tags=["Table"])
 async def retirer_un_joueur(id_joueur: str):
     """retire un joueur a la table"""
     logging.info("retire un joueur a la table")
