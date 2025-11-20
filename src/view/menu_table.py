@@ -49,7 +49,7 @@ class MenuTable(VueAbstraite):
                 from view.menu_joueur_vue import MenuJoueurVue
 
                 return MenuJoueurVue()
-            from view.game_menu_view import GameMenu
+            from view.menu_lancement_manche import GameMenu
 
             print(f"Vous êtes connecté sur la table {numero_table}")
             return GameMenu()
@@ -79,7 +79,7 @@ class MenuTable(VueAbstraite):
             if Session().joueur not in Session.joueurs_connectes:
                 Session.joueurs_connectes.append(Session().joueur)
 
-            from view.game_menu_view import GameMenu
+            from view.menu_lancement_manche import GameMenu
 
             print(f"Vous êtes connecté sur la table {numero_table}")
             return GameMenu()
