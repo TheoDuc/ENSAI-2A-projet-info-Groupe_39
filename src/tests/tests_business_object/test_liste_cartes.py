@@ -143,3 +143,54 @@ class AbstractListeCartesTest(ABC):
 
         # THEN
         assert liste_carte.cartes != liste_carte_temoin.cartes
+
+    def test_liste_cartes_eq_type_diff(self, liste_cartes):
+        # GIVEN
+        autre = "pas une liste de cartes"
+
+        # WHEN / THEN
+        assert (liste_cartes == autre) is False
+
+
+    def test_liste_cartes_eq_ordre_diff(self, cls):
+        # GIVEN
+        cartes1 = [pytest.as_pique, pytest.dix_coeur]
+        cartes2 = [pytest.dix_coeur, pytest.as_pique]
+
+        liste1 = cls(cartes1, False)
+        liste2 = cls(cartes2, False)
+
+        # WHEN / THEN
+        assert (liste1 == liste2) is False
+
+
+    def test_liste_cartes_eq_contenu_diff(self, cls):
+        # GIVEN
+        cartes1 = [pytest.as_pique, pytest.dix_coeur]
+        cartes2 = [pytest.as_pique, pytest.cinq_trefle]
+
+        liste1 = cls(cartes1, False)
+        liste2 = cls(cartes2, False)
+
+        # WHEN / THEN
+        assert (liste1 == liste2) is False
+
+
+    def test_liste_cartes_eq_succes(self, cls):
+        # GIVEN
+        cartes = [pytest.as_pique, pytest.dix_coeur]
+
+        liste1 = cls(cartes, False)
+        liste2 = cls(cartes, False)
+
+        # WHEN / THEN
+        assert (liste1 == liste2) is True
+
+    def test_liste_cartes_retirer_carte_liste_vide(self, cls):
+        # GIVEN
+        liste = cls([], False)
+        message_attendu = "La liste de cartes est vide, aucune carte ne peut être retirée."
+
+        # WHEN / THEN
+        with pytest.raises(Exception, match=message_attendu):
+            liste.retirer_carte()
