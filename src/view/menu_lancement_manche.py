@@ -40,16 +40,28 @@ class GameMenu(VueAbstraite):
 
         match choix:
             case "Info de session":
+                from view.menu_lancement_manche import GameMenu
+
                 return GameMenu(Session().afficher(), temps_attente=3)
 
             case "Lancer manche":
                 joueur = JoueurService().trouver_par_id(Session().id)
                 logger.debug(f"{joueur.table}")
-                numero_table = joueur.table
+                # numero_table = joueur.table
+                numero_table = joueur.table.numero_table
                 # numero_table = 1
                 req = requests.get(f"{host}{END_POINT}lancer/{numero_table}")
 
-                return MenuManche("")
+                # return MenuManche("")
+
+                if req.status_code == 200:
+                    print("Manche lancée !")
+                    return MenuManche("")
+                else:
+                    print("Erreur lors du lancement de la manche")
+                    from view.game_menu_view import GameMenu
+
+                    return GameMenu(Session().afficher())
 
                 """
                 TableService().lancer_manche(table.numero_table)
