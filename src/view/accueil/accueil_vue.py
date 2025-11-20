@@ -48,7 +48,6 @@ class AccueilVue(VueAbstraite):
 
                 return InfosSessionVue("Chargement...", temps_attente=0)
 
-                return InfosSessionVue()
             case "Ré-initialiser la base de données":
                 succes = ResetDatabase().lancer()
                 message = (
