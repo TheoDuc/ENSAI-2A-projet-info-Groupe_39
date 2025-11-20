@@ -45,7 +45,9 @@ class AccueilVue(VueAbstraite):
                 return InscriptionVue("Création de compte joueur")
 
             case "Infos de session":
-                return AccueilVue(Session().afficher(), temps_attente=3)
+                from view.menu_joueur_vue import MenuJoueurVue
+
+                return MenuJoueurVue(Session().afficher(), temps_attente=3)
 
             case "Ré-initialiser la base de données":
                 succes = ResetDatabase().lancer()
