@@ -29,8 +29,8 @@ class ActionService:
             si aucune manche n'est en cours sur la table du joueur
             si le joueur n'est pas dans la manche en cours
         """
-
-        joueur = self.joueur_par_id(id_joueur)
+        joueur_service = JoueurService()
+        joueur = joueur_service.trouver_par_id(id_joueur)
 
         if joueur.table is None:
             raise ValueError(
@@ -68,7 +68,7 @@ class ActionService:
 
         joueur = JoueurService().trouver_par_id(id_joueur)
 
-        manche = self.manche_joueur(joueur)
+        manche = self.manche_joueur(id_joueur)
         indice_joueur = manche.indice_joueur(joueur)
 
         if not manche.est_tour(joueur):
@@ -95,10 +95,10 @@ class ActionService:
         Exception
             si ce n'est pas au tour du joueur de jouer
         """
+        joueur_service = JoueurService()
+        joueur = joueur_service.trouver_par_id(id_joueur)
 
-        joueur = JoueurService().trouver_par_id(id_joueur)
-
-        manche = self.manche_joueur(joueur)
+        manche = self.manche_joueur(id_joueur)
         indice_joueur = manche.indice_joueur(joueur)
 
         if not manche.est_tour(joueur):
@@ -132,7 +132,7 @@ class ActionService:
 
         joueur = JoueurService().trouver_par_id(id_joueur)
 
-        manche = self.manche_joueur(joueur)
+        manche = self.manche_joueur(id_joueur)
         indice_joueur = manche.indice_joueur(joueur)
 
         if not manche.est_tour(joueur):
@@ -161,7 +161,7 @@ class ActionService:
 
         joueur = JoueurService().trouver_par_id(id_joueur)
 
-        manche = self.manche_joueur(joueur)
+        manche = self.manche_joueur(id_joueur)
         indice_joueur = manche.indice_joueur(joueur)
 
         if not manche.est_tour(joueur):

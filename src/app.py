@@ -235,44 +235,39 @@ async def regarder_main(numero_table: int, id_joueur: int):
     return table_service.regarder_main(numero_table=numero_table, id_joueur=id_joueur)
 
 
-@app.get("/action/{pseudo}", tags=["Action"])
-async def manche_joueur(pseudo: str):
+@app.get("/action/{id}", tags=["Action"])
+async def manche_joueur(id: int):
     """Trouver la manche auquel joue le joueur"""
     logging.info("Trouver la manche auquel joue le joueur")
-    joueur = joueur_service.trouver_par_pseudo(pseudo)
-    return action_service.manche_joueur(joueur)
+    return action_service.manche_joueur(id)
 
 
-@app.put("/action/all_in/{pseudo}", tags=["Action"])
-async def all_in(pseudo: str):
+@app.put("/action/all_in/{id}", tags=["Action"])
+async def all_in(id: int):
     """Joue all_in pour le joueur"""
     logging.info("Joue all_in pour le joueur")
-    joueur = joueur_service.trouver_par_pseudo(pseudo)
-    return action_service.all_in(joueur)
+    return action_service.all_in(id)
 
 
-@app.put("/action/checker/{pseudo}", tags=["Action"])
-async def checker(pseudo: str):
+@app.put("/action/checker/{id}", tags=["Action"])
+async def checker(id: int):
     """Joue checker pour le joueur"""
     logging.info("Joue checker pour le joueur")
-    joueur = joueur_service.trouver_par_pseudo(pseudo)
-    return action_service.checker(joueur)
+    return action_service.checker(id)
 
 
-@app.put("/action/se_coucher/{pseudo}", tags=["Action"])
-async def se_coucher(pseudo: str):
+@app.put("/action/se_coucher/{id}", tags=["Action"])
+async def se_coucher(id: int):
     """Joue se_coucher pour le joueur"""
     logging.info("Joue se_coucher pour le joueur")
-    joueur = joueur_service.trouver_par_pseudo(pseudo)
-    return action_service.se_coucher(joueur)
+    return action_service.se_coucher(id)
 
 
-@app.put("/action/suivre/{pseudo}", tags=["Action"])
-async def suivre(pseudo: str):
+@app.put("/action/suivre/{id}", tags=["Action"])
+async def suivre(id: int):
     """Joue suivre pour le joueur"""
     logging.info("Joue suivre pour le joueur")
-    joueur = joueur_service.trouver_par_pseudo(pseudo)
-    return action_service.suivre(joueur)
+    return action_service.suivre(id)
 
 
 # Run the FastAPI application
