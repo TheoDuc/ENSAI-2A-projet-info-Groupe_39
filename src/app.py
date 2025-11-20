@@ -168,7 +168,13 @@ async def creer_table(t: TableModel):
 async def ajouter_joueur(numero_table: int, id_joueur: int):
     """ajoute un joueur a la table"""
     logging.info("ajoute un joueur a la table")
-    joueur = joueur_service.trouver_par_id(id_joueur)
+    try:
+        joueur = joueur_service.trouver_par_id(id_joueur)
+    except ValueError:
+        joueur = joueur_service.dao.trouver_par_id(id_joueur)
+        if not joueur:
+            return {"error": f"Le joueur avec l'id {id_joueur} n'existe pas"}
+        joueur_service._joueurs_connectes[id_joueur] = joueur
     table_service.ajouter_joueur(numero_table, id_joueur)
     return f"le joueur {joueur.pseudo} a été ajouté à la table {numero_table}"
 
