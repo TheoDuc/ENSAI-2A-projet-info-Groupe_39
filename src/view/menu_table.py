@@ -2,8 +2,8 @@
 
 import logging
 import os
-
 import requests
+
 from InquirerPy import inquirer
 
 from view.session import Session
@@ -42,14 +42,17 @@ class MenuTable(VueAbstraite):
         if choix in boutons_tables:
             numero_table = int(choix.split()[1].replace(",", ""))
             id_joueur = Session().id
-            req = requests.put(f"{host}{END_POINT}ajouter/{numero_table}/{id_joueur}")
-            if req.status_code == 200:
-                from view.menu_lancement_manche import GameMenu
+            url = f"{host}{END_POINT}ajouter/{numero_table}/{id_joueur}"
+            req = requests.put(url)
 
-                print(f"Vous êtes connecté sur la table {numero_table}")
-                return GameMenu()
+            if req.status_code == 200:
+                from view.menu_info_table import InfoTableMenu
+
+                message = f"Vous êtes connecté sur la table {numero_table}"
+                return InfoTableMenu(message, 2)
+
             else:
-                print("Erreur lors de la connexion à la table")
                 from view.menu_joueur_vue import MenuJoueurVue
 
-                return MenuJoueurVue()
+                message = f"Erreur lors de la connexion à la table {numero_table}"
+                return MenuJoueurVue(message)

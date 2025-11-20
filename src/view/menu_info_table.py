@@ -15,7 +15,7 @@ host = os.environ["HOST_WEBSERVICE"]
 END_POINT = "/table/"
 
 
-class GameMenu(VueAbstraite):
+class InfoTableMenu(VueAbstraite):
     """Vue du menu de jeu du joueur"""
 
     def choisir_menu(self):
@@ -39,7 +39,7 @@ class GameMenu(VueAbstraite):
         ).execute()
 
         match choix:
-            case "Info de session":
+            case "Joueurs à la table":
                 return GameMenu(Session().afficher(), temps_attente=3)
 
             case "Lancer manche":
@@ -57,13 +57,15 @@ class GameMenu(VueAbstraite):
                 """
 
             case "Quitter table":  # fonctionne pas
-                joueur = JoueurService().trouver_par_id(Session().id)
-                pseudo = joueur.pseudo
-                req = requests.put(f"{host}{END_POINT}quiter/{pseudo}")
+                id_joueur = Session().id
+                url = f"{host}{END_POINT}retirer/{id_joueur}"
+                req = requests.put(url)
 
                 if req.status_code == 200:
-                    print("vous avez quité la table")
+                    message = "vous avez quitté la table"
+                else:
+                    message = "vous n'avez pas pu quitter la table"
 
                 from view.menu_joueur_vue import MenuJoueurVue
 
-                return MenuJoueurVue(Session().afficher())
+                return MenuJoueurVue(message)
