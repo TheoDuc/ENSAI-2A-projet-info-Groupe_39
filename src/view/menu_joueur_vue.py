@@ -75,10 +75,21 @@ class MenuJoueurVue(VueAbstraite):
                 return MenuJoueurVue(reponse, temps_attente=3)
 
             case "Changer ses informations":
+                url = f"{host}/joueur/id/{id_joueur}"
+                req = requests.get(url)
+
+        
+                if req.status_code == 200:
+                    reponse = req.json()
+                    joueur = Joueur(
+                            id_joueur=reponse["_Joueur__id_joueur"],
+                            pseudo=reponse["_Joueur__pseudo"],
+                            credit=reponse["_Joueur__credit"],
+                            pays=reponse["_Joueur__pays"],
+                            table=reponse["_Joueur__table"])
                 END_POINT = "/joueur"
                 
-                joueur = JoueurService().trouver_par_id(Session().id)
-
+                req = requests.put(f"{host}{END_POINT}/{joueur.pseudo}/{credit}")
                 nouveau_pseudo = inquirer.text(message="Entrez votre  nouveau pseudo : ").execute()
                 nouveau_pays = inquirer.text(message="Entrez votre nouveau pays : ").execute()
 
