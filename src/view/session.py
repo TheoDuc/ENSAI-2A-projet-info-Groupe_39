@@ -60,8 +60,7 @@ class Session(metaclass=Singleton):
         if joueur.table:
             res += f"Joueurs à la table {joueur.table.numero_table} :\n"
             res += "-" * 40 + "\n"
-            for j in joueur.table.joueurs:  # Utilisation de la liste de la table
-                # Affiche "Non connecté" si le joueur n'a pas de debut_connexion
+            for j in joueur.table.joueurs:  # tous les joueurs assignés à la table
                 debut = getattr(j, "debut_connexion", "Non connecté")
                 res += f"{j.pseudo} : {j.credit} crédits (connexion : {debut})\n"
 
