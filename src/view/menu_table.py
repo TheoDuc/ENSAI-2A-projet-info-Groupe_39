@@ -6,6 +6,7 @@ import os
 import requests
 from InquirerPy import inquirer
 
+from view.session import Session
 from view.vue_abstraite import VueAbstraite
 
 host = os.environ["HOST_WEBSERVICE"]
@@ -40,7 +41,7 @@ class MenuTable(VueAbstraite):
 
         if choix in boutons_tables:
             numero_table = int(choix.split()[1].replace(",", ""))
-            id_joueur = self.id
+            id_joueur = Session().id
 
             # Ajout du joueur sur la table
             req = requests.put(f"{host}{END_POINT}ajouter/{numero_table}/{id_joueur}")
