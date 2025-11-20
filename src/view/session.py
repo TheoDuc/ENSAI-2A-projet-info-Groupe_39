@@ -57,6 +57,10 @@ class Session(metaclass=Singleton):
             res += f"Début connexion : {joueur.debut_connexion}\n"
         res += "\n"
 
+        print(
+            f"[DEBUG] Joueur {joueur.pseudo} est sur la table : {getattr(joueur.table, 'numero_table', 'Aucune')}"
+        )
+
         # Tous les joueurs à la même table
         if joueur.table:
             numero_table = joueur.table.numero_table
