@@ -9,54 +9,67 @@ from src.service.action_service import ActionService
 
 
 class Test_Action_Service:
-    def test_manche_joueur_normal(self):
+    def test_manche_joueur(self):
         # GIVEN
         joueur1 = Joueur(1, "A", 100, "France")
         joueur2 = Joueur(2, "B", 100, "France")
+
         info = InfoManche(joueurs=[joueur1, joueur2])
         manche = Manche(info=info, grosse_blind=50)
         table = type("Table", (), {"manche": manche})()
-        joueur1._Joueur__table = table
 
         service = ActionService()
-        service.joueur_par_id = lambda _id: joueur1
 
-        # WHEN
-        result = service.manche_joueur(joueur1.id_joueur)
+        with patch("src.service.action_service.JoueurService") as MockService:
+            instance = MockService.return_value
+            instance.trouver_par_id.return_value = joueur1
 
-        # THEN
-        assert result == manche
+            joueur1._Joueur__table = table
+            service.joueur_par_id = lambda _id: joueur1
+
+            # WHEN
+            result = service.manche_joueur(joueur1.id_joueur)
+
+            # THEN
+            assert result == manche
 
     def test_manche_joueur_table_sans_manche(self):
         # GIVEN
         joueur1 = Joueur(1, "A", 100, "France")
         table = type("Table", (), {"manche": None})()
-        joueur1._Joueur__table = table
-
+        # WHEN
         service = ActionService()
-        service.joueur_par_id = lambda _id: joueur1
+        with patch("src.service.action_service.JoueurService") as MockJS:
+            instance = MockJS.return_value
+            instance.trouver_par_id.return_value = joueur1
 
-        # WHEN / THEN
-        with pytest.raises(ValueError, match="aucune manche n'est en cours"):
-            service.manche_joueur(joueur1.id_joueur)
+            joueur1._Joueur__table = table
+            service.joueur_par_id = lambda _id: joueur1
+
+            # THEN
+            with pytest.raises(ValueError, match="aucune manche n'est en cours"):
+                service.manche_joueur(joueur1.id_joueur)
 
     def test_manche_joueur_pas_dans_manche(self):
         # GIVEN
         joueur1 = Joueur(1, "A", 100, "France")
         joueur2 = Joueur(2, "B", 100, "France")
         joueur3 = Joueur(3, "C", 100, "France")
-
-        info = InfoManche(joueurs=[joueur2, joueur3])  # joueur1 pas dedans
+        # WHEN
+        info = InfoManche(joueurs=[joueur2, joueur3])
         manche = Manche(info=info, grosse_blind=50)
         table = type("Table", (), {"manche": manche})()
         joueur1._Joueur__table = table
-
         service = ActionService()
-        service.joueur_par_id = lambda _id: joueur1
+        # THEN
+        with patch("src.service.action_service.JoueurService") as MockService:
+            instance = MockService.return_value
+            instance.trouver_par_id.return_value = joueur1
 
-        # WHEN / THEN
-        with pytest.raises(ValueError, match="ne participe pas à la manche"):
-            service.manche_joueur(joueur1.id_joueur)
+            service.joueur_par_id = lambda _id: joueur1
+
+            with pytest.raises(ValueError, match="ne participe pas à la manche"):
+                service.manche_joueur(joueur1.id_joueur)
 
     def test_manche_all_in_pas_tour(self):
         # GIVEN
@@ -115,7 +128,7 @@ class Test_Action_Service:
         manche = Mock()
         manche.est_tour.return_value = True
         manche.indice_joueur.return_value = 0
-        manche.info.statuts = [2]  # statut correct
+        manche.info.statuts = [2]
 
         service = ActionService()
         service.manche_joueur = Mock(return_value=manche)
@@ -153,8 +166,7 @@ class Test_Action_Service:
         manche = Mock()
         manche.est_tour.return_value = True
         manche.indice_joueur.return_value = 0
-        manche.info.statuts = [1]  # joueur ne peut pas checker
-
+        manche.info.statuts = [1]
         service = ActionService()
         service.manche_joueur = Mock(return_value=manche)
 
