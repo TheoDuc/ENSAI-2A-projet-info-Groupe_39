@@ -54,3 +54,6 @@ class AccueilVue(VueAbstraite):
                     f"Ré-initilisation de la base de données - {'SUCCES' if succes else 'ECHEC'}"
                 )
                 return AccueilVue(message)
+
+
+
