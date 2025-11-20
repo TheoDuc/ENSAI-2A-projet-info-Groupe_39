@@ -106,7 +106,7 @@ class AbstractCombinaison(ABC):
         int
             Valeur permettant de comparer deux combinaisons.
         """
-        pass
+        pass # pragma: no cover
 
     @classmethod
     @abstractmethod
@@ -124,7 +124,7 @@ class AbstractCombinaison(ABC):
         bool
             True si la combinaison est détectée, False sinon.
         """
-        pass
+        pass # pragma: no cover
 
     @classmethod
     @abstractmethod
@@ -142,7 +142,7 @@ class AbstractCombinaison(ABC):
         AbstractCombinaison
             Objet représentant la combinaison détectée.
         """
-        pass
+        pass # pragma: no cover
 
     # --- Comparaison entre combinaisons ---
     def _valeur_comparaison(self) -> Tuple[int, Tuple[int, ...], Tuple[int, ...]]:

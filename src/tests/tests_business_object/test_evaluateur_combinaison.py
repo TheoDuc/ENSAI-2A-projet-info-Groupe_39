@@ -141,3 +141,23 @@ def test_eval_carre():
     ]
     combi = EvaluateurCombinaison.eval(cartes)
     assert isinstance(combi, Carre)
+
+def test_eval_erreur_moins_de_5_cartes():
+    with pytest.raises(ValueError):
+        EvaluateurCombinaison.eval([])
+
+    with pytest.raises(ValueError):
+        EvaluateurCombinaison.eval([pytest.as_coeur, pytest.roi_pique])
+
+def test_eval_aucune_combinaison_retourne_simple():
+    cartes = [
+        pytest.as_coeur,     # As
+        pytest.roi_pique,    # Roi
+        pytest.huit_trefle,  # 8
+        pytest.six_carreau,  # 6
+        pytest.trois_coeur   # 3
+    ]
+
+    combi = EvaluateurCombinaison.eval(cartes)
+
+    assert isinstance(combi, Simple)

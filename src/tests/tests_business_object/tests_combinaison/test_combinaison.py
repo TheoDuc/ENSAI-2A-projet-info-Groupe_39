@@ -132,3 +132,21 @@ def test_combinaison_init_hauteur_invalide():
 def test_combinaison_init_kicker_invalide():
     with pytest.raises(TypeError):
         CombinaisonTest("As", kicker=123)
+
+def test_combinaison_eq_autre_type():
+    c = CombinaisonTest("As")
+    other = 42  # objet d'un autre type
+
+    # __eq__ doit renvoyer NotImplemented → Python interprète ça comme False
+    assert (c == other) is False
+    # Et l'opérateur inverse aussi
+    assert (other == c) is False
+
+
+def test_combinaison_lt_autre_type():
+    c = CombinaisonTest("As")
+    other = 42  # objet d'un autre type
+
+    # __lt__ renvoie NotImplemented → Python doit lever TypeError
+    with pytest.raises(TypeError):
+        c < other
