@@ -60,11 +60,13 @@ async def joueur_connection(pseudo: str):
     logging.info("Connecte le joueur")
     return joueur_service.se_connecter(pseudo)
 
+
 @app.get("/joueur/deconnection/{id_joueur}", tags=["Joueurs"])
 async def joueur_connection(id_joueur: int):
     """Deconnecte le joueur"""
     logging.info("Deconnecte le joueur")
     return joueur_service.deconnexion(id_joueur)
+
 
 # fonctionne
 @app.get("/joueur/liste/", tags=["Joueurs"])
@@ -163,20 +165,20 @@ async def creer_table(t: TableModel):
 
 # fonctionne
 @app.put("/table/ajouter/{numero_table}/{pseudo}", tags=["Table"])
-async def ajouter_joueur(numero_table: int, pseudo: str):
+async def ajouter_joueur(numero_table: int, id_joueur: int):
     """ajoute un joueur a la table"""
     logging.info("ajoute un joueur a la table")
-    joueur = joueur_service.trouver_par_pseudo(pseudo)
-    table_service.ajouter_joueur(numero_table, joueur.id_joueur)
+    joueur = joueur_service.trouver_par_id(id_joueur)
+    table_service.ajouter_joueur(numero_table, id_joueur)
     return f"le joueur {joueur.pseudo} a été ajouté à la table {numero_table}"
 
 
 # fonctionne pas, le joueur ne garde pas en mémoire la table dans laquel il est
 @app.put("/table/retirer/{pseudo}", tags=["Table"])
-async def retirer_un_joueur(pseudo: str):
+async def retirer_un_joueur(id_joueur: str):
     """retire un joueur a la table"""
     logging.info("retire un joueur a la table")
-    joueur = joueur_service.trouver_par_pseudo(pseudo)
+    joueur = joueur_service.trouver_par_id(id_joueur)
     print(joueur.table)
     # pourquoi c'est None ??
     table_service.retirer_joueur(joueur)
