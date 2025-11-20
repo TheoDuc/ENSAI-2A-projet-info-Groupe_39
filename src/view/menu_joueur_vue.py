@@ -49,6 +49,10 @@ class MenuJoueurVue(VueAbstraite):
 
         match choix:
             case "Se déconnecter":
+                id_joueur = Session().joueur.id_joueur
+                req = requests.get(
+                    f"{host}/joueur/deconnection/{id_joueur}")
+
                 Session().deconnexion()
                 from view.accueil.accueil_vue import AccueilVue
 

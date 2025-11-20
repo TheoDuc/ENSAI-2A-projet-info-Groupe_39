@@ -3,6 +3,7 @@ from datetime import datetime
 import pytz
 
 from utils.singleton import Singleton
+from service.joueur_service import JoueurService
 
 
 class Session(metaclass=Singleton):
@@ -17,12 +18,12 @@ class Session(metaclass=Singleton):
 
     def __init__(self):
         """Création de la session"""
-        self.joueur = None
+        self.id = None
         self.debut_connexion = None
 
     def connexion(self, joueur):
         """Enregistrement des données en session et mise à jour des joueurs de la table"""
-        self.joueur = joueur
+        self.id = joueur.id_joueur
 
         debut = datetime.now(pytz.timezone("Europe/Paris")).strftime("%d/%m/%Y %H:%M:%S")
         self.debut_connexion = debut
@@ -38,20 +39,15 @@ class Session(metaclass=Singleton):
                     Session.joueurs_connectes.append(j)
 
     def deconnexion(self):
-
-        from service.joueur_service import JoueurService
-
-        JoueurService().deconnexion(id_joueur)
-
         """Suppression des données de la session"""
-        self.joueur = None
+        self.id = None
         self.debut_connexion = None
 
     def afficher(self) -> str:
         res = "Actuellement en session :\n"
         res += "-------------------------\n"
 
-        joueur = self.joueur
+        joueur = JoueurService().trouver_par_id(self.id)
         if not joueur:
             return res + "Aucun joueur connecté.\n"
 
