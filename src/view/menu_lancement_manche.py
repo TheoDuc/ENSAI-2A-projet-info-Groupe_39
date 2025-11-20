@@ -31,12 +31,16 @@ class GameMenu(VueAbstraite):
         choix = inquirer.select(
             message="Faites votre choix : ",
             choices=[
+                "Info de session",
                 "Lancer manche",
                 "Quitter table",
             ],
         ).execute()
 
         match choix:
+            case "Info de session":
+                return GameMenu(Session().afficher(), temps_attente=3)
+
             case "Lancer manche":
                 logger.debug(f"{Session().joueur.table}")
                 # numero_table = Session().joueur.table.numero_table
