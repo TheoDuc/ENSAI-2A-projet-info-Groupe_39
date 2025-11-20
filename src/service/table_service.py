@@ -238,3 +238,30 @@ class TableService:
         id_manche = MancheService().sauvegarder_manche(table.manche)
         MancheJoueurService().sauvegarder_manche_joueur(id_manche, table.manche.info)
         table.rotation_dealer()
+
+    @log
+    def afficher_joueurs_table(self, numero_table: int) -> str:
+        """
+        Retourne une chaîne affichant tous les joueurs d'une table
+        avec pseudo, crédits et début de connexion.
+        """
+        try:
+            table = self.table_par_numero(numero_table)
+        except ValueError as e:
+            return str(e)
+
+        joueur_service = JoueurService()
+        res = f"Joueurs à la table {numero_table} :\n"
+        res += "-" * 40 + "\n"
+
+        if not table.joueurs:
+            return res + "Aucun joueur sur cette table.\n"
+
+        for j in table.joueurs:
+            # on récupère le joueur a partir du service pour être sûr que toutes les infos sont à jour
+            joueur = joueur_service.trouver_par_id(j.id_joueur)
+            if joueur:
+                debut = getattr(joueur, "debut_connexion", "Non connecté")
+                res += f"{joueur.pseudo} : {joueur.credit} crédits (connexion : {debut})\n"
+
+        return res

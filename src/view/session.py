@@ -2,6 +2,7 @@ from datetime import datetime
 
 import pytz
 
+from service.table_service import TableService
 from utils.singleton import Singleton
 
 
@@ -43,10 +44,9 @@ class Session(metaclass=Singleton):
         self.joueur = None
         self.debut_connexion = None
 
-    def afficher(self, table_service) -> str:
+    def afficher(self, table_service: "TableService") -> str:
         """
         Affiche le joueur connecté et tous les joueurs présents sur la même table.
-        table_service : instance d'un service permettant de récupérer les joueurs d'une table.
         """
         res = "Actuellement en session :\n"
         res += "-------------------------\n"
@@ -63,14 +63,6 @@ class Session(metaclass=Singleton):
 
         # Joueurs présents sur la même table
         if joueur.table:
-            res += f"Joueurs à la table {joueur.table.numero_table} :\n"
-            res += "-------------------------\n"
-
-            # Récupère depuis le service / DB
-            joueurs_table = table_service.get_joueurs(joueur.table.numero_table)
-
-            for j in joueurs_table:
-                res += f"{j.pseudo} : {j.credit} crédits\n"
-            res += "\n"
+            res += table_service.afficher_joueurs_table(joueur.table.numero_table)
 
         return res
