@@ -55,7 +55,7 @@ class MenuJoueurVue(VueAbstraite):
                 return AccueilVue()
 
             case "Infos de session":
-                from service.table_service import TableService
+                from src.service.table_service import TableService
 
                 table_service = TableService()
                 return MenuJoueurVue(Session().afficher(table_service), temps_attente=3)
