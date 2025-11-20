@@ -2,8 +2,8 @@
 
 import logging
 import os
-import requests
 
+import requests
 from InquirerPy import inquirer
 
 from view.session import Session
@@ -41,18 +41,23 @@ class MenuTable(VueAbstraite):
 
         if choix in boutons_tables:
             numero_table = int(choix.split()[1].replace(",", ""))
-            id_joueur = Session().id
-            url = f"{host}{END_POINT}ajouter/{numero_table}/{id_joueur}"
-            req = requests.put(url)
+
+            # Si on a l'id du joueur dans la session, on essaie avec l'ID
+            if hasattr(Session(), "id") and Session().id is not None:
+                id_joueur = Session().id
+                req = requests.put(f"{host}{END_POINT}ajouter/{numero_table}/{id_joueur}")
+            else:
+                # Sinon on utilise le pseudo pour récupérer l'ID et connecter le joueur automatiquement
+                pseudo = Session().pseudo
+                req = requests.put(f"{host}{END_POINT}ajouter/{numero_table}/pseudo/{pseudo}")
 
             if req.status_code == 200:
-                from view.menu_info_table import InfoTableMenu
+                from view.menu_lancement_manche import GameMenu
 
-                message = f"Vous êtes connecté sur la table {numero_table}"
-                return InfoTableMenu(message, 2)
-
+                print(f"Vous êtes connecté sur la table {numero_table}")
+                return GameMenu()
             else:
+                print("Erreur lors de la connexion à la table")
                 from view.menu_joueur_vue import MenuJoueurVue
 
-                message = f"Erreur lors de la connexion à la table {numero_table}"
-                return MenuJoueurVue(message)
+                return MenuJoueurVue()
