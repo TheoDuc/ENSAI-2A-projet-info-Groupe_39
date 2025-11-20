@@ -134,6 +134,7 @@ class TableService:
         table = self.table_par_numero(numero_table)
 
         joueur.rejoindre_table(table)
+        JoueurService().modifier(joueur)
 
     @log
     def retirer_joueur(self, id_joueur: int) -> None:
