@@ -50,6 +50,8 @@ class MenuTable(VueAbstraite):
             # Récupération des infos de la table depuis le serveur
             table_req = requests.get(f"{host}{END_POINT}{numero_table}")
             table_data = table_req.json()
+            print("DEBUG - Table récupérée depuis le serveur :")
+            print(table_data)
 
             # Mettre à jour la table globale
             from business_object.joueur import Joueur
