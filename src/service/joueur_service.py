@@ -14,9 +14,9 @@ class JoueurService:
     - Rattachement à une table
     - Gestion des crédits via les méthodes de Joueur
     """
-
-    dao = JoueurDao()
-    _joueurs_connectes: dict[int, Joueur] = {}
+    def __init__(self):
+        self.dao = JoueurDao()
+        self._joueurs_connectes: dict[int, Joueur] = {}
 
     @log
     def se_connecter(self, pseudo: str) -> Joueur | None:
