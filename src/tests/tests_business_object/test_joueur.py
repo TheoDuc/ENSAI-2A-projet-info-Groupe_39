@@ -203,3 +203,41 @@ class TestJoueur:
         # WHEN / THEN
         with pytest.raises(Exception, match=message_attendu):
             joueur.quitter_table()
+
+    def test_joueur_changer_pseudo_succes(self, joueur):
+        # GIVEN
+        nouveau_pseudo = "Raichu"
+
+        # WHEN
+        joueur.changer_pseudo(nouveau_pseudo)
+
+        # THEN
+        assert joueur.pseudo == "Raichu"
+
+    def test_joueur_changer_pseudo_TypeError(self, joueur):
+        # GIVEN
+        nouveau_pseudo = 123
+        msg = f"Le pseudo doit être de type str : {type(nouveau_pseudo)}"
+
+        # WHEN / THEN
+        with pytest.raises(TypeError, match=msg):
+            joueur.changer_pseudo(nouveau_pseudo)
+
+    def test_joueur_changer_pays_succes(self, joueur):
+        # GIVEN
+        nouveau_pays = "Japon"
+
+        # WHEN
+        joueur.changer_pays(nouveau_pays)
+
+        # THEN
+        assert joueur.pays == "Japon"
+
+    def test_joueur_changer_pays_TypeError(self, joueur):
+        # GIVEN
+        nouveau_pays = 42
+        msg = f"Le pays doit être de type str : {type(nouveau_pays)}"
+
+        # WHEN / THEN
+        with pytest.raises(TypeError, match=msg):
+            joueur.changer_pays(nouveau_pays)
