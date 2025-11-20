@@ -69,6 +69,7 @@ class Session(metaclass=Singleton):
 
             # Récupération des joueurs depuis la table globale
             table = Session.tables_globales.get(numero_table)
+            print(table)
             if table:
                 for j in table.joueurs:
                     # On cherche le joueur dans la liste globale des connectés
