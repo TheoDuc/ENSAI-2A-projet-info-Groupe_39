@@ -49,7 +49,8 @@ class MenuTable(VueAbstraite):
                 from view.menu_joueur_vue import MenuJoueurVue
 
                 return MenuJoueurVue()
-            from view.menu_lancement_manche import GameMenu
+            else:
+                from view.menu_lancement_manche import GameMenu
 
-            print(f"Vous êtes connecté sur la table {numero_table}")
-            return GameMenu()
+                print(f"Vous êtes connecté sur la table {numero_table}")
+                return GameMenu(numero_table)

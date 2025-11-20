@@ -4,10 +4,10 @@ import os
 import requests
 from InquirerPy import inquirer
 
-from view.session import Session
-from view.vue_abstraite import VueAbstraite
 from service.joueur_service import JoueurService
 from view.menu_manche import MenuManche
+from view.session import Session
+from view.vue_abstraite import VueAbstraite
 
 logger = logging.getLogger(__name__)
 
