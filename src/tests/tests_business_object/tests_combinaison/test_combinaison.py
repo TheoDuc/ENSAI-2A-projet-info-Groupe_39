@@ -124,3 +124,11 @@ def test_combinaison_verifier_min_cartes():
     # THEN: Erreur si moins de 5 cartes
     with pytest.raises(ValueError):
         CombinaisonTest.verifier_min_cartes([1, 2, 3], n=5)
+
+def test_combinaison_init_hauteur_invalide():
+    with pytest.raises(TypeError):
+        CombinaisonTest(123)  # hauteur invalide
+
+def test_combinaison_init_kicker_invalide():
+    with pytest.raises(TypeError):
+        CombinaisonTest("As", kicker=123)

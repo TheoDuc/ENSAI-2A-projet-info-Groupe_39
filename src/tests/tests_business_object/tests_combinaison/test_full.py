@@ -113,3 +113,17 @@ def test_str_repr_full():
     # THEN
     assert str(full) == "Full Dame Roi"
     assert repr(full) == "Full(hauteur=['Dame', 'Roi'], kicker=None)"
+
+def test_from_cartes_brelan_sans_paire():
+    # GIVEN : un brelan mais aucune paire distincte
+    cartes = [
+        pytest.dame_coeur,
+        pytest.dame_pique,
+        pytest.dame_trefle,  # brelan
+        pytest.roi_coeur,
+        pytest.as_coeur,
+    ]
+
+    # WHEN / THEN : on doit lever l'erreur spécifique de manque de paire
+    with pytest.raises(ValueError, match="Aucune paire pour former un Full"):
+        Full.from_cartes(cartes)

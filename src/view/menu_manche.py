@@ -31,7 +31,8 @@ class MenuManche(VueAbstraite):
             message="Faites votre choix : ",
             choices=[
                 "Voir les infos de la manche",
-                "Regarder mainChecker",
+                "Regarder main",
+                "Checker",
                 "Suivre",
                 "All in",
                 "Se coucher",
@@ -41,30 +42,41 @@ class MenuManche(VueAbstraite):
 
         match choix:
             case "Voir les infos de la manche":
-                return
+                numero_table = 1
+                # numero_table = Session().joueur.table.numero_table
+                req = requests.get(f"{host}/table/affichage/{numero_table}")
+                if req.status_code == 200:
+                    print(req.text)
+                return MenuManche()
 
             case "Regarder main":
-                return
+                numero_table = 1
+                id_joueur =  Session().joueur.id_joueur
+                # numero_table = Session().joueur.table.numero_table
+                req = requests.get(f"{host}/table/main/{numero_table}/{id_joueur}")
+                if req.status_code == 200:
+                    print(req.text)
+                return MenuManche()
 
             case "Checker":
                 pseudo = Session().joueur.pseudo
                 req = requests.put(f"{host}{END_POINT}checker/{pseudo}")
-                return
+                return MenuManche()
 
             case "Suivre":
                 pseudo = Session().joueur.pseudo
                 req = requests.put(f"{host}{END_POINT}suivre/{pseudo}")
-                return
+                return MenuManche()
 
             case "All in":
                 pseudo = Session().joueur.pseudo
                 req = requests.put(f"{host}{END_POINT}all_in/{pseudo}")
-                return
+                return MenuManche()
 
             case "Se coucher":
                 pseudo = Session().joueur.pseudo
                 req = requests.put(f"{host}{END_POINT}se_coucher/{pseudo}")
-                return
+                return MenuManche()
 
             case "Quitter manche":
                 # numero_table = Session().joueur.table.numero_table

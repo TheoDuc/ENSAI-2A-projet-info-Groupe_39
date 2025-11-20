@@ -6,6 +6,8 @@ from InquirerPy import inquirer
 
 from view.session import Session
 from view.vue_abstraite import VueAbstraite
+from service.joueur_service import JoueurService
+from view.menu_manche import MenuManche
 
 logger = logging.getLogger(__name__)
 
@@ -30,19 +32,24 @@ class GameMenu(VueAbstraite):
         choix = inquirer.select(
             message="Faites votre choix : ",
             choices=[
+                "Info de session",
                 "Lancer manche",
                 "Quitter table",
             ],
         ).execute()
 
         match choix:
+            case "Info de session":
+                return GameMenu(Session().afficher(), temps_attente=3)
+
             case "Lancer manche":
-                logger.debug(f"{Session().joueur.table}")
-                # numero_table = Session().joueur.table.numero_table
-                numero_table = 1
+                joueur = JoueurService().trouver_par_id(Session().id)
+                logger.debug(f"{joueur.table}")
+                numero_table = joueur.table
+                # numero_table = 1
                 req = requests.get(f"{host}{END_POINT}lancer/{numero_table}")
 
-                return GameMenu("")
+                return MenuManche("")
 
                 """
                 TableService().lancer_manche(table.numero_table)
@@ -50,7 +57,8 @@ class GameMenu(VueAbstraite):
                 """
 
             case "Quitter table":  # fonctionne pas
-                pseudo = Session().joueur.pseudo
+                joueur = JoueurService().trouver_par_id(Session().id)
+                pseudo = joueur.pseudo
                 req = requests.put(f"{host}{END_POINT}quiter/{pseudo}")
 
                 if req.status_code == 200:
