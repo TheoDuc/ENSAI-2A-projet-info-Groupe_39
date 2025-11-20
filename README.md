@@ -133,7 +133,7 @@ Pour vérifier que toutes les fonctionnalités du projet fonctionnent correcteme
 1. Ouvrez votre terminal (Git Bash, PowerShell, ou autre).
 2. Lancez les tests avec `pytest` :
 
-Pour que Python saches que src contient les modules,Faire dans le terminal à la racine du projet:
+Pour que Python saches que src contient les modules,Faire d'abord dans le terminal à la racine du projet:
 
 ```bash
 export PYTHONPATH=$(pwd)/src
@@ -164,12 +164,11 @@ Vous pouvez générer un rapport de couverture de code avec **Coverage** pour v�
 #### Étapes
 
 
-Pour que Python saches que src contient les modules,Faire dans le terminal à la racine du projet:
+Pour que Python saches que src contient les modules,Faire d'abord dans le terminal à la racine du projet:
 
 ```bash
 export PYTHONPATH=$(pwd)/src
 ```
-Ensuite vous pouvez excecuter :
 1. Exécutez les tests avec Coverage :
 
 ```bash

@@ -1,11 +1,15 @@
 """Implémentation de la classe TableService"""
 
+import logging
+
 from business_object.table import Table
 from dao.joueur_dao import JoueurDao
 from service.joueur_service import JoueurService
 from service.manche_joueur_service import MancheJoueurService
 from service.manche_service import MancheService
 from utils.log_decorator import log
+
+logger = logging.getLogger(__name__)
 
 
 class TableService:
@@ -135,7 +139,6 @@ class TableService:
         table = self.table_par_numero(numero_table)
 
         joueur.rejoindre_table(table)
-        JoueurService().modifier(joueur)
 
     @log
     def retirer_joueur(self, id_joueur: int) -> None:
