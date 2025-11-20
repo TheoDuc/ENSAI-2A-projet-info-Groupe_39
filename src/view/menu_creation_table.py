@@ -5,6 +5,7 @@ from InquirerPy import inquirer
 
 from business_object.table import Table
 from view.vue_abstraite import VueAbstraite
+from service.joueur_service import JoueurService
 
 host = os.environ["HOST_WEBSERVICE"]
 END_POINT = "/table/"

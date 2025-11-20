@@ -41,7 +41,7 @@ class MenuTable(VueAbstraite):
             return MenuCreationTable()
 
         if choix in boutons_tables:
-            numero_table = int(choix[6])
+            numero_table = int(choix.split()[1].replace(",", ""))
             joueur= JoueurService().trouver_par_id(Session().id)
             pseudo = joueur.pseudo
 

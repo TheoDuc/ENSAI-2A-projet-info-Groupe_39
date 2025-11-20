@@ -4,6 +4,7 @@ import requests
 from InquirerPy import inquirer
 
 from view.session import Session
+from service.joueur_service import JoueurService
 from view.vue_abstraite import VueAbstraite
 
 host = os.environ["HOST_WEBSERVICE"]
@@ -49,7 +50,7 @@ class MenuJoueurVue(VueAbstraite):
 
         match choix:
             case "Se déconnecter":
-                id_joueur = Session().joueur.id_joueur
+                id_joueur = Session().id
                 req = requests.get(
                     f"{host}/joueur/deconnection/{id_joueur}")
 
@@ -75,7 +76,8 @@ class MenuJoueurVue(VueAbstraite):
 
             case "Changer ses informations":
                 END_POINT = "/joueur"
-                joueur = Session().joueur
+                
+                joueur = JoueurService().trouver_par_id(Session().id)
 
                 nouveau_pseudo = inquirer.text(message="Entrez votre  nouveau pseudo : ").execute()
                 nouveau_pays = inquirer.text(message="Entrez votre nouveau pays : ").execute()
@@ -89,7 +91,6 @@ class MenuJoueurVue(VueAbstraite):
                     reponse = req.json()
                 print(reponse)
 
-                # Session().joueur = un truc mais je sais pas quoi
                 return MenuJoueurVue(reponse)
 
             case "Tables":
@@ -98,7 +99,7 @@ class MenuJoueurVue(VueAbstraite):
                 return MenuTable()
 
             case "Se créditer":
-                joueur = Session().joueur
+                joueur = JoueurService().trouver_par_id(Session().id)
                 admin = inquirer.text(message="Etes vous un administrateur : (oui/non)").execute()
                 if admin == "non":
                     return MenuJoueurVue(Session().joueur)
@@ -113,8 +114,7 @@ class MenuJoueurVue(VueAbstraite):
                     reponse = req.json()
                 print(reponse)
 
-                # Session().joueur = un truc mais je sais pas quoi
-                return MenuJoueurVue(Session().joueur)
+                return MenuJoueurVue(JoueurService().trouver_par_id(Session().id))
 
             case "Lire les regles":
                 texte = """
