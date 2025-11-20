@@ -42,13 +42,10 @@ class MenuTable(VueAbstraite):
 
         if choix in boutons_tables:
             numero_table = int(choix.split()[1].replace(",", ""))
-            joueur= JoueurService().trouver_par_id(Session().id)
-            pseudo = joueur.pseudo
+            id_joueur = Session().id
 
-            # Ajout du joueur sur le serveur
-            req = requests.put(f"{host}{END_POINT}ajouter/{numero_table}/{pseudo}")
-            print(req.status_code)
-            print(req.text)
+            # Ajout du joueur sur la table
+            req = requests.put(f"{host}{END_POINT}ajouter/{numero_table}/{id_joueur}")
             if req.status_code != 200:
                 from view.menu_joueur_vue import MenuJoueurVue
 
