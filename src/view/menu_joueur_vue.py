@@ -54,8 +54,8 @@ class MenuJoueurVue(VueAbstraite):
 
                 return AccueilVue()
 
-            case "Infos de session":
-                return MenuJoueurVue(Session().afficher(), temps_attente=3)
+            # case "Infos de session":
+            #     return MenuJoueurVue(Session().afficher(), temps_attente=3)
 
             case "Afficher les joueurs de la base de données":
                 END_POINT = "/joueur/liste/"
