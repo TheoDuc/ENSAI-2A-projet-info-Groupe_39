@@ -1,7 +1,6 @@
 from InquirerPy import inquirer
 
 from utils.reset_database import ResetDatabase
-from view.session import Session
 from view.vue_abstraite import VueAbstraite
 
 
@@ -45,10 +44,9 @@ class AccueilVue(VueAbstraite):
                 return InscriptionVue("Création de compte joueur")
 
             case "Infos de session":
-                # self.session est l'instance existante de Session
-                session = Session()  # Singleton → renvoie toujours la même instance
-                return AccueilVue(session.afficher(), temps_attente=3)
+                from view.accueil.InfosSessionVue import InfosSessionVue
 
+                return InfosSessionVue()
             case "Ré-initialiser la base de données":
                 succes = ResetDatabase().lancer()
                 message = (
