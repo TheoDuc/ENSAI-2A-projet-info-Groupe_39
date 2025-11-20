@@ -1,5 +1,6 @@
 """Menu des tables"""
 
+import logging
 import os
 
 import requests
@@ -10,6 +11,8 @@ from view.vue_abstraite import VueAbstraite
 
 host = os.environ["HOST_WEBSERVICE"]
 END_POINT = "/table/"
+
+logger = logging.getLogger(__name__)
 
 
 class MenuTable(VueAbstraite):
@@ -50,8 +53,7 @@ class MenuTable(VueAbstraite):
             # Récupération des infos de la table depuis le serveur
             table_req = requests.get(f"{host}{END_POINT}{numero_table}")
             table_data = table_req.json()
-            print("DEBUG - Table récupérée depuis le serveur :")
-            print(table_data)
+            logger.info("DEBUG - Table récupérée depuis le serveur : %s", table_data)
 
             # Mettre à jour la table globale
             from business_object.joueur import Joueur
