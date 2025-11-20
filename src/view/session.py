@@ -13,6 +13,7 @@ class Session(metaclass=Singleton):
     """
 
     joueurs_connectes = []
+    tables_globales = {}
 
     def __init__(self):
         """Création de la session"""
@@ -56,12 +57,23 @@ class Session(metaclass=Singleton):
             res += f"Début connexion : {joueur.debut_connexion}\n"
         res += "\n"
 
-        # Tous les joueurs à la même table, connectés ou non
+        # Tous les joueurs à la même table
         if joueur.table:
-            res += f"Joueurs à la table {joueur.table.numero_table} :\n"
+            numero_table = joueur.table.numero_table
+            res += f"Joueurs à la table {numero_table} :\n"
             res += "-" * 40 + "\n"
-            for j in joueur.table.joueurs:  # tous les joueurs assignés à la table
-                debut = getattr(j, "debut_connexion", "Non connecté")
-                res += f"{j.pseudo} : {j.credit} crédits (connexion : {debut})\n"
+
+            # Récupération des joueurs depuis la table globale
+            table = Session.tables_globales.get(numero_table)
+            if table:
+                for j in table.joueurs:
+                    # On cherche le joueur dans la liste globale des connectés
+                    if j in Session.joueurs_connectes:
+                        debut = getattr(j, "debut_connexion", "Connexion inconnue")
+                    else:
+                        debut = "Non connecté"
+                    res += f"{j.pseudo} : {j.credit} crédits (connexion : {debut})\n"
+            else:
+                res += "Impossible de récupérer les joueurs de la table.\n"
 
         return res
