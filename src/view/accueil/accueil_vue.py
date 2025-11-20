@@ -47,7 +47,9 @@ class AccueilVue(VueAbstraite):
             case "Infos de session":
                 from view.menu_joueur_vue import MenuJoueurVue
 
-                return MenuJoueurVue(Session().afficher(), temps_attente=3)
+                # self.session est l'instance existante de Session
+                session = Session()  # Singleton → renvoie toujours la même instance
+                return MenuJoueurVue(session.afficher(), temps_attente=3)
 
             case "Ré-initialiser la base de données":
                 succes = ResetDatabase().lancer()

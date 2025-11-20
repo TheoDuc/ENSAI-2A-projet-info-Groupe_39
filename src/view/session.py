@@ -51,18 +51,18 @@ class Session(metaclass=Singleton):
         if not joueur:
             return res + "Aucun joueur connecté.\n"
 
-        res += f"joueur connecté : {joueur.pseudo} : {joueur.credit} crédits\n"
+        res += f"Joueur connecté : {joueur.pseudo} : {joueur.credit} crédits\n"
         if getattr(joueur, "debut_connexion", None):
-            res += f"debut_connexion : {joueur.debut_connexion}\n"
+            res += f"Début connexion : {joueur.debut_connexion}\n"
         res += "\n"
 
-        # Tous les joueurs connectés à la même table
+        # Tous les joueurs à la même table, connectés ou non
         if joueur.table:
             res += f"Joueurs à la table {joueur.table.numero_table} :\n"
             res += "-" * 40 + "\n"
-            for j in Session.joueurs_connectes:
-                if j.table == joueur.table:
-                    debut = getattr(j, "debut_connexion", "Non connecté")
-                    res += f"{j.pseudo} : {j.credit} crédits (connexion : {debut})\n"
+            for j in joueur.table.joueurs:  # Utilisation de la liste de la table
+                # Affiche "Non connecté" si le joueur n'a pas de debut_connexion
+                debut = getattr(j, "debut_connexion", "Non connecté")
+                res += f"{j.pseudo} : {j.credit} crédits (connexion : {debut})\n"
 
         return res
