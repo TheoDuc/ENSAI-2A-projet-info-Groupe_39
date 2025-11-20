@@ -14,6 +14,7 @@ class JoueurService:
     - Rattachement à une table
     - Gestion des crédits via les méthodes de Joueur
     """
+
     def __init__(self):
         self.dao = JoueurDao()
         self._joueurs_connectes: dict[int, Joueur] = {}
@@ -28,7 +29,6 @@ class JoueurService:
 
         if joueur:
             self._joueurs_connectes[joueur.id_joueur] = joueur
-            
         return self._joueurs_connectes[joueur.id_joueur]
 
     @log
@@ -78,7 +78,7 @@ class JoueurService:
         """Récupère un joueur par ID"""
         if id_joueur in self._joueurs_connectes.keys():
             return self._joueurs_connectes[id_joueur]
-        
+
         raise ValueError(f"Le joueur avec l'identifiant {id_joueur} n'est pas connecté")
 
     def trouver_par_pseudo(self, pseudo: str) -> Joueur | None:

@@ -88,10 +88,11 @@ class Test_JoueurService:
         mock_dao = MockDao.return_value
         joueur = Joueur(1, "A", 2000, "France")
         mock_dao.trouver_par_id.return_value = joueur
+
         service = JoueurService()
         service.dao = mock_dao
 
-        # Ajouter le joueur aux connectés
+        # Simuler que le joueur est connecté
         service._joueurs_connectes[joueur.id_joueur] = joueur
 
         # WHEN
