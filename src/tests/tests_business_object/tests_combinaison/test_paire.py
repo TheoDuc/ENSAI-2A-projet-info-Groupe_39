@@ -25,6 +25,7 @@ class Test_Paire:
         assert paire.kicker[0] == "Roi"
         assert all(k in Carte.VALEURS() for k in paire.kicker)
 
+
     def test_paire_init_invalide(self):
         # GIVEN : cartes sans Paire
         cartes = [pytest.dame_coeur, pytest.roi_coeur, pytest.valet_coeur]
@@ -64,3 +65,14 @@ class Test_Paire:
         # THEN : vérifications
         assert texte_str == "Paire Dame"
         assert texte_repr == "Paire(hauteur=Dame, kicker=('Roi', 'Valet', '10'))"
+
+    def test_paire_str_as(self):
+        # GIVEN
+        paire = Paire("As", ("Roi", "Dame", "Valet"))
+
+        # WHEN
+        texte = str(paire)
+
+        # THEN
+        assert texte == "Paire d'As"
+
