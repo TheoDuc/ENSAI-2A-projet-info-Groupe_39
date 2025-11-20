@@ -45,11 +45,9 @@ class AccueilVue(VueAbstraite):
                 return InscriptionVue("Création de compte joueur")
 
             case "Infos de session":
-                from view.menu_joueur_vue import MenuJoueurVue
-
                 # self.session est l'instance existante de Session
                 session = Session()  # Singleton → renvoie toujours la même instance
-                return MenuJoueurVue(session.afficher(), temps_attente=3)
+                return AccueilVue(session.afficher(), temps_attente=3)
 
             case "Ré-initialiser la base de données":
                 succes = ResetDatabase().lancer()
