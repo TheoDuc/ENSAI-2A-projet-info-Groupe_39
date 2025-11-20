@@ -4,6 +4,7 @@ import requests
 
 from view.session import Session
 from view.vue_abstraite import VueAbstraite
+from service.joueur_service import JoueurService
 
 host = os.environ["HOST_WEBSERVICE"]
 
@@ -11,7 +12,7 @@ host = os.environ["HOST_WEBSERVICE"]
 class InfosSessionVue(VueAbstraite):
     def choisir_menu(self):
         session = Session()
-        joueur = session.joueur
+        joueur = JoueurService().trouver_par_id(session.id)
 
         res = "\n==================== INFOS SESSION ====================\n"
 

@@ -7,6 +7,7 @@ import requests
 from InquirerPy import inquirer
 
 from view.session import Session
+from service.joueur_service import JoueurService
 from view.vue_abstraite import VueAbstraite
 
 host = os.environ["HOST_WEBSERVICE"]
@@ -41,7 +42,8 @@ class MenuTable(VueAbstraite):
 
         if choix in boutons_tables:
             numero_table = int(choix[6])
-            pseudo = Session().joueur.pseudo
+            joueur= JoueurService().trouver_par_id(Session().id)
+            pseudo = joueur.pseudo
 
             # Ajout du joueur sur le serveur
             req = requests.put(f"{host}{END_POINT}ajouter/{numero_table}/{pseudo}")
@@ -51,36 +53,6 @@ class MenuTable(VueAbstraite):
                 from view.menu_joueur_vue import MenuJoueurVue
 
                 return MenuJoueurVue()
-            from view.menu_lancement_manche import GameMenu
-
-            print(f"Vous êtes connecté sur la table {numero_table}")
-            return GameMenu()
-
-            # Récupération des infos de la table depuis le serveur
-            table_req = requests.get(f"{host}{END_POINT}{numero_table}")
-            table_data = table_req.json()
-            logger.info("DEBUG - Table récupérée depuis le serveur : %s", table_data)
-
-            # Mettre à jour la table globale
-            from business_object.joueur import Joueur
-            from business_object.table import Table
-
-            Session.tables_globales[numero_table] = Table(
-                numero_table=table_data["numero_table"],
-                grosse_blind=table_data["grosse_blind"],
-                joueurs=[
-                    Joueur(j["id_joueur"], j["pseudo"], j["credit"], j["pays"])
-                    for j in table_data["joueurs"]
-                ],
-            )
-
-            # Mettre à jour la session du joueur connecté
-            Session().joueur.table = Session.tables_globales[numero_table]
-
-            # Mettre à jour la liste des joueurs connectés
-            if Session().joueur not in Session.joueurs_connectes:
-                Session.joueurs_connectes.append(Session().joueur)
-
             from view.menu_lancement_manche import GameMenu
 
             print(f"Vous êtes connecté sur la table {numero_table}")
