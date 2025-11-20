@@ -1,28 +1,54 @@
-from InquirerPy import inquirer
+import os
+
+import requests
 
 from view.session import Session
 from view.vue_abstraite import VueAbstraite
 
+host = os.environ["HOST_WEBSERVICE"]
+
 
 class InfosSessionVue(VueAbstraite):
-    """Vue pour afficher les informations de la session"""
-
     def choisir_menu(self):
-        """Affiche les infos de session et retourne au menu après un temps d'attente ou input"""
-
         session = Session()
-        texte = session.afficher()
+        joueur = session.joueur
 
-        if session.joueur is None:
-            texte += "\n⚠ Aucun joueur n'est actuellement connecté."
+        res = "\n==================== INFOS SESSION ====================\n"
 
-        print("\n" + "-" * 50)
-        print("Infos de session")
-        print("-" * 50 + "\n")
-        print(texte)
+        # A) Joueur connecté dans CE terminal
+        if joueur is None:
+            res += "Aucun joueur connecté dans ce terminal.\n"
+            return InfosSessionVue(res, temps_attente=3)
 
-        inquirer.text(message="Appuyez sur Entrée pour revenir au menu...").execute()
+        res += f"Joueur connecté : {joueur.pseudo} ({joueur.credit} crédits)\n"
+        res += f"Début connexion : {getattr(joueur, 'debut_connexion', 'N/A')}\n\n"
 
-        from view.accueil.accueil_vue import AccueilVue
+        # A) Joueurs connectés dans CE terminal
+        res += "Joueurs connectés dans ce terminal :\n"
+        res += "--------------------------------------------------------\n"
+        for j in Session.joueurs_connectes:
+            debut = getattr(j, "debut_connexion", "Non connecté")
+            res += f"- {j.pseudo} : {j.credit} crédits (connexion : {debut})\n"
 
-        return AccueilVue()
+        res += "\n"
+
+        # B) Tous les joueurs de la table (depuis la base)
+        if joueur.table:
+            table_id = joueur.table.numero_table
+            try:
+                url = f"{host}/table/{table_id}/joueurs/"
+                req = requests.get(url)
+
+                if req.status_code == 200:
+                    joueurs_table = req.json()
+
+                    res += f"Joueurs de la table {table_id} (depuis la base) :\n"
+                    res += "--------------------------------------------------------\n"
+                    for j in joueurs_table:
+                        res += f"- {j['pseudo']} : {j['credit']} crédits\n"
+                else:
+                    res += f"Impossible de récupérer les joueurs de la table (code {req.status_code})\n"
+            except Exception as e:
+                res += f"Erreur API : {e}\n"
+
+        return InfosSessionVue(res, temps_attente=3)

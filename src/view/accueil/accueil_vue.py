@@ -46,6 +46,8 @@ class AccueilVue(VueAbstraite):
             case "Infos de session":
                 from view.accueil.InfosSessionVue import InfosSessionVue
 
+                return InfosSessionVue("Chargement...", temps_attente=0)
+
                 return InfosSessionVue()
             case "Ré-initialiser la base de données":
                 succes = ResetDatabase().lancer()
