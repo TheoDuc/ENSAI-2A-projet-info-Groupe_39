@@ -42,15 +42,14 @@ class MenuTable(VueAbstraite):
         if choix in boutons_tables:
             numero_table = int(choix.split()[1].replace(",", ""))
             id_joueur = Session().id
-
-            # Ajout du joueur sur la table
             req = requests.put(f"{host}{END_POINT}ajouter/{numero_table}/{id_joueur}")
-            if req.status_code != 200:
-                from view.menu_joueur_vue import MenuJoueurVue
-
-                return MenuJoueurVue()
-            else:
+            if req.status_code == 200:
                 from view.menu_lancement_manche import GameMenu
 
                 print(f"Vous êtes connecté sur la table {numero_table}")
-                return GameMenu(numero_table)
+                return GameMenu()
+            else:
+                print("Erreur lors de la connexion à la table")
+                from view.menu_joueur_vue import MenuJoueurVue
+
+                return MenuJoueurVue()
