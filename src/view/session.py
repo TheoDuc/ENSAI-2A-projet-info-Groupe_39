@@ -2,7 +2,6 @@ from datetime import datetime
 
 import pytz
 
-from service.table_service import TableService
 from utils.singleton import Singleton
 
 
@@ -44,10 +43,7 @@ class Session(metaclass=Singleton):
         self.joueur = None
         self.debut_connexion = None
 
-    def afficher(self, table_service: "TableService") -> str:
-        """
-        Affiche le joueur connecté et tous les joueurs présents sur la même table.
-        """
+    def afficher(self) -> str:
         res = "Actuellement en session :\n"
         res += "-------------------------\n"
 
@@ -55,14 +51,18 @@ class Session(metaclass=Singleton):
         if not joueur:
             return res + "Aucun joueur connecté.\n"
 
-        # Joueur connecté sur ce terminal
         res += f"joueur connecté : {joueur.pseudo} : {joueur.credit} crédits\n"
         if getattr(joueur, "debut_connexion", None):
             res += f"debut_connexion : {joueur.debut_connexion}\n"
         res += "\n"
 
-        # Joueurs présents sur la même table
+        # Tous les joueurs connectés à la même table
         if joueur.table:
-            res += table_service.afficher_joueurs_table(joueur.table.numero_table)
+            res += f"Joueurs à la table {joueur.table.numero_table} :\n"
+            res += "-" * 40 + "\n"
+            for j in Session.joueurs_connectes:
+                if j.table == joueur.table:
+                    debut = getattr(j, "debut_connexion", "Non connecté")
+                    res += f"{j.pseudo} : {j.credit} crédits (connexion : {debut})\n"
 
         return res
