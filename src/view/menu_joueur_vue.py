@@ -3,8 +3,8 @@ import os
 import requests
 from InquirerPy import inquirer
 
-from view.session import Session
 from service.joueur_service import JoueurService
+from view.session import Session
 from view.vue_abstraite import VueAbstraite
 
 host = os.environ["HOST_WEBSERVICE"]
@@ -51,8 +51,7 @@ class MenuJoueurVue(VueAbstraite):
         match choix:
             case "Se déconnecter":
                 id_joueur = Session().id
-                req = requests.get(
-                    f"{host}/joueur/deconnection/{id_joueur}")
+                req = requests.get(f"{host}/joueur/deconnection/{id_joueur}")
 
                 Session().deconnexion()
                 from view.accueil.accueil_vue import AccueilVue
@@ -75,33 +74,34 @@ class MenuJoueurVue(VueAbstraite):
                 return MenuJoueurVue(reponse, temps_attente=3)
 
             case "Changer ses informations":
+                id_joueur = Session().id
                 url = f"{host}/joueur/id/{id_joueur}"
                 req = requests.get(url)
 
-        
-                if req.status_code == 200:
-                    reponse = req.json()
-                    joueur = Joueur(
-                            id_joueur=reponse["_Joueur__id_joueur"],
-                            pseudo=reponse["_Joueur__pseudo"],
-                            credit=reponse["_Joueur__credit"],
-                            pays=reponse["_Joueur__pays"],
-                            table=reponse["_Joueur__table"])
-                END_POINT = "/joueur"
-                
-                req = requests.put(f"{host}{END_POINT}/{joueur.pseudo}/{credit}")
-                nouveau_pseudo = inquirer.text(message="Entrez votre  nouveau pseudo : ").execute()
-                nouveau_pays = inquirer.text(message="Entrez votre nouveau pays : ").execute()
+                if req.status_code != 200:
+                    return MenuJoueurVue(
+                        "Erreur lors de la récupération du joueur", temps_attente=1
+                    )
 
-                req = requests.put(
-                    f"{host}{END_POINT}/{joueur.id_joueur}/{nouveau_pseudo}/{nouveau_pays}"
-                )
+                reponse = req.json()
 
-                reponse = False
-                if req.status_code == 200:
-                    reponse = req.json()
-                print(reponse)
+                id_joueur = reponse["_Joueur__id_joueur"]
+                pseudo_actuel = reponse["_Joueur__pseudo"]
+                pays_actuel = reponse["_Joueur__pays"]
 
+                nouveau_pseudo = inquirer.text(
+                    message=f"Entrez votre nouveau pseudo (actuel : {pseudo_actuel}) : "
+                ).execute()
+
+                nouveau_pays = inquirer.text(
+                    message=f"Entrez votre nouveau pays (actuel : {pays_actuel}) : "
+                ).execute()
+
+                END_POINT = f"/joueur/{id_joueur}"
+
+                req = requests.put(f"{host}{END_POINT}/{nouveau_pseudo}/{nouveau_pays}")
+
+                reponse = req.json() if req.status_code == 200 else False
                 return MenuJoueurVue(reponse)
 
             case "Tables":
