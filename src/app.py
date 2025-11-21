@@ -39,10 +39,15 @@ class JoueurModel(BaseModel):
 
 # fonctionne pas oublier de demander si admin dans les view
 @app.put("/admin/crediter/{pseudo}/{montant}", tags=["Admin"])
-def crediter(pseudo, montant: int):
+def crediter(pseudo: str, montant: int):
     joueur = joueur_service.trouver_par_pseudo(pseudo)
+
+    reponse = input(f"Est-ce que {joueur.pseudo} est admin ? (Oui/Non) : ")
+    if reponse.lower() != "oui":
+        return {"error": "Vous n'êtes pas autorisé à créditer : accès admin requis."}
+
     credit_service.crediter(joueur, montant)
-    return f"l'admin a bien crediter {montant} à {joueur}"
+    return {"message": f"L'admin a bien crédité {montant} à {joueur.pseudo}"}
 
 
 # fonctionne
