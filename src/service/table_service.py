@@ -1,6 +1,7 @@
 """Implémentation de la classe TableService"""
 
 from business_object.table import Table
+from service.credit_service import CreditService
 from service.joueur_service import JoueurService
 from service.manche_joueur_service import MancheJoueurService
 from service.manche_service import MancheService
@@ -246,6 +247,12 @@ class TableService:
         """
 
         table = self.table_par_numero(numero_table)
+
+        gains = table.manche.terminer_manche()
+
+        for id_joueur, montant in gains:
+            joueur = JoueurService().trouver_par_id(id_joueur)
+            CreditService().crediter(joueur, montant)
 
         id_manche = MancheService().sauvegarder_manche(table.manche)
         MancheJoueurService().sauvegarder_manche_joueur(id_manche, table.manche.info)

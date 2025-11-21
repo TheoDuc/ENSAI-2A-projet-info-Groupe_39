@@ -5,7 +5,6 @@ import logging
 from business_object.joueur import Joueur
 from dao.joueur_dao import JoueurDao
 from service.joueur_service import JoueurService
-
 from utils.log_decorator import log
 
 logger = logging.getLogger(__name__)
@@ -35,7 +34,7 @@ class CreditService:
 
         """
 
-        if montant <= 0:
+        if montant < 0:
             raise ValueError("Le montant à créditer doit être positif.")
 
         ram_modif = False
