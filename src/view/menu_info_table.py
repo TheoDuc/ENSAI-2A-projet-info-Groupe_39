@@ -39,32 +39,32 @@ class InfoTableMenu(VueAbstraite):
 
         match choix:
             case "Info de session":
-                # On récupère la table du joueur via l'API
-                id_joueur = Session().id
-                res_table = requests.get(f"{host}{END_POINT}joueur/{id_joueur}")
+                from view.menu_joueur_vue import MenuJoueurVue
+
+                # Vérifier si le joueur est dans une table
+                numero_table = getattr(Session(), "table_numero", None)
+                if not numero_table:
+                    print("Vous n'êtes connecté à aucune table")
+                    return MenuJoueurVue()
+
+                # Récupérer la table via l'API
+                res_table = requests.get(f"{host}{END_POINT}{numero_table}")
                 if res_table.status_code != 200:
                     print("Impossible de récupérer la table du joueur")
-                    from view.menu_joueur_vue import MenuJoueurVue
-
-                    return MenuJoueurVue("Vous n'êtes connecté à aucune table")
+                    return MenuJoueurVue()
 
                 table_info = res_table.json()
-
                 nb_joueurs = len(table_info.get("joueurs", []))
                 nb_max = table_info.get("joueur_max", 0)
                 pseudos = [j["pseudo"] for j in table_info.get("joueurs", [])]
 
-                print(
-                    f"\nTable n°{table_info['numero_table']} : {nb_joueurs}/{nb_max} joueurs présents"
-                )
+                print(f"\nTable n°{numero_table} : {nb_joueurs}/{nb_max} joueurs présents")
                 if pseudos:
                     print("Joueurs présents : " + ", ".join(pseudos))
                 else:
-                    print("Aucun joueur présent pour le moment.")
+                    print("Aucun joueur présent pour le moment")
 
-                from view.menu_info_table import InfoTableMenu
-
-                return InfoTableMenu()  # reste dans le menu table
+                return MenuJoueurVue()
 
             case "Lancer manche":
                 joueur = JoueurService().trouver_par_id(Session().id)
