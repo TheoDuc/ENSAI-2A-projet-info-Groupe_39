@@ -1,11 +1,9 @@
 import logging
 import os
 
-import requests
 from InquirerPy import inquirer
 
 from view.menu_manche import MenuManche
-from view.session import Session
 from view.vue_abstraite import VueAbstraite
 
 logger = logging.getLogger(__name__)
@@ -39,44 +37,49 @@ class InfoTableMenu(VueAbstraite):
 
         match choix:
             case "Info de session":
+                import os
+
+                import requests
+
                 from view.menu_joueur_vue import MenuJoueurVue
+                from view.session import Session
 
                 session = Session()
+                host = os.environ["HOST_WEBSERVICE"]
 
-                if not session.id:
-                    print("Aucun joueur connecté")
+                # Récupérer toutes les tables
+                res_tables = requests.get(f"{host}/table/")
+                if res_tables.status_code != 200:
+                    print("Impossible de récupérer la liste des tables")
                     return MenuJoueurVue()
 
-                # Récupérer le joueur via l'API
-                joueur_req = requests.get(f"{host}/joueur/id/{session.id}")
-                if joueur_req.status_code != 200:
-                    print("Impossible de récupérer les infos du joueur")
-                    return MenuJoueurVue()
+                tables = res_tables.json()
 
-                joueur_info = joueur_req.json()
-                table_numero = joueur_info.get(
-                    "table"
-                )  # Ici on récupère directement la table via l'API
-                if not table_numero:
+                # Trouver la table où le joueur connecté est présent
+                table_info = None
+                for t in tables:
+                    for j in t.get("joueurs", []):
+                        if j.get("id_joueur") == session.id:
+                            table_info = t
+                            break
+                    if table_info:
+                        break
+
+                if not table_info:
                     print("Vous n'êtes connecté à aucune table")
                     return MenuJoueurVue()
 
-                # Récupérer les infos de la table directement via l'API
-                table_req = requests.get(f"{host}/table/{table_numero}")
-                if table_req.status_code != 200:
-                    print("Impossible de récupérer les joueurs de la table")
-                    return MenuJoueurVue()
-
-                table_info = table_req.json()
+                # Affichage des infos de la table
+                numero_table = table_info.get("numero_table", "?")
                 nb_joueurs = len(table_info.get("joueurs", []))
                 nb_max = table_info.get("joueur_max", 0)
-                pseudos = [
-                    f"{j['pseudo']} : {j['credit']} crédits" for j in table_info.get("joueurs", [])
-                ]
 
-                print(f"\nTable n°{table_numero} : {nb_joueurs}/{nb_max} joueurs présents")
+                print(f"\nTable n°{numero_table} : {nb_joueurs}/{nb_max} joueurs présents")
                 print("-" * 40)
-                print("\n".join(pseudos) if pseudos else "Aucun joueur présent pour le moment")
+                for j in table_info.get("joueurs", []):
+                    pseudo = j.get("pseudo", "Inconnu")
+                    credit = j.get("credit", 0)
+                    print(f"{pseudo} : {credit} crédits")
 
                 return MenuJoueurVue()
 
