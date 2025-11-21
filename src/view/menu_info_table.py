@@ -41,24 +41,41 @@ class InfoTableMenu(VueAbstraite):
             case "Info de session":
                 from view.menu_joueur_vue import MenuJoueurVue
 
-                numero_table = getattr(Session(), "table_numero", None)
-                if not numero_table:
+                session = Session()
+
+                if not session.id:
+                    print("Aucun joueur connecté")
+                    return MenuJoueurVue()
+
+                # Récupérer les infos du joueur connecté via l'API
+                joueur_req = requests.get(f"{host}/joueur/id/{session.id}")
+                if joueur_req.status_code != 200:
+                    print("Impossible de récupérer les infos du joueur")
+                    return MenuJoueurVue()
+
+                joueur_info = joueur_req.json()
+                table_numero = joueur_info.get("table")
+                if not table_numero:
                     print("Vous n'êtes connecté à aucune table")
                     return MenuJoueurVue()
 
-                res_table = requests.get(f"{host}{END_POINT}{numero_table}")
-                if res_table.status_code != 200:
-                    print("Impossible de récupérer la table du joueur")
+                # Récupérer la table et tous les joueurs via l'API
+                table_req = requests.get(f"{host}/table/{table_numero}")
+                if table_req.status_code != 200:
+                    print("Impossible de récupérer les joueurs de la table")
                     return MenuJoueurVue()
 
-                table_info = res_table.json()
+                table_info = table_req.json()
                 nb_joueurs = len(table_info.get("joueurs", []))
                 nb_max = table_info.get("joueur_max", 0)
-                pseudos = [j["pseudo"] for j in table_info.get("joueurs", [])]
+                pseudos = [
+                    f"{j['pseudo']} : {j['credit']} crédits" for j in table_info.get("joueurs", [])
+                ]
 
-                print(f"\nTable n°{numero_table} : {nb_joueurs}/{nb_max} joueurs présents")
+                print(f"\nTable n°{table_numero} : {nb_joueurs}/{nb_max} joueurs présents")
+                print("-" * 40)
                 if pseudos:
-                    print("Joueurs présents : " + ", ".join(pseudos))
+                    print("\n".join(pseudos))
                 else:
                     print("Aucun joueur présent pour le moment")
 
