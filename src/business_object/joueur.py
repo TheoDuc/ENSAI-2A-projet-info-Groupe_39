@@ -10,7 +10,15 @@ logger = logging.getLogger(__name__)
 class Joueur:
     """Représente un joueur de poker avec ses informations personnelles"""
 
-    def __init__(self, id_joueur: int, pseudo: str, credit: int, pays: str, table=None) -> "Joueur":
+    def __init__(
+        self,
+        id_joueur: int,
+        pseudo: str,
+        credit: int,
+        pays: str,
+        numero_table: int = None,
+        est_admin: True = False,
+    ) -> "Joueur":
         """
         Crée un nouveau joueur avec ses informations de base.
 
@@ -63,13 +71,8 @@ class Joueur:
         self.__pseudo = pseudo
         self.__credit = credit
         self.__pays = pays
-        self.__table = table
-
-        # Pour gerer la manche
-        self.est_actif = True
-        self.a_checke = False
-        self.est_couche = False
-        self.all_in = False
+        self.__numero_table = numero_table
+        self.__est_admin = est_admin
 
     @property
     def id_joueur(self) -> int:
@@ -92,13 +95,22 @@ class Joueur:
         return self.__pays
 
     @property
-    def table(self):
+    def numero_table(self):
         """Retourne la table où se trouve le joueur"""
-        return self.__table
+        return self.__numero_table
 
-    @table.setter
-    def table(self, table):
-        self.__table = table
+    @numero_table.setter
+    def numero_table(self, numero_table: int):
+        self.__numero_table = numero_table
+
+    @property
+    def est_admin(self) -> bool:
+        """Renvoie si le joueur est un admin ou non"""
+        return self.__est_admin
+
+    @est_admin.setter
+    def est_admin(self, valeur: bool):
+        self.__est_admin = valeur
 
     def __str__(self) -> str:
         """Permet d'afficher le pseudo et les crédits du joueur"""
@@ -200,7 +212,7 @@ class Joueur:
         return self.credit
 
     @log
-    def rejoindre_table(self, table) -> None:
+    def rejoindre_table(self, numero_table: int) -> None:
         """
         Associe le joueur à une table de poker.
 
@@ -215,17 +227,13 @@ class Joueur:
             Si le joueur est déjà à une table.
         """
 
-        from business_object.table import Table
-
-        if self.table is not None:
+        if self.numero_table is not None:
             raise Exception(f"Le joueur {self.pseudo} est déjà à une table")
 
-        if not isinstance(table, Table):
-            raise TypeError(f"le paramètre table doit être de type Table : {type(table)}")
+        if not isinstance(numero_table, int):
+            raise TypeError(f"le paramètre numero_table doit être un int : {type(numero_table)}")
 
-        
-        table.ajouter_joueur(self)
-        self.__table = table
+        self.__numero_table = numero_table
 
         logger.info(f"Le joueur {self.pseudo} a rejoint une table")
 
@@ -240,14 +248,13 @@ class Joueur:
             Si le joueur n'est associé à aucune table.
         """
 
-        if self.table is None:
+        if self.numero_table is None:
             raise Exception(f"Le joueur {self.pseudo} n'est actuellement à aucune table")
 
-        indice = self.__table.joueurs.index(self)
-        self.__table.retirer_joueur(indice)
-        table = self.table
-        self.__table = None
-        logger.info(f"Le joueur {self.pseudo} a quitté sa table {table.numero_table}")
+        numero_table = self.__numero_table
+
+        self.__numero_table = None
+        logger.info(f"Le joueur {self.pseudo} a quitté sa table {numero_table}")
 
     @log
     def changer_pseudo(self, pseudo: str) -> None:

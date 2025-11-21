@@ -47,47 +47,49 @@ class InfoTableMenu(VueAbstraite):
                     print("Aucun joueur connecté")
                     return MenuJoueurVue()
 
-                res_tables = requests.get(f"{host}/table/")
-                if res_tables.status_code != 200:
+                # Appel à l'API pour récupérer toutes les tables
+                try:
+                    res_tables = requests.get(f"{host}/table/")
+                    res_tables.raise_for_status()
+                    tables = res_tables.json()
+                except requests.RequestException:
                     print("Impossible de récupérer la liste des tables")
                     return MenuJoueurVue()
-
-                try:
-                    tables = res_tables.json()
-                except Exception:
+                except ValueError:
                     print("Erreur : impossible de décoder la réponse JSON")
                     return MenuJoueurVue()
 
                 # Chercher la table où le joueur est présent
-                table_info = None
-                for t in tables:
-                    if not isinstance(t, dict):
-                        continue
-                    joueurs = t.get("joueurs")
-                    if not isinstance(joueurs, list):
-                        continue
-                    for j in joueurs:
-                        if isinstance(j, dict) and j.get("id_joueur") == session.id:
-                            table_info = t
-                            break
-                    if table_info:
-                        break
+                table_info = next(
+                    (
+                        t
+                        for t in tables
+                        if isinstance(t, dict)
+                        and any(
+                            isinstance(j, dict) and j.get("id_joueur") == session.id
+                            for j in t.get("joueurs", [])
+                        )
+                    ),
+                    None,
+                )
 
                 if not table_info:
                     print("Vous n'êtes connecté à aucune table")
                     return MenuJoueurVue()
 
-                # Afficher les infos
+                # Afficher les infos de la table
                 numero_table = table_info.get("numero_table", "?")
-                nb_joueurs = len(table_info.get("joueurs", []))
+                joueurs_list = table_info.get("joueurs", [])
+                nb_joueurs = len(joueurs_list)
                 nb_max = table_info.get("joueur_max", 0)
 
                 print(f"\nTable n°{numero_table} : {nb_joueurs}/{nb_max} joueurs présents")
                 print("-" * 40)
-                for j in table_info.get("joueurs", []):
-                    pseudo = j.get("pseudo", "Inconnu") if isinstance(j, dict) else "Inconnu"
-                    credit = j.get("credit", 0) if isinstance(j, dict) else 0
-                    print(f"{pseudo} : {credit} crédits")
+                for j in joueurs_list:
+                    if isinstance(j, dict):
+                        pseudo = j.get("pseudo", "Inconnu")
+                        credit = j.get("credit", 0)
+                        print(f"{pseudo} : {credit} crédits")
 
                 return MenuJoueurVue()
 

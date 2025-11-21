@@ -46,7 +46,7 @@ class InfoManche:
         self.__tour_couche = [None for _ in joueurs]
 
     @property
-    def joueurs(self) -> list[Joueur]:
+    def joueurs(self) -> list[int]:
         """
         Renvoie la liste des joueurs participant à la manche.
 
@@ -135,7 +135,6 @@ class InfoManche:
         )
 
     def affichage_tout_joueur(self) -> str:
-
         pseudos = [j.pseudo for j in self.__joueurs]
         statuts = [self.__STATUTS[s] for s in self.__statuts]
         mises = [str(m) for m in self.__mises]
@@ -148,10 +147,7 @@ class InfoManche:
 
         def row(label, values):
             """Construit une ligne du tableau, en centrant les valeurs."""
-            cells = [
-                f"{v:^{col_widths[i]}}"
-                for i, v in enumerate(values)
-            ]
+            cells = [f"{v:^{col_widths[i]}}" for i, v in enumerate(values)]
             return f"{label:<12} | " + " | ".join(cells) + " |"
 
         lines = []
