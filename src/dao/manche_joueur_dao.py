@@ -75,7 +75,7 @@ class MancheJoueurDAO(metaclass=Singleton):
                             """,
                             {
                                 "id_manche": id_manche,
-                                "id_joueur": joueur.id_joueur,
+                                "id_joueur": joueur,
                                 "carte_main_1": carte1,
                                 "carte_main_2": carte2,
                                 "gain": gain,
