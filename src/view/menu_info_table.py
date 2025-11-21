@@ -4,7 +4,6 @@ import os
 import requests
 from InquirerPy import inquirer
 
-from service.joueur_service import JoueurService
 from view.menu_manche import MenuManche
 from view.session import Session
 from view.vue_abstraite import VueAbstraite
@@ -40,9 +39,22 @@ class InfoTableMenu(VueAbstraite):
 
         match choix:
             case "Info de session":
+                from service.joueur_service import JoueurService
+                from view.menu_info_table import InfoTableMenu
                 from view.menu_joueur_vue import MenuJoueurVue
 
-                return MenuJoueurVue(Session().afficher(), temps_attente=3)
+                joueur = JoueurService().trouver_par_id(Session().id)
+                table = joueur.table
+                if table:
+                    nb_joueurs = len(table.joueurs)
+                    nb_max = table.joueur_max
+                    pseudos = [j.pseudo for j in table.joueurs]
+                    print(f"Table n°{table.numero_table}: {nb_joueurs}/{nb_max} joueurs présents")
+                    print("Joueurs présents : " + ", ".join(pseudos))
+                else:
+                    print("Vous n'êtes connecté à aucune table.")
+
+                return InfoTableMenu(Session().afficher(), temps_attente=3)
 
             case "Lancer manche":
                 joueur = JoueurService().trouver_par_id(Session().id)
