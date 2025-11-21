@@ -96,7 +96,7 @@ class JoueurService:
         """Récupère un joueur par pseudo"""
         joueur = self.dao.trouver_par_pseudo(pseudo)
         if joueur.id not in self._joueurs_connectes:
-            self._joueurs_connectes[joueur.id] = joueur  # on le connecte automatiquement
+            self._joueurs_connectes[joueur.id] = joueur
         return joueur
 
     def lister_tous(self) -> list[Joueur]:

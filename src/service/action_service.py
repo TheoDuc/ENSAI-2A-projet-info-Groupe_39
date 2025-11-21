@@ -3,6 +3,7 @@
 from business_object.manche import Manche
 from service.credit_service import CreditService
 from service.joueur_service import JoueurService
+from service.table_service import TableService
 
 
 class ActionService:
@@ -30,22 +31,24 @@ class ActionService:
             si le joueur n'est pas dans la manche en cours
         """
         joueur_service = JoueurService()
+        table_service = TableService()
         joueur = joueur_service.trouver_par_id(id_joueur)
+        table = table_service.table_par_numero(joueur.numero_table)
 
-        if joueur.table is None:
+        if joueur.numero_table is None:
             raise ValueError(
                 f"Le joueur {joueur.pseudo} n'est à aucune table et ne peut effectuer d'action"
             )
 
-        if joueur.table.manche is None:
+        if table.manche is None:
             raise ValueError(
                 f"Le joueur {joueur.pseudo} est dans une table mais aucune manche n'est en cours"
             )
 
-        if joueur not in joueur.table.manche.info.joueurs:
+        if id_joueur not in table.manche.info.joueurs:
             raise ValueError(f"Le joueur {joueur.pseudo} ne participe pas à la manche en cours")
 
-        return joueur.table.manche
+        return table.manche
 
     def all_in(self, id_joueur: int) -> None:
         """
@@ -69,12 +72,12 @@ class ActionService:
         joueur = JoueurService().trouver_par_id(id_joueur)
 
         manche = self.manche_joueur(id_joueur)
-        indice_joueur = manche.indice_joueur(joueur)
+        indice_joueur = manche.indice_joueur(id_joueur)
 
-        if not manche.est_tour(joueur):
+        if not manche.est_tour(id_joueur):
             raise Exception(f"Ce n'est pas à {joueur.pseudo} de jouer")
 
-        montant = manche.info.all_in(indice_joueur)
+        montant = manche.action(indice_joueur, "all-in", joueur.credit)
         CreditService().debiter(joueur, montant)
 
     def checker(self, id_joueur: int) -> None:
@@ -101,15 +104,7 @@ class ActionService:
         manche = self.manche_joueur(id_joueur)
         indice_joueur = manche.indice_joueur(joueur)
 
-        if not manche.est_tour(joueur):
-            raise Exception(f"Ce n'est pas à {joueur.pseudo} de jouer")
-
-        if not manche.info.statuts[indice_joueur] == 2:
-            raise ValueError(
-                f"{joueur.pseudo} ne peut pas checker car il est en retard sur les mises"
-            )
-
-        manche.info.mettre_statut(indice_joueur, 2)
+        manche.action(indice_joueur, "checker")
 
     def se_coucher(self, id_joueur: int) -> None:
         """
@@ -130,15 +125,10 @@ class ActionService:
             si ce n'est pas au tour du joueur de jouer
         """
 
-        joueur = JoueurService().trouver_par_id(id_joueur)
-
         manche = self.manche_joueur(id_joueur)
-        indice_joueur = manche.indice_joueur(joueur)
+        indice_joueur = manche.indice_joueur(id_joueur)
 
-        if not manche.est_tour(joueur):
-            raise Exception(f"Ce n'est pas à {joueur.pseudo} de jouer")
-
-        manche.info.coucher_joueur(indice_joueur, 3)
+        manche.action(indice_joueur, "se coucher")
 
     def suivre(self, id_joueur: int, relance: int = 0) -> None:
         """
@@ -167,24 +157,5 @@ class ActionService:
         if not manche.est_tour(joueur):
             raise Exception(f"Ce n'est pas à {joueur.pseudo} de jouer")
 
-        montant = manche.info.suivre(indice_joueur, relance)
+        montant = manche.action(indice_joueur, "suivre", joueur.credit, relance)
         CreditService().debiter(joueur, montant)
-
-    def test_checker_ok(self):
-        joueur = Mock()
-        joueur.pseudo = "A"
-
-        manche = Mock()
-        manche.est_tour.return_value = True
-        manche.indice_joueur.return_value = 0
-        manche.info.statuts = [2]  # joueur peut checker
-
-        service = ActionService()
-        service.manche_joueur = Mock(return_value=manche)
-
-        with patch("src.service.action_service.JoueurService") as MockJoueurService:
-            MockJoueurService.return_value.trouver_par_id.return_value = joueur
-
-            service.checker(id_joueur=1)
-
-            manche.info
