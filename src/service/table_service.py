@@ -1,15 +1,11 @@
 """Implémentation de la classe TableService"""
 
-import logging
-
 from business_object.table import Table
 from dao.joueur_dao import JoueurDao
 from service.joueur_service import JoueurService
 from service.manche_joueur_service import MancheJoueurService
 from service.manche_service import MancheService
 from utils.log_decorator import log
-
-logger = logging.getLogger(__name__)
 
 
 class TableService:
@@ -64,7 +60,7 @@ class TableService:
         raise ValueError(f"Aucune table existante ne porte le numéro {numero_table}")
 
     @log
-    def creer_table(self, joueur_max: int, grosse_blind: int, mode_jeu: int = 1) -> Table:
+    def creer_table(self, joueurs_max: int, grosse_blind: int, mode_jeu: int = 1) -> Table:
         """
         Créer une table de jeu de poker
 
@@ -139,6 +135,7 @@ class TableService:
         table = self.table_par_numero(numero_table)
 
         joueur.rejoindre_table(table)
+        JoueurService().modifier(joueur)
 
     @log
     def retirer_joueur(self, id_joueur: int) -> None:
