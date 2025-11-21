@@ -39,25 +39,32 @@ class InfoTableMenu(VueAbstraite):
 
         match choix:
             case "Info de session":
-                from service.joueur_service import JoueurService
-                from view.menu_joueur_vue import MenuJoueurVue
+                # On récupère la table du joueur via l'API
+                id_joueur = Session().id
+                res_table = requests.get(f"{host}{END_POINT}joueur/{id_joueur}")
+                if res_table.status_code != 200:
+                    print("Impossible de récupérer la table du joueur")
+                    from view.menu_joueur_vue import MenuJoueurVue
 
-                # Récupère le joueur courant
-                joueur = JoueurService().trouver_par_id(Session().id)
+                    return MenuJoueurVue("Vous n'êtes connecté à aucune table")
 
-                # Récupère la table du joueur
-                table = joueur.table
-                if table:
-                    nb_joueurs = len(table.joueurs)
-                    nb_max = table.joueur_max
-                    pseudos = [j.pseudo for j in table.joueurs]
+                table_info = res_table.json()
 
-                    print(f"Table n°{table.numero_table}: {nb_joueurs}/{nb_max} joueurs présents")
+                nb_joueurs = len(table_info.get("joueurs", []))
+                nb_max = table_info.get("joueur_max", 0)
+                pseudos = [j["pseudo"] for j in table_info.get("joueurs", [])]
+
+                print(
+                    f"\nTable n°{table_info['numero_table']} : {nb_joueurs}/{nb_max} joueurs présents"
+                )
+                if pseudos:
                     print("Joueurs présents : " + ", ".join(pseudos))
                 else:
-                    print("Vous n'êtes connecté à aucune table.")
+                    print("Aucun joueur présent pour le moment.")
 
-                return MenuJoueurVue(Session().afficher(), temps_attente=3)
+                from view.menu_info_table import InfoTableMenu
+
+                return InfoTableMenu()  # reste dans le menu table
 
             case "Lancer manche":
                 joueur = JoueurService().trouver_par_id(Session().id)
