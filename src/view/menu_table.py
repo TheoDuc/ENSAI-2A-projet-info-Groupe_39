@@ -49,10 +49,10 @@ class MenuTable(VueAbstraite):
             req = requests.put(f"{host}{END_POINT}ajouter/{numero_table}/{id_joueur}")
 
             if req.status_code == 200:
-                from view.menu_lancement_manche import GameMenu
+                from view.menu_joueur_vue import MenuJoueurVue
 
                 print(f"Vous êtes connecté sur la table {numero_table}")
-                return GameMenu()
+                return MenuJoueurVue()
             else:
                 print("Erreur lors de la connexion à la table")
                 from view.menu_joueur_vue import MenuJoueurVue
