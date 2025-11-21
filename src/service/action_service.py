@@ -72,13 +72,12 @@ class ActionService:
         joueur = JoueurService().trouver_par_id(id_joueur)
 
         manche = self.manche_joueur(id_joueur)
-        indice_joueur = manche.indice_joueur(id_joueur)
 
         if not manche.est_tour(id_joueur):
             raise Exception(f"Ce n'est pas à {joueur.pseudo} de jouer")
 
-        montant = manche.action(indice_joueur, "all-in", joueur.credit)
-        CreditService().debiter(joueur, montant)
+        montant = manche.action(id_joueur, "all-in", joueur.credit)
+        CreditService().debiter(id_joueur, montant)
 
     def checker(self, id_joueur: int) -> None:
         """
@@ -98,13 +97,10 @@ class ActionService:
         Exception
             si ce n'est pas au tour du joueur de jouer
         """
-        joueur_service = JoueurService()
-        joueur = joueur_service.trouver_par_id(id_joueur)
 
         manche = self.manche_joueur(id_joueur)
-        indice_joueur = manche.indice_joueur(joueur)
 
-        manche.action(indice_joueur, "checker")
+        manche.action(id_joueur, "checker")
 
     def se_coucher(self, id_joueur: int) -> None:
         """
@@ -126,9 +122,8 @@ class ActionService:
         """
 
         manche = self.manche_joueur(id_joueur)
-        indice_joueur = manche.indice_joueur(id_joueur)
 
-        manche.action(indice_joueur, "se coucher")
+        manche.action(id_joueur, "se coucher")
 
     def suivre(self, id_joueur: int, relance: int = 0) -> None:
         """
@@ -152,10 +147,6 @@ class ActionService:
         joueur = JoueurService().trouver_par_id(id_joueur)
 
         manche = self.manche_joueur(id_joueur)
-        indice_joueur = manche.indice_joueur(joueur)
 
-        if not manche.est_tour(joueur):
-            raise Exception(f"Ce n'est pas à {joueur.pseudo} de jouer")
-
-        montant = manche.action(indice_joueur, "suivre", joueur.credit, relance)
-        CreditService().debiter(joueur, montant)
+        montant = manche.action(id_joueur, "suivre", joueur.credit, relance)
+        CreditService().debiter(id_joueur, montant)
