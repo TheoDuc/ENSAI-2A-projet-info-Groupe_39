@@ -27,16 +27,20 @@ class JoueurService:
         self.dao = JoueurDao()
 
     @log
-    def se_connecter(self, pseudo: str) -> Joueur | None:
-        """Simule la connexion d’un joueur via son pseudo"""
+    def se_connecter(self, pseudo: str) -> Joueur:
+        """Simule la connexion d’un joueur via son pseudo."""
+
         joueur = self.dao.se_connecter(pseudo)
 
-        if joueur.id_joueur in self._joueurs_connectes.keys():
+        if joueur is None:
+            raise ValueError(f"Le pseudo '{pseudo}' n'existe pas !")
+
+        if joueur.id_joueur in self._joueurs_connectes:
             raise Exception(f"Le joueur {joueur.pseudo} est déjà connecté !")
 
-        if joueur:
-            self._joueurs_connectes[joueur.id_joueur] = joueur
-        return self._joueurs_connectes[joueur.id_joueur]
+        self._joueurs_connectes[joueur.id_joueur] = joueur
+
+        return joueur
 
     @log
     def deconnexion(self, id_joueur: int) -> None:
@@ -90,7 +94,10 @@ class JoueurService:
 
     def trouver_par_pseudo(self, pseudo: str) -> Joueur | None:
         """Récupère un joueur par pseudo"""
-        return self.dao.trouver_par_pseudo(pseudo)
+        joueur = self.dao.trouver_par_pseudo(pseudo)
+        if joueur.id not in self._joueurs_connectes:
+            self._joueurs_connectes[joueur.id] = joueur  # on le connecte automatiquement
+        return joueur
 
     def lister_tous(self) -> list[Joueur]:
         """Liste tous les joueurs"""
