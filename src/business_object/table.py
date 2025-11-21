@@ -53,7 +53,7 @@ class Table:
         self.__grosse_blind = grosse_blind
         self.__numero_table = numero_table
         self.__mode_jeu = mode_jeu
-        self.__manche = Manche
+        self.__manche = manche
 
         if id_joueurs is None:
             self.__id_joueurs = []
