@@ -51,6 +51,7 @@ class Manche:
         self.__indice_joueur_actuel = 0
         self.__grosse_blind = grosse_blind
         self.__fin = False
+        self.__enregistree = False
 
     @property
     def tour(self) -> int:
@@ -651,7 +652,7 @@ class Manche:
 
         if self.fin_de_manche():
             self.fin = True
-            return self.gains()
+            return montant
 
         if self.fin_du_tour():
             if self.tour == 0:
@@ -664,3 +665,15 @@ class Manche:
 
         self.joueur_suivant()
         return montant
+
+    def terminer_manche(self):
+        """Termine la manche et retourne les gains de chaque joueurs"""
+        if self.__enregistree:
+            return
+
+        if not self.fin:
+            raise Exception("La manche n'est pas encore terminée !")
+        else:
+            gains = self.gains()
+            self.__enregistree = True
+            return gains
