@@ -3,21 +3,16 @@
 import pytest
 
 from business_object.joueur import Joueur
-from business_object.table import Table
 
 
 class TestJoueur:
-    @pytest.fixture
-    def table(self):
-        return Table(joueur_max=10, grosse_blind=20)
-
     @pytest.fixture
     def joueur(self):
         return Joueur(1, "Pikachu", 100, "France")
 
     @pytest.fixture
-    def joueur_en_jeu(self, table):
-        return Joueur(1, "Pikachu", 100, "France", table)
+    def joueur_en_jeu(self):
+        return Joueur(1, "Pikachu", 100, "France", 1)
 
     def test_joueur_init_succes(self):
         # GIVEN
@@ -34,7 +29,7 @@ class TestJoueur:
         assert joueur.pseudo == "Pikachu"
         assert joueur.credit == 100
         assert joueur.pays == "France"
-        assert joueur.table is None
+        assert joueur.numero_table is None
 
     @pytest.mark.parametrize(
         "id_joueur, pseudo, credit, pays",
@@ -82,8 +77,8 @@ class TestJoueur:
         "joueur1, joueur2, resultat",
         [
             (Joueur(1, "Crocorible", 200, "France"), Joueur(1, "Crocorible", 200, "France"), True),
-            (Joueur(1, "Crocorible", 200, "France"),Joueur(2, "Pikachu", 200, "France"),False),
-            (Joueur(1, "Crocorible", 200, "France"), "pas un joueur", False)
+            (Joueur(1, "Crocorible", 200, "France"), Joueur(2, "Pikachu", 200, "France"), False),
+            (Joueur(1, "Crocorible", 200, "France"), "pas un joueur", False),
         ],
     )
     def test_joueur_eq(self, joueur1, joueur2, resultat):
@@ -158,45 +153,45 @@ class TestJoueur:
         with pytest.raises(ValueError, match=message_attendu):
             joueur.retirer_credits(credits)
 
-    def test_joueur_rejoindre_table_succes(self, joueur, table):
+    def test_joueur_rejoindre_table_succes(self, joueur):
         # GIVEN
-        # pytest fixture
+        numero_table = 1
 
         # WHEN
-        joueur.rejoindre_table(table)
+        joueur.rejoindre_table(numero_table)
 
         # THEN
-        assert joueur.table == table
-        assert table.joueurs == [joueur]
+        assert joueur.numero_table == numero_table
 
-    def test_joueur_rejoindre_table_echec_deja_en_jeu(self, joueur_en_jeu, table):
+    def test_joueur_rejoindre_table_echec_deja_en_jeu(self, joueur_en_jeu):
         # GIVEN
+        numero_table = 2
         message_attendu = f"Le joueur {joueur_en_jeu.pseudo} est déjà à une table"
 
         # WHEN / THEN
         with pytest.raises(Exception, match=message_attendu):
-            joueur_en_jeu.rejoindre_table(table)
+            joueur_en_jeu.rejoindre_table(numero_table)
 
     def test_joueur_rejoindre_table_echec_mauvais_type_table(self, joueur):
         # GIVEN
-        table = "Table 2"
-        message_attendu = f"le paramètre table doit être de type Table : {type(table)}"
+        numero_table = "2"
+        message_attendu = f"le paramètre numero_table doit être un int : {type(numero_table)}"
 
         # WHEN / THEN
         with pytest.raises(TypeError, match=message_attendu):
-            joueur.rejoindre_table(table)
+            joueur.rejoindre_table(numero_table)
 
-    def test_joueur_quitter_table_succes(self, joueur, table):
+    def test_joueur_quitter_table_succes(self, joueur_en_jeu):
         # GIVEN
-        joueur.rejoindre_table(table)
+        joueur_en_jeu
 
         # WHEN
-        joueur.quitter_table()
+        joueur_en_jeu.quitter_table()
 
         # THEN
-        assert joueur.table is None
+        assert joueur_en_jeu.numero_table is None
 
-    def test_joueur_rejoindre_table_echec_aucune_table(self, joueur, table):
+    def test_joueur_quitter_table_echec_aucune_table(self, joueur):
         # GIVEN
         message_attendu = f"Le joueur {joueur.pseudo} n'est actuellement à aucune table"
 

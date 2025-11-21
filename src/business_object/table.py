@@ -3,7 +3,6 @@
 import logging
 
 from business_object.info_manche import InfoManche
-from business_object.joueur import Joueur
 from business_object.manche import Manche
 from utils.log_decorator import log
 
@@ -20,11 +19,11 @@ class Table:
 
     def __init__(
         self,
-        joueur_max: int,
+        joueurs_max: int,
         grosse_blind: int,
         numero_table: int = 0,
         mode_jeu: int = 1,
-        joueurs: list = None,
+        id_joueurs: list[int] = None,
         manche: Manche = None,
     ):
         """
@@ -32,14 +31,14 @@ class Table:
 
         Paramètres
         ----------
-        joueur_max : int
-            nombre de joueur maximum sur la table
+        joueurs_max : int
+            nombre de joueurs maximum sur la table
         grosse_blind : int
             valeur de la grosse blind
         mode_jeu : int
             code du mode de jeu de la tabl
             1 : Texas Hold'em (cash game)
-        joueurs : list[Joueur]
+        id_joueurs : list[int]
             liste des joueurs present sur la table
         manche : Manche
             Manche en cours sur la table
@@ -50,24 +49,21 @@ class Table:
             Instance de 'Table'
 
         """
-        self.__joueur_max = joueur_max
+        self.__joueurs_max = joueurs_max
         self.__grosse_blind = grosse_blind
         self.__numero_table = numero_table
         self.__mode_jeu = mode_jeu
         self.__manche = Manche
 
-        if joueurs is None:
-            self.__joueurs = []
+        if id_joueurs is None:
+            self.__id_joueurs = []
         else:
-            self.__joueurs = joueurs
-
-        for j in self.__joueurs:
-            j.table = self
+            self.__id_joueurs = id_joueurs
 
     @property
-    def joueur_max(self):
-        """Retourne l'attribut 'joueur_max'"""
-        return self.__joueur_max
+    def joueurs_max(self):
+        """Retourne l'attribut 'joueurs_max'"""
+        return self.__joueurs_max
 
     @property
     def grosse_blind(self):
@@ -85,9 +81,9 @@ class Table:
         return self.__mode_jeu
 
     @property
-    def joueurs(self):
-        """Retourne l'attribut 'joueurs'"""
-        return self.__joueurs
+    def id_joueurs(self):
+        """Retourne l'attribut 'id_joueurs'"""
+        return self.__id_joueurs
 
     @property
     def manche(self):
@@ -96,14 +92,14 @@ class Table:
 
     def __str__(self):
         """Représentation d'une table"""
-        return f"Table {self.numero_table}, grosse blind : {self.grosse_blind} ({len(self)}/{self.joueur_max})"
+        return f"Table {self.numero_table}, grosse blind : {self.grosse_blind} ({len(self)}/{self.joueurs_max})"
 
     def __len__(self) -> int:
         """Retourne le nombre de joueurs à la table"""
-        return len(self.joueurs)
+        return len(self.id_joueurs)
 
     @log
-    def ajouter_joueur(self, joueur) -> None:
+    def ajouter_joueur(self, id_joueur: int) -> None:
         """
         Ajoute un joueur à la table
 
@@ -117,48 +113,49 @@ class Table:
         None
         """
 
-        if not isinstance(joueur, Joueur):
-            raise TypeError("Le joueur n'est pas une instance de joueur")
+        if not isinstance(id_joueur, int):
+            raise TypeError(f"L'id_joueur n'est pas un entier : {type(id_joueur)}")
 
-        if len(self.__joueurs) >= self.__joueur_max:
-            logger.warning(f"Table pleine : impossible d'ajouter {joueur.pseudo}")
+        if len(self.__id_joueurs) >= self.__joueurs_max:
+            logger.warning(f"Table pleine : impossible d'ajouter le joueur {id_joueur}")
             raise ValueError("Nombre maximum de joueurs atteint")
 
         logger.info(
-            f"{joueur.pseudo} rejoint la table {self.numero_table} ({len(self.joueurs)}/{self.joueur_max})"
+            f"Le joueur {id_joueur} rejoint la table {self.numero_table} ({len(self.id_joueurs)}/{self.joueurs_max})"
         )
-        self.__joueurs.append(joueur)
-        joueur.table = self
+        self.__id_joueurs.append(id_joueur)
 
     @log
-    def retirer_joueur(self, indice: int) -> Joueur:
+    def retirer_joueur(self, indice: int) -> int:
         """
         Retire un joueur de la liste des joueurs selon son indice
 
         Paramètres
         ----------
         indice : int
-            Indice du joueur à retirer dans la liste des joueurs
+            Indice du joueur à retirer dans la liste des id_joueurs
 
         Renvois
         -------
-        Joueur
-            Retourne le joueru retirée de la liste des joueurs
+        int
+            L'id du joueur quittant la table
         """
 
         if not isinstance(indice, int):
             raise TypeError("L'indice doit être un entier")
 
-        if indice >= len(self.__joueurs):
-            raise IndexError(f"Indice plus grand que le nombre de joueurs : {len(self.__joueurs)}")
+        if indice >= len(self.id_joueurs):
+            raise IndexError(
+                f"Indice plus grand que le nombre de joueurs : {len(self.__id_joueurs)}"
+            )
 
         if indice < 0:
             raise IndexError("Indice négatif impossible")
 
-        joueur = self.__joueurs.pop(indice)
-        joueur.table = None
-        logger.info(f"Le joueur {self.joueurs[indice].pseudo} est retiré de la table")
-        return joueur
+        id_joueur = self.__id_joueurs.pop(indice)
+
+        logger.info(f"Le joueur {self.__id_joueurs} est retiré de la table")
+        return id_joueur
 
     @log
     def mettre_grosse_blind(self, montant: int) -> None:
@@ -175,7 +172,7 @@ class Table:
         None
         """
         if not isinstance(montant, int):
-            raise TypeError("Le crédit doit être un entier")
+            raise TypeError("Le crédit doit être un int")
 
         self.__grosse_blind = montant
         logger.info(f"La grosse blind de la table passe à {montant}")
@@ -197,7 +194,7 @@ class Table:
         dealer = self.retirer_joueur(0)
         self.ajouter_joueur(dealer)
 
-        logger.info(f"{dealer.pseudo} devient dealer")
+        logger.info(f"Le joueur {dealer} devient dealer")
 
     @log
     def nouvelle_manche(self) -> None:
@@ -219,12 +216,12 @@ class Table:
             sans crédit suffisant pour la grosse blind.
         """
         for indice_joueur in range(len(self.__joueurs)):
-            if self.__joueurs[indice_joueur].credit < self.__grosse_blind:
+            if self.__id_joueurs[indice_joueur].credit < self.__grosse_blind:
                 self.retirer_joueur(indice_joueur)
 
-        if len(self.__joueurs) < 2:
+        if len(self.__id_joueurs) < 2:
             raise Exception(
                 f"Trop peu de joeuurs sur la table pour lancer une manche : {len(self.__joueurs)}"
             )
 
-        self.__manche = Manche(info=InfoManche(self.__joueurs), grosse_blind=self.__grosse_blind)
+        self.__manche = Manche(info=InfoManche(self.__id_joueurs), grosse_blind=self.__grosse_blind)

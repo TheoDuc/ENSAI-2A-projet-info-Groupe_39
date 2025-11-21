@@ -121,7 +121,7 @@ class Manche:
 
         return tour + info + board + indication
 
-    def indice_joueur(self, joueur) -> int:
+    def indice_joueur(self, id_joueur: int) -> int:
         """
         Retourne l'indice du joueur si il est présent dans la manche
 
@@ -142,11 +142,11 @@ class Manche:
         """
 
         for i in range(len(self.info.joueurs)):
-            if self.info.joueurs[i] == joueur:
+            if self.info.joueurs[i] == id_joueur:
                 return i
         raise ValueError("Le joueur n'est pas dans cette manche")
 
-    def regarder_cartes(self, joueur) -> str:
+    def regarder_cartes(self, id_joueur: int) -> str:
         """
         Renvoie les cartes d'un joeuur au format texte
 
@@ -161,13 +161,13 @@ class Manche:
             les cartes du joeuur
         """
 
-        indice = self.indice_joueur(joueur)
-        if self.info.mains[indice] is None :
+        indice = self.indice_joueur(id_joueur)
+        if self.info.mains[indice] is None:
             return "   [?]      [?]   "
         else:
             return self.info.mains[indice].affichage_main()
 
-    def est_tour(self, joueur) -> bool:
+    def est_tour(self, id_joueur: int) -> bool:
         """
         Vérifie si c'est au tour du joueur
 
@@ -182,7 +182,7 @@ class Manche:
             True si c'est bien au tour du joueur, False sinon
         """
 
-        return self.indice_joueur_actuel == self.indice_joueur(joueur)
+        return self.indice_joueur_actuel == self.indice_joueur(id_joueur)
 
     def indice_joueur_suivant(self) -> int:
         """
