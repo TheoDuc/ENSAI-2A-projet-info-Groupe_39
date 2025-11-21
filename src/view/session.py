@@ -56,18 +56,7 @@ class Session(metaclass=Singleton):
         except Exception:
             return
 
-        # Au lieu de JoueurService.trouver_par_id, on récupère le joueur dans la session
-        joueur = next((j for j in Session.joueurs_connectes if j.id_joueur == self.id), None)
-        if joueur is None:
-            # Si pas trouvé, on le crée à partir de l'API et on l'ajoute
-            joueur = Joueur(
-                id_joueur=res["_Joueur__id_joueur"],
-                pseudo=res["_Joueur__pseudo"],
-                credit=res["_Joueur__credit"],
-                pays=res["_Joueur__pays"],
-            )
-            Session.joueurs_connectes.append(joueur)
-
+        joueur = JoueurService().trouver_par_id(self.id)
         joueur.numero_table = res.get("_Joueur__numero_table")
 
         # Rafraîchir la table globale si nécessaire
@@ -79,3 +68,23 @@ class Session(metaclass=Singleton):
                     Session.tables_globales[joueur.numero_table] = Table.from_json(table_json)
             except Exception:
                 pass
+
+    def afficher(self) -> str:
+        self.refresh()
+        res = "Actuellement en session :\n" + "-" * 25 + "\n"
+        if not self.id:
+            return res + "Aucun joueur connecté.\n"
+        joueur = JoueurService().trouver_par_id(self.id)
+        res += f"Joueur connecté : {joueur.pseudo} : {joueur.credit} crédits\n"
+        if getattr(joueur, "debut_connexion", None):
+            res += f"Début connexion : {joueur.debut_connexion}\n"
+
+        if joueur.numero_table:
+            table = Session.tables_globales.get(joueur.numero_table)
+            if table:
+                res += f"\nJoueurs à la table {table.numero_table} :\n" + "-" * 40 + "\n"
+                for id_j in table.id_joueurs:
+                    j = JoueurService().trouver_par_id(id_j)
+                    debut = getattr(j, "debut_connexion", "Non connecté")
+                    res += f"{j.pseudo} : {j.credit} crédits (connexion : {debut})\n"
+        return res
