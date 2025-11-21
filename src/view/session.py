@@ -58,7 +58,7 @@ class Session(metaclass=Singleton):
         # Chercher le joueur dans la session
         joueur = next((j for j in Session.joueurs_connectes if j.id_joueur == self.id), None)
 
-        # Si le joueur n'est pas encore dans la session, le créer
+        # Si pas trouvé, le créer
         if joueur is None:
             joueur = Joueur(
                 id_joueur=res["_Joueur__id_joueur"],
@@ -68,6 +68,7 @@ class Session(metaclass=Singleton):
             )
             Session.joueurs_connectes.append(joueur)
 
+        # Mettre à jour les informations
         joueur.numero_table = res.get("_Joueur__numero_table")
 
         # Rafraîchir la table globale si nécessaire
