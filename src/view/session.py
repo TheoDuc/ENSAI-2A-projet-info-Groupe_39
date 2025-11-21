@@ -19,8 +19,8 @@ class Session(metaclass=Singleton):
     tables_globales = {}
 
     def __init__(self):
-        self.id = getattr(self, "id", None)
-        self.debut_connexion = getattr(self, "debut_connexion", None)
+        self.id = None
+        self.debut_connexion = None
 
     def connexion(self, joueur: Joueur):
         self.id = joueur.id_joueur
