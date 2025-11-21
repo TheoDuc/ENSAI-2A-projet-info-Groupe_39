@@ -115,22 +115,35 @@ class InfoTableMenu(VueAbstraite):
                 return GameMenu("")
                 """
             case "Quitter table":
-                import requests
-
-                from view.menu_creation_table import MenuCreationTable
+                from view.menu_joueur_vue import MenuJoueurVue
                 from view.session import Session
 
                 session = Session()
-                id_joueur = session.id
-                url = f"{host}/table/retirer/{id_joueur}"
+                if not session.id:
+                    logger.info("Aucun joueur connecté")
+                    return MenuJoueurVue()
 
+                # On récupère le joueur connecté
+                joueur_connecte = next(
+                    (j for j in Session.joueurs_connectes if j.id_joueur == session.id), None
+                )
+                if not joueur_connecte:
+                    logger.info("Erreur : joueur non trouvé dans les joueurs connectés")
+                    return MenuJoueurVue()
+
+                if not joueur_connecte.table:
+                    logger.info("Vous n'êtes actuellement à aucune table")
+                    return MenuJoueurVue()
+
+                table = joueur_connecte.table
                 try:
-                    req = requests.put(url)
-                    if req.status_code == 200:
-                        message = req.json().get("message", "Vous avez quitté la table")
-                    else:
-                        message = req.json().get("error", "Impossible de quitter la table")
-                except Exception as e:
-                    message = f"Erreur lors de la requête : {e}"
+                    index = table.joueurs.index(joueur_connecte)
+                    table.retirer_joueur(index)
+                    logger.info(f"Vous avez quitté la table {table.numero_table}")
+                except ValueError:
+                    logger.info("Erreur : impossible de vous retirer de la table")
 
-                return MenuCreationTable(message)
+                # On met à jour la table globale
+                Session.tables_globales[table.numero_table] = table
+
+                return MenuJoueurVue()
