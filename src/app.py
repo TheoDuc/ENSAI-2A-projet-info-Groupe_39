@@ -163,35 +163,6 @@ async def creer_table(t: TableModel):
     )
 
 
-# Pas tester mais esperons que ca marche
-@app.get("/table/", tags=["Table"])
-async def liste_tables():
-    tables = table_service.lister_tables()
-
-    # On convertit manuellement en dictionnaire AVEC joueurs
-    resultat = []
-    for t in tables:
-        resultat.append(
-            {
-                "numero_table": t.numero_table,
-                "joueur_max": t.joueur_max,
-                "grosse_blind": t.grosse_blind,
-                "mode_jeu": t.mode_jeu,
-                "joueurs": [
-                    {
-                        "id_joueur": j.id_joueur,
-                        "pseudo": j.pseudo,
-                        "credit": j.credit,
-                        "pays": j.pays,
-                    }
-                    for j in t.joueurs
-                ],
-            }
-        )
-
-    return resultat
-
-
 # fonctionne
 @app.put("/table/ajouter/{numero_table}/{id_joueur}", tags=["Table"])
 async def ajouter_joueur(numero_table: int, id_joueur: int):
