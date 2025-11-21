@@ -18,7 +18,26 @@ logger = logging.getLogger(__name__)
 class MenuTable(VueAbstraite):
     """Vue qui affiche les tables"""
 
+    def __init__(self, table_info=None):
+        self.table_info = table_info  # dictionnaire avec les infos de la table
+
+    def afficher_infos_table(self):
+        if not self.table_info:
+            print("Impossible de récupérer les infos de la table.")
+            return
+
+        nb_joueurs = len(self.table_info.get("joueurs", []))
+        nb_max = self.table_info.get("joueur_max", 0)
+        pseudos = [j["pseudo"] for j in self.table_info.get("joueurs", [])]
+
+        print(f"Table n°{self.table_info['numero_table']}: {nb_joueurs}/{nb_max} joueurs présents")
+        if pseudos:
+            print("Joueurs présents : " + ", ".join(pseudos))
+        else:
+            print("Aucun joueur présent pour le moment.")
+
     def choisir_menu(self):
+        self.afficher_infos_table()
         action_table = ["Retour au Menu Joueur", "Créer une Table"]
         reponse = requests.get(f"{host}{END_POINT}")
         boutons_tables = reponse.json()
