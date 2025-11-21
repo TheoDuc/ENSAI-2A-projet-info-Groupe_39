@@ -50,6 +50,10 @@ class JoueurService:
 
         del self._joueurs_connectes[id_joueur]
 
+    def joueurs_connectes(self):
+        """Renvoie les id des joueurs connectés"""
+        return [id for id in self._joueurs_connectes.keys()]
+
     @log
     def pseudo_deja_utilise(self, pseudo: str) -> bool:
         """
