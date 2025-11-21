@@ -94,6 +94,7 @@ class InfoTableMenu(VueAbstraite):
 
             case "Lancer manche":
                 from service.joueur_service import JoueurService
+                from view.session import Session
 
                 joueur = JoueurService().trouver_par_id(Session().id)
                 numero_table = joueur.numero_table
@@ -108,7 +109,7 @@ class InfoTableMenu(VueAbstraite):
                     print("Manche lancée !")
                     from view.menu_manche_vue import MenuManche
 
-                    return MenuManche("")
+                    return MenuManche()
                 else:
                     print("Erreur lors du lancement de la manche")
                     from view.menu_joueur_vue import MenuJoueurVue
