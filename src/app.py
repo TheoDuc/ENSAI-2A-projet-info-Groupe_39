@@ -265,7 +265,7 @@ async def se_coucher(id_joueur: int):
 
 
 @app.put("/action/suivre/{id_joueur}/{relance}", tags=["Action"])
-async def suivre(id_joueur: int, relance: 0 = int):
+async def suivre(id_joueur: int, relance: int):
     """Joue suivre pour le joueur"""
     logging.info("Joue suivre pour le joueur")
     return action_service.suivre(id_joueur, relance)
