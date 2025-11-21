@@ -54,12 +54,6 @@ class MenuTable(VueAbstraite):
         if choix in boutons_tables:
             session = Session()
 
-            if not getattr(session, "id", None):
-                print("Aucun joueur connecté")
-                from view.menu_joueur_vue import MenuJoueurVue
-
-                return MenuJoueurVue()
-
             # Extraction du numéro de table
             numero_table = int(choix.split()[1].replace(",", ""))
             id_joueur = session.id
