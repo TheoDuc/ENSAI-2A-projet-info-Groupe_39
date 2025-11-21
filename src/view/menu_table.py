@@ -33,35 +33,37 @@ class MenuTable(VueAbstraite):
             choices=action_table,
         ).execute()
 
-        if choix == "Retour au Menu Joueur":
-            from view.menu_joueur_vue import MenuJoueurVue
-
-            return MenuJoueurVue()
-
-        if choix == "Créer une Table":
-            from view.menu_creation_table import MenuCreationTable
-
-            return MenuCreationTable()
-
-        if choix in boutons_tables:
-            numero_table = int(choix.split()[1].replace(",", ""))
-            id_joueur = Session().id
-
-            req = requests.put(f"{host}{END_POINT}ajouter/{numero_table}/{id_joueur}")
-
-            if req.status_code == 200:
-                # Met à jour la session globale
-                joueur = next(
-                    (j for j in Session.joueurs_connectes if j.id_joueur == id_joueur), None
-                )
-                if joueur:
-                    joueur.numero_table = numero_table
-                from view.menu_info_table import InfoTableMenu
-
-                print(f"Vous êtes connecté sur la table {numero_table}")
-                return InfoTableMenu()
-            else:
-                print("Erreur lors de la connexion à la table")
+        match choix:
+            case "Retour au Menu Joueur":
                 from view.menu_joueur_vue import MenuJoueurVue
 
                 return MenuJoueurVue()
+
+            case "Créer une Table":
+                from view.menu_creation_table import MenuCreationTable
+
+                return MenuCreationTable()
+
+            case _ if choix in boutons_tables:
+                numero_table = int(choix.split()[1].replace(",", ""))
+                id_joueur = Session().id
+
+                req = requests.put(f"{host}{END_POINT}ajouter/{numero_table}/{id_joueur}")
+
+                match req.status_code:
+                    case 200:
+                        # Met à jour la session globale
+                        joueur = next(
+                            (j for j in Session.joueurs_connectes if j.id_joueur == id_joueur), None
+                        )
+                        if joueur:
+                            joueur.numero_table = numero_table
+                        from view.menu_info_table import InfoTableMenu
+
+                        print(f"Vous êtes connecté sur la table {numero_table}")
+                        return InfoTableMenu()
+                    case _:
+                        print("Erreur lors de la connexion à la table")
+                        from view.menu_joueur_vue import MenuJoueurVue
+
+                        return MenuJoueurVue()
