@@ -29,7 +29,7 @@ class MenuManche(VueAbstraite):
         # Récupération du joueur courant
         joueur = next((j for j in session.joueurs_connectes if j.id_joueur == session.id), None)
         if not joueur or not joueur.numero_table:
-            print("Vous n'êtes connecté à aucune table")
+            logger.info("Vous n'êtes connecté à aucune table")
             from view.menu_joueur_vue import MenuJoueurVue
 
             return MenuJoueurVue()

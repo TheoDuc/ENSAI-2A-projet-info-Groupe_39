@@ -25,7 +25,6 @@ class InfoTableMenu(VueAbstraite):
         logger.info(f"ID session : {session.id}")
         logger.info(f"Joueurs connectés : {[j.id_joueur for j in Session.joueurs_connectes]}")
 
-        # On récupère le joueur connecté
         joueur = next((j for j in Session.joueurs_connectes if j.id_joueur == session.id), None)
         if not joueur:
             logger.warning("Erreur : joueur non trouvé dans la session")
@@ -74,7 +73,7 @@ class InfoTableMenu(VueAbstraite):
 
         if not joueur.numero_table:
             logger.warning("Le joueur n'est connecté à aucune table")
-            print("Vous n'êtes connecté à aucune table")
+
             from view.menu_joueur_vue import MenuJoueurVue
 
             return MenuJoueurVue()
