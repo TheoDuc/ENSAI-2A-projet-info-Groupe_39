@@ -56,11 +56,7 @@ class Table:
         self.__mode_jeu = mode_jeu
         self.__manche = manche
         self.joueurs: list[Joueur] = []
-
-        if id_joueurs is None:
-            self.__id_joueurs = []
-        else:
-            self.__id_joueurs = id_joueurs
+        self.id_joueurs = []
 
     @property
     def joueurs_max(self):
