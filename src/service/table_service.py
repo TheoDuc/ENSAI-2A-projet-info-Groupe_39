@@ -84,7 +84,7 @@ class TableService:
 
         table = Table(
             numero_table=numero,
-            joueur_max=joueurs_max,
+            joueurs_max=joueurs_max,
             grosse_blind=grosse_blind,
             mode_jeu=mode_jeu,
         )
@@ -134,7 +134,7 @@ class TableService:
         joueur = JoueurDao().trouver_par_id(id_joueur)
         table = self.table_par_numero(numero_table)
 
-        joueur.rejoindre_table(table)
+        joueur.rejoindre_table(table.numero_table)
         JoueurService().modifier(joueur)
 
     @log
