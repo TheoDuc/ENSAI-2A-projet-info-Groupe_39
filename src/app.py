@@ -148,7 +148,7 @@ class TableModel(BaseModel):
     """Définir un modèle Pydantic pour les Table"""
 
     numero_table: int | None = None  # Champ optionnel
-    joueur_max: int
+    joueurs_max: int
     grosse_blind: int
     mode_jeu: int | None = None  # Champ optionnel
     joueurs: List[JoueurModel] = Field(default_factory=list)
@@ -160,10 +160,10 @@ async def creer_table(t: TableModel):
     """Créer une table"""
     logging.info("Créer une table")
 
-    table = table_service.creer_table(t.joueur_max, t.grosse_blind)
+    table = table_service.creer_table(t.joueurs_max, t.grosse_blind)
     return TableModel(
         numero_table=table.numero_table,
-        joueur_max=table.joueur_max,
+        joueurs_max=table.joueur_max,
         grosse_blind=table.grosse_blind,
         mode_jeu=table.mode_jeu,
         joueurs=[],
