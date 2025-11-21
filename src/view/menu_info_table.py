@@ -37,46 +37,56 @@ class InfoTableMenu(VueAbstraite):
 
         match choix:
             case "Info de session":
-                import os
-
                 import requests
 
                 from view.menu_joueur_vue import MenuJoueurVue
                 from view.session import Session
 
                 session = Session()
-                host = os.environ["HOST_WEBSERVICE"]
-
-                # Vérifier si le joueur est connecté
                 if not session.id:
                     print("Aucun joueur connecté")
                     return MenuJoueurVue()
 
-                # Vérifier si le joueur est dans une table
-                numero_table = getattr(session, "table_numero", None)
-                if not numero_table:
+                res_tables = requests.get(f"{host}/table/")
+                if res_tables.status_code != 200:
+                    print("Impossible de récupérer la liste des tables")
+                    return MenuJoueurVue()
+
+                try:
+                    tables = res_tables.json()
+                except Exception:
+                    print("Erreur : impossible de décoder la réponse JSON")
+                    return MenuJoueurVue()
+
+                # Chercher la table où le joueur est présent
+                table_info = None
+                for t in tables:
+                    if not isinstance(t, dict):
+                        continue
+                    joueurs = t.get("joueurs")
+                    if not isinstance(joueurs, list):
+                        continue
+                    for j in joueurs:
+                        if isinstance(j, dict) and j.get("id_joueur") == session.id:
+                            table_info = t
+                            break
+                    if table_info:
+                        break
+
+                if not table_info:
                     print("Vous n'êtes connecté à aucune table")
                     return MenuJoueurVue()
 
-                # Récupérer les infos de la table spécifique via l'API
-                res_table = requests.get(f"{host}/table/{numero_table}")
-                if res_table.status_code != 200:
-                    print("Impossible de récupérer la table")
-                    return MenuJoueurVue()
-
-                table_info = res_table.json()
-
-                # Affichage des infos de la table
+                # Afficher les infos
+                numero_table = table_info.get("numero_table", "?")
                 nb_joueurs = len(table_info.get("joueurs", []))
                 nb_max = table_info.get("joueur_max", 0)
 
-                print(
-                    f"\nTable n°{table_info.get('numero_table', '?')} : {nb_joueurs}/{nb_max} joueurs présents"
-                )
+                print(f"\nTable n°{numero_table} : {nb_joueurs}/{nb_max} joueurs présents")
                 print("-" * 40)
                 for j in table_info.get("joueurs", []):
-                    pseudo = j.get("pseudo", "Inconnu")
-                    credit = j.get("credit", 0)
+                    pseudo = j.get("pseudo", "Inconnu") if isinstance(j, dict) else "Inconnu"
+                    credit = j.get("credit", 0) if isinstance(j, dict) else 0
                     print(f"{pseudo} : {credit} crédits")
 
                 return MenuJoueurVue()
