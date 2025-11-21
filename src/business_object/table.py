@@ -3,6 +3,7 @@
 import logging
 
 from business_object.info_manche import InfoManche
+from business_object.joueur import Joueur
 from business_object.manche import Manche
 from utils.log_decorator import log
 
@@ -54,6 +55,7 @@ class Table:
         self.__numero_table = numero_table
         self.__mode_jeu = mode_jeu
         self.__manche = manche
+        self.joueurs: list[Joueur] = []
 
         if id_joueurs is None:
             self.__id_joueurs = []
