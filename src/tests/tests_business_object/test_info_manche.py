@@ -1,14 +1,13 @@
 import pytest
 
 from business_object.info_manche import InfoManche
-from business_object.joueur import Joueur
 from business_object.main import Main
 
 
 class TestInfoManche:
     @pytest.fixture
     def joueurs(self):
-        return [Joueur(1, "Alice", 500, "France"), Joueur(2, "Bob", 300, "Canada")]
+        return [1, 2]
 
     @pytest.fixture
     def mains(self):
@@ -133,8 +132,8 @@ class TestInfoManche:
         manche = InfoManche(joueurs)
 
         # On force un état pour être sûr de l'affichage
-        manche.modifier_statut(0, 2)      # "à jour"
-        manche.modifier_statut(1, 4)      # "all in"
+        manche.modifier_statut(0, 2)  # "à jour"
+        manche.modifier_statut(1, 4)  # "all in"
         manche.modifier_mise(0, 150)
         manche.modifier_mise(1, 300)
         manche.modifier_tour_couche(1, 3)
@@ -149,8 +148,6 @@ class TestInfoManche:
         assert "Couché au" in texte
 
         # Vérifications du contenu réel
-        assert "Alice" in texte
-        assert "Bob" in texte
         assert "à jour" in texte
         assert "all in" in texte
         assert "150" in texte

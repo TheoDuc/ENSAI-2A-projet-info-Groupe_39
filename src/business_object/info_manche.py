@@ -31,8 +31,8 @@ class InfoManche:
                 f"Le paramètre 'joueurs' doit être une liste, pas {type(joueurs).__name__}"
             )
 
-        if not all(isinstance(j, Joueur) for j in joueurs):
-            raise TypeError("Tous les éléments de 'joueurs' doivent être des instances de Joueur")
+        if not all(isinstance(j, int) for j in joueurs):
+            raise TypeError("Tous les éléments de 'joueurs' doivent être des int")
 
         if len(joueurs) < 2:
             raise ValueError(
@@ -135,14 +135,14 @@ class InfoManche:
         )
 
     def affichage_tout_joueur(self) -> str:
-        pseudos = [j.pseudo for j in self.__joueurs]
+        id_joueurs = [str(j) for j in self.__joueurs]
         statuts = [self.__STATUTS[s] for s in self.__statuts]
         mises = [str(m) for m in self.__mises]
         couches = [str(t) if t is not None else "-" for t in self.__tour_couche]
 
         col_widths = [
-            max(len(pseudo), len(statut), len(mise), len(couche), 7)
-            for pseudo, statut, mise, couche in zip(pseudos, statuts, mises, couches)
+            max(len(id_joueur), len(statut), len(mise), len(couche), 7)
+            for id_joueur, statut, mise, couche in zip(id_joueurs, statuts, mises, couches)
         ]
 
         def row(label, values):
@@ -154,7 +154,7 @@ class InfoManche:
         separator = "-" * (14 + sum(col_widths) + 3 * len(col_widths))
 
         lines.append(separator)
-        lines.append(row("Joueurs", pseudos))
+        lines.append(row("Joueurs", id_joueurs))
         lines.append(separator)
         lines.append(row("Statuts", statuts))
         lines.append(row("Mises", mises))
