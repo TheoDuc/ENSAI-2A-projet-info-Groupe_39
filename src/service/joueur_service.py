@@ -116,3 +116,10 @@ class JoueurService:
     def supprimer(self, joueur: Joueur) -> bool:
         """Supprime un joueur via DAO"""
         return self.dao.supprimer(joueur)
+
+    def maj_joueur(self, joueur: Joueur) -> None:
+        """Met à jour le joueur dans le service"""
+        if joueur.id_joueur not in self._joueurs_connectes:
+            raise Exception(f"Le joueur {joueur.pseudo} n'est pas connecté")
+
+        self._joueurs_connectes[joueur.id_joueur] = joueur

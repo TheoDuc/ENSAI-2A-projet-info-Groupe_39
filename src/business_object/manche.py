@@ -115,12 +115,11 @@ class Manche:
         info = self.info.affichage_tout_joueur() + "\n\n\n"
         board = "Board :" + self.board.affichage_board() + "\n\n"
         if self.fin:
-            indication = "La manche est terminée !"
+            indice = None
         else:
-            pseudo = self.info.joueurs[self.indice_joueur_actuel].pseudo
-            indication = f"C'est à {pseudo} de jouer !"
+            indice = self.info.joueurs[self.indice_joueur_actuel]
 
-        return tour + info + board + indication
+        return [(tour + info + board), indice]
 
     def indice_joueur(self, id_joueur: int) -> int:
         """

@@ -128,25 +128,34 @@ class Table:
         self.__id_joueurs.append(id_joueur)
 
     @log
-    def retirer_joueur(self, id_joueur: int) -> int:
+    def retirer_joueur(self, indice: int) -> Joueur:
         """
         Retire un joueur de la liste des joueurs selon son indice
 
         Paramètres
         ----------
         indice : int
-            Indice du joueur à retirer dans la liste des id_joueurs
+            Indice du joueur à retirer dans la liste des joueurs
 
         Renvois
         -------
-        int
-            L'id du joueur quittant la table
+        Joueur
+            Retourne le joueru retirée de la liste des joueurs
         """
 
-        if id_joueur not in self.__id_joueurs:
-            raise ValueError(f"Le joueur {id_joueur} n'est pas présent dans la table")
-        self.__id_joueurs.remove(id_joueur)
-        return id_joueur
+        if not isinstance(indice, int):
+            raise TypeError("L'indice doit être un entier")
+
+        if indice >= len(self.__id_joueurs):
+            raise IndexError(
+                f"Indice plus grand que le nombre de joueurs : {len(self.__id_joueurs)}"
+            )
+
+        if indice < 0:
+            raise IndexError("Indice négatif impossible")
+
+        logger.info(f"Le joueur {self.id_joueurs[indice]} est retiré de la table")
+        return self.__id_joueurs.pop(indice)
 
     @log
     def mettre_grosse_blind(self, montant: int) -> None:
@@ -203,16 +212,12 @@ class Table:
         Exceptions
         ----------
         Exception
-            Si le nombre de joueurs restants est inférieur à 2 après le retrait des joueurs
-            sans crédit suffisant pour la grosse blind.
+            Si le nombre de joueurs restants est inférieur à 2
         """
-        for indice_joueur in range(len(self.__joueurs)):
-            if self.__id_joueurs[indice_joueur].credit < self.__grosse_blind:
-                self.retirer_joueur(indice_joueur)
 
         if len(self.__id_joueurs) < 2:
             raise Exception(
-                f"Trop peu de joeuurs sur la table pour lancer une manche : {len(self.__joueurs)}"
+                f"Trop peu de joeuurs sur la table pour lancer une manche : {len(self.__id_joueurs)}"
             )
 
         self.__manche = Manche(info=InfoManche(self.__id_joueurs), grosse_blind=self.__grosse_blind)
