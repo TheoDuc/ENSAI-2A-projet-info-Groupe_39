@@ -192,6 +192,7 @@ async def retirer_un_joueur(id_joueur: str):
     return f"le joueur {joueur.pseudo} a été retiré de la table"
 
 
+@app.get()
 # fonctionne
 @app.delete("/table/{numero_table}", tags=["Table"])
 def supprimer_table(numero_table: int):
@@ -202,13 +203,11 @@ def supprimer_table(numero_table: int):
 
 
 @app.get("table/{numero_table}", tages=["table"])
-def joueur_id(numero_table: int):
+async def joueur_id(numero_table: int):
     a = table_service.table_par_numero(numero_table)
-
     return a.id_joueurs
 
 
-@app.get()
 # fonctionne
 @app.get("/table/", tags=["Table"])
 async def liste_tables():
