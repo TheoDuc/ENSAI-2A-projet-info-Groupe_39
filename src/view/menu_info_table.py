@@ -41,13 +41,11 @@ class InfoTableMenu(VueAbstraite):
             case "Info de session":
                 from view.menu_joueur_vue import MenuJoueurVue
 
-                # Vérifier si le joueur est dans une table
                 numero_table = getattr(Session(), "table_numero", None)
                 if not numero_table:
                     print("Vous n'êtes connecté à aucune table")
                     return MenuJoueurVue()
 
-                # Récupérer la table via l'API
                 res_table = requests.get(f"{host}{END_POINT}{numero_table}")
                 if res_table.status_code != 200:
                     print("Impossible de récupérer la table du joueur")
