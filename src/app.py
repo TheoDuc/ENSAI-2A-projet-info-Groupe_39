@@ -1,4 +1,5 @@
 import logging
+from typing import List
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import RedirectResponse
@@ -146,6 +147,27 @@ class TableModel(BaseModel):
     joueur_max: int
     grosse_blind: int
     mode_jeu: int | None = None  # Champ optionnel
+    joueurs: List[JoueurModel] = []
+
+
+@app.get("/table/", response_model=List[TableModel], tags=["Table"])
+async def liste_tables():
+    """Retourne toutes les tables avec leurs joueurs"""
+    result = []
+    for table in table_service.liste_tables():
+        result.append(
+            TableModel(
+                numero_table=table.numero_table,
+                joueur_max=table.joueur_max,
+                grosse_blind=table.grosse_blind,
+                mode_jeu=table.mode_jeu,
+                joueurs=[
+                    JoueurModel(id_joueur=j.id_joueur, pseudo=j.pseudo, credit=j.credit)
+                    for j in table.joueurs
+                ],
+            )
+        )
+    return result
 
 
 # fonctionne
@@ -161,33 +183,6 @@ async def creer_table(t: TableModel):
         grosse_blind=table.grosse_blind,
         mode_jeu=table.mode_jeu,
     )
-
-
-@app.get("/table/{numero_table}", tags=["Table"])
-async def get_table(numero_table: int):
-    """Récupère une table avec tous ses joueurs"""
-    try:
-        table = table_service.table_par_numero(numero_table)
-    except ValueError:
-        return {"error": f"Aucune table avec le numéro {numero_table}"}
-
-    # Construire le JSON à retourner
-    return {
-        "numero_table": table.numero_table,
-        "joueur_max": table.joueur_max,
-        "grosse_blind": table.grosse_blind,
-        "mode_jeu": table.mode_jeu,
-        "joueurs": [
-            {
-                "id_joueur": j.id_joueur,
-                "pseudo": j.pseudo,
-                "credit": j.credit,
-                "pays": j.pays,
-                "debut_connexion": getattr(j, "debut_connexion", None),
-            }
-            for j in table.joueurs
-        ],
-    }
 
 
 # fonctionne
