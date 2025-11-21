@@ -3,7 +3,6 @@ import pytest
 from business_object.board import Board
 from business_object.carte import Carte
 from business_object.info_manche import InfoManche
-from business_object.joueur import Joueur
 from business_object.main import Main
 from business_object.manche import Manche
 
@@ -13,10 +12,7 @@ class Test_Manche:
     @pytest.fixture
     @staticmethod
     def joueurs():
-        return [
-            Joueur(id_joueur=i + 1, pseudo=f"J{i + 1}", credit=1000, pays="France")
-            for i in range(3)
-        ]
+        return [1, 2, 3]
 
     @pytest.fixture
     @staticmethod
@@ -79,7 +75,7 @@ class Test_Manche:
 
     def test_manche_indice_joueur_inexistant(self, manche):
         # GIVEN/WHEN
-        joueur_inexistant = Joueur(id_joueur=99, pseudo="X", credit=1000, pays="France")
+        joueur_inexistant = -1
         # THEN
         with pytest.raises(ValueError):
             manche.indice_joueur(joueur_inexistant)
@@ -125,7 +121,7 @@ class Test_Manche:
 
     def test_manche_suivre_relance(self, manche):
         # GIVEN/WHEN
-        montant = manche.suivre(0, relance=10)
+        montant = manche.suivre(0, 500, relance=10)
         # HEN
         assert montant > 0
         assert manche.info.mises[0] > 0
@@ -140,8 +136,8 @@ class Test_Manche:
 
     def test_manche_all_in(self, manche):
         # GIVEN/WHEN
-        credit = manche.info.joueurs[0].credit
-        montant = manche.all_in(0)
+        credit = 200
+        montant = manche.all_in(0, credit)
         # THEN
         assert montant == credit
         assert manche.info.statuts[0] == 4
@@ -233,7 +229,7 @@ class Test_Manche:
 
     def test_manche_init_grosse_blind_type_error(self):
         # GIVEN
-        joueurs = [Joueur(1, "A", 1000, "France"), Joueur(2, "B", 1000, "France")]
+        joueurs = [1, 2]
         # WHEN
         info = InfoManche(joueurs)
         # THEN
@@ -242,7 +238,7 @@ class Test_Manche:
 
     def test_manche_init_grosse_blind_value_error(self):
         # GIVEN
-        joueurs = [Joueur(1, "A", 1000, "France"), Joueur(2, "B", 1000, "France")]
+        joueurs = [1, 2]
         # WHEN
         info = InfoManche(joueurs)
         # THEN
@@ -258,10 +254,7 @@ class Test_Manche:
 
     def test_manche_suivre_limits(self):
         # GIVEN
-        joueurs = [
-            Joueur(1, "A", 20, "France"),
-            Joueur(2, "B", 1000, "France"),
-        ]
+        joueurs = [1, 2]
         # WHEN
         info = InfoManche(joueurs)
         manche = Manche(info, 10)
@@ -269,7 +262,7 @@ class Test_Manche:
         info.mises[1] = 50
         # THEN
         with pytest.raises(ValueError):
-            manche.suivre(0, relance=0)
+            manche.suivre(0, 20, relance=0)
 
     def test_classement_ex_aequo(self, manche):
         # GIVEN
@@ -322,7 +315,7 @@ class Test_Manche:
 
     def test_action_exceptions(self, manche, joueurs):
         # GIVEN/WHEN/THEN
-        with pytest.raises(Exception, match="Ce n'est pas à J2 de jouer"):
+        with pytest.raises(Exception, match="Ce n'est pas au joueur 2 de jouer"):
             manche.action(joueurs[1], "checker")
 
         # GIVEN/WHEN
@@ -336,21 +329,6 @@ class Test_Manche:
         with pytest.raises(ValueError, match="L'action danser n'existe pas"):
             manche.action(joueurs[0], "danser")
 
-    def test_manche_suivre_limits_(self):
-        # GIVEN
-        joueurs = [
-            Joueur(1, "A", 20, "France"),
-            Joueur(2, "B", 1000, "France"),
-        ]
-        # WHEN
-        info = InfoManche(joueurs)
-        manche = Manche(info, 10)
-
-        info.mises[1] = 50
-        # THEN
-        with pytest.raises(ValueError, match="Le joueur doit all-in"):
-            manche.suivre(0, relance=0)
-
     def test_indice_joueur_suivant_all_couches(self, manche):
         # GIVEN/WHEN
         manche.info.statuts[:] = [3, 3, 3]
@@ -358,35 +336,35 @@ class Test_Manche:
         with pytest.raises(ValueError):
             manche.indice_joueur_suivant()
 
-    def test_suivre_joueur_doigt_all_in(self):
+    def test_suivre_joueur_doit_all_in(self):
         # GIVEN
-        joueurs = [Joueur(1, "A", 10, "France"), Joueur(2, "B", 50, "France")]
+        joueurs = [1, 2]
         # WHEN
         info = InfoManche(joueurs)
         manche = Manche(info, 10)
         info.mises[1] = 50
         # THEN
         with pytest.raises(ValueError, match="Le joueur doit all-in"):
-            manche.suivre(0, relance=0)
+            manche.suivre(0, 10, relance=0)
 
     def test_all_in_joueur_deja_couche(self, manche):
         # GIVEN/WHEN
         manche.info.statuts[0] = 3
         # THEN
         with pytest.raises(ValueError):
-            manche.all_in(0)
+            manche.all_in(0, 100)
 
     def test_suivre_relance_trop_grande(self):
         # GIVEN
-        joueurs = [Joueur(1, "A", 20, "France"), Joueur(2, "B", 50, "France")]
+        joueurs = [1, 2]
         # WHEN
         info = InfoManche(joueurs)
         manche = Manche(info, 10)
         info.mises[0] = 10
         info.mises[1] = 50
         # THEN
-        with pytest.raises(ValueError, match="Le joueur doit all-in"):
-            manche.suivre(0, relance=50)
+        with pytest.raises(ValueError, match="Le joueur ne peut relancer autant"):
+            manche.suivre(0, 50, relance=50)
 
     def test_fin_de_manche_all_couches(self, manche):
         # GIVEN/WHEN
@@ -402,12 +380,12 @@ class Test_Manche:
         assert montant is None or isinstance(montant, int)
 
         # GIVEN/WHEN
-        montant = manche.action(joueurs[1], "suivre", relance=0)
+        montant = manche.action(joueurs[1], "suivre", 100, relance=0)
         # THEN
         assert isinstance(montant, int)
 
         # GIVEN/WHEN
-        montant = manche.action(joueurs[2], "all-in")
+        montant = manche.action(joueurs[2], "all-in", 100)
         # THEN
         assert isinstance(montant, int)
 

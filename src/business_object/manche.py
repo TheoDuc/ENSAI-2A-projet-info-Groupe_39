@@ -313,7 +313,7 @@ class Manche:
         self.info.modifier_statut(indice_joueur, 2)
 
     @log
-    def suivre(self, indice_joueur: int, relance: int = 0) -> int:
+    def suivre(self, indice_joueur: int, credit_joueur: int, relance: int = 0) -> int:
         """
         Permet à un joueur de suivre ou relancer.
 
@@ -321,6 +321,8 @@ class Manche:
         ----------
         indice_joueur : int
             Indice du joueur
+        credit_joueur : int
+            Les crédits du joueur qui veut suivre
         relance : int
             Montant de la relance additionnelle
 
@@ -342,9 +344,9 @@ class Manche:
 
         pour_suivre = max(self.info.mises) - self.info.mises[indice_joueur]
 
-        if pour_suivre >= self.info.joueurs[indice_joueur].credit:
+        if pour_suivre >= credit_joueur:
             raise ValueError("Le joueur doit all-in")
-        if relance + pour_suivre >= self.info.joueurs[indice_joueur].credit:
+        if relance + pour_suivre >= credit_joueur:
             raise ValueError("Le joueur ne peut relancer autant")
 
         ancienne_mise = self.info.mises[indice_joueur]
@@ -360,7 +362,7 @@ class Manche:
         return pour_suivre + relance
 
     @log
-    def all_in(self, indice_joueur: int) -> int:
+    def all_in(self, indice_joueur: int, credit_joueur: int) -> int:
         """
         Mise tout le crédit d'un joueur
 
@@ -368,6 +370,8 @@ class Manche:
         ----------
         indice_joueur : int
             l'indice du joueur qui all-in
+        credit_joueur : int
+            Les crédits du joueur qui veut suivre
 
         Renvois
         -------
@@ -383,7 +387,7 @@ class Manche:
         if self.info.statuts[indice_joueur] in [3, 4]:
             raise ValueError("Le joueur ne peut plus all-in")
 
-        montant = self.info.joueurs[indice_joueur].credit
+        montant = credit_joueur
         pour_suivre = max(self.info.mises) - self.info.mises[indice_joueur]
 
         ancienne_mise = self.info.mises[indice_joueur]
@@ -599,7 +603,7 @@ class Manche:
         return gains
 
     @log
-    def action(self, joueur, action: str, relance: int = 0) -> dict:
+    def action(self, id_joueur: int, action: str, credit_joueur: int = 0, relance: int = 0) -> dict:
         """
         Effectue l'action souhaitée d'un joueur et met à jour la manche
 
@@ -626,19 +630,19 @@ class Manche:
             si l'action est invalide
         """
 
-        indice_joueur = self.indice_joueur(joueur)
+        indice_joueur = self.indice_joueur(id_joueur)
 
         if indice_joueur != self.indice_joueur_actuel:
-            raise Exception(f"Ce n'est pas à {joueur.pseudo} de jouer")
+            raise Exception(f"Ce n'est pas au joueur {id_joueur} de jouer")
         if self.fin:
             raise Exception("La manche est déjà terminée, aucune action ne peut être effectuée")
 
         if action == "checker":
             montant = self.checker(indice_joueur)
         elif action == "suivre":
-            montant = self.suivre(indice_joueur, relance)
+            montant = self.suivre(indice_joueur, credit_joueur, relance)
         elif action == "all-in":
-            montant = self.all_in(indice_joueur)
+            montant = self.all_in(indice_joueur, credit_joueur)
         elif action == "se coucher":
             montant = self.se_coucher(indice_joueur)
         else:
