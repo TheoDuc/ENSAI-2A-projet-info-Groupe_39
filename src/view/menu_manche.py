@@ -9,23 +9,35 @@ from view.vue_abstraite import VueAbstraite
 
 logger = logging.getLogger(__name__)
 
-host = os.environ["HOST_WEBSERVICE"]
+host = os.environ.get("HOST_WEBSERVICE")
 END_POINT = "/action/"
 
 
 class MenuManche(VueAbstraite):
-    """Vue du menu d'une manche"""
+    """Menu du joueur pendant une manche de poker multi-joueurs."""
 
     def choisir_menu(self):
-        """Choix du menu suivant de l'utilisateur
+        """Affiche le menu principal de la manche et gère les actions du joueur."""
 
-        Return
-        ------
-        vue
-            Retourne la vue choisie par l'utilisateur dans le terminal
-        """
+        session = Session()
+        if not session.id:
+            print("Aucun joueur connecté")
+            from view.menu_joueur_vue import MenuJoueurVue
 
-        print("\n" + "-" * 50 + "\nMenu de jeu Joueur\n" + "-" * 50 + "\n")
+            return MenuJoueurVue()
+
+        # Récupération du joueur courant
+        joueur = next((j for j in session.joueurs_connectes if j.id_joueur == session.id), None)
+        if not joueur or not joueur.numero_table:
+            print("Vous n'êtes connecté à aucune table")
+            from view.menu_joueur_vue import MenuJoueurVue
+
+            return MenuJoueurVue()
+
+        numero_table = joueur.numero_table
+        pseudo = joueur.pseudo
+
+        print("\n" + "-" * 50 + "\nMenu de jeu - Manche\n" + "-" * 50 + "\n")
 
         choix = inquirer.select(
             message="Faites votre choix : ",
@@ -40,68 +52,88 @@ class MenuManche(VueAbstraite):
             ],
         ).execute()
 
-        id_joueur = Session().id
-        req_joueur = requests.get(f"{host}/joueur/id/{id_joueur}")
-        if req_joueur.status_code != 200:
-            print("Erreur : impossible de récupérer les infos du joueur.")
-            return self
-        joueur_data = req_joueur.json()
-        numero_table = joueur_data.get("_Joueur__numero_table")
-        pseudo = joueur_data.get("_Joueur__pseudo")
         match choix:
             case "Voir les infos de la manche":
-                req = requests.get(f"{host}/table/affichage/{numero_table}")
-                # numero_table = 1
-                # joueur = JoueurService().trouver_par_id(Session().id)
-                # numero_table = joueur.table.numero_table
-                # req = requests.get(f"{host}/table/affichage/{numero_table}")
-                if req.status_code == 200:
-                    print(req.text)
+                self.voir_infos_manche(numero_table)
                 return MenuManche()
 
             case "Regarder main":
-                # numero_table = 1
-                # joueur = JoueurService().trouver_par_id(Session().id)
-                # id_joueur =  Session().id
-                # numero_table = joueur.table.numero_table
-                req = requests.get(f"{host}/table/main/{numero_table}/{id_joueur}")
-                if req.status_code == 200:
-                    print(req.text)
+                self.voir_main(numero_table, joueur.id_joueur)
                 return MenuManche()
 
             case "Checker":
-                # joueur = JoueurService().trouver_par_id(Session().id)
-                # pseudo = joueur.pseudo
-                req = requests.put(f"{host}{END_POINT}checker/{pseudo}")
+                self.effectuer_action("checker", pseudo)
                 return MenuManche()
 
             case "Suivre":
-                # joueur = JoueurService().trouver_par_id(Session().id)
-                # pseudo = joueur.pseudo
-                req = requests.put(f"{host}{END_POINT}suivre/{pseudo}")
+                self.effectuer_action("suivre", pseudo)
                 return MenuManche()
 
             case "All in":
-                # joueur = JoueurService().trouver_par_id(Session().id)
-                # pseudo = joueur.pseudo
-                req = requests.put(f"{host}{END_POINT}all_in/{pseudo}")
+                self.effectuer_action("all_in", pseudo)
                 return MenuManche()
 
             case "Se coucher":
-                # joueur = JoueurService().trouver_par_id(Session().id)
-                # pseudo = joueur.pseudo
-                req = requests.put(f"{host}{END_POINT}se_coucher/{pseudo}")
+                self.effectuer_action("se_coucher", pseudo)
                 return MenuManche()
 
             case "Quitter manche":
-                # joueur = JoueurService().trouver_par_id(Session().id)
-                # numero_table = joueur.table.numero_table
-                # numero_table = 1
-                req = requests.get(f"{host}/table/terminer/{numero_table}")
-
-                if req.status_code == 200:
-                    print("vous avez quité la manche")
-
+                self.quitter_manche(numero_table, joueur)
                 from view.game_menu_view import GameMenu
 
-                return GameMenu(Session().afficher())
+                return GameMenu(session.afficher())
+
+    def voir_infos_manche(self, numero_table):
+        """Affiche l’état complet de la manche (pot, joueurs, mises...)."""
+        try:
+            req = requests.get(f"{host}/table/affichage/{numero_table}")
+            if req.status_code == 200:
+                print(req.text)
+            else:
+                print("Impossible de récupérer les infos de la manche")
+        except requests.RequestException:
+            print("Erreur : impossible de contacter le serveur")
+
+    def voir_main(self, numero_table, id_joueur):
+        """Affiche la main du joueur courant."""
+        try:
+            req = requests.get(f"{host}/table/main/{numero_table}/{id_joueur}")
+            if req.status_code == 200:
+                print(req.text)
+            else:
+                print("Impossible de récupérer votre main")
+        except requests.RequestException:
+            print("Erreur : impossible de contacter le serveur")
+
+    def effectuer_action(self, action, pseudo):
+        """Exécute une action (checker, suivre, all_in, se_coucher) pour le joueur."""
+        try:
+            req = requests.put(f"{host}{END_POINT}{action}/{pseudo}")
+            if req.status_code == 200:
+                print(f"Action '{action}' effectuée avec succès")
+            else:
+                print(f"Impossible de '{action}', réessayez")
+        except requests.RequestException:
+            print(f"Erreur serveur lors de l'action '{action}'")
+
+    def quitter_manche(self, numero_table, joueur):
+        """Permet au joueur de quitter la manche."""
+        try:
+            req = requests.get(f"{host}/table/terminer/{numero_table}")
+            if req.status_code == 200:
+                print("Vous avez quitté la manche")
+            else:
+                print("Impossible de quitter la manche")
+        except requests.RequestException:
+            print("Erreur : impossible de contacter le serveur")
+
+        # Mise à jour de la table globale et de la session
+        table = Session.tables_globales.get(numero_table)
+        if table and joueur in table.joueurs:
+            try:
+                index = table.joueurs.index(joueur)
+                table.retirer_joueur(index)
+                Session.tables_globales[numero_table] = table
+                joueur.numero_table = None
+            except ValueError:
+                logger.warning("Erreur lors du retrait du joueur de la table")
