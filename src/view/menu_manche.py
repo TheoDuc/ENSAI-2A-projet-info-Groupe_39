@@ -46,9 +46,8 @@ class MenuManche(VueAbstraite):
             print("Erreur : impossible de récupérer les infos du joueur.")
             return self
         joueur_data = req_joueur.json()
-        numero_table = joueur_data["table"]["numero_table"]
-        pseudo = joueur_data["pseudo"]
-
+        numero_table = joueur_data.get("_Joueur__numero_table")
+        pseudo = joueur_data.get("_Joueur__pseudo")
         match choix:
             case "Voir les infos de la manche":
                 req = requests.get(f"{host}/table/affichage/{numero_table}")

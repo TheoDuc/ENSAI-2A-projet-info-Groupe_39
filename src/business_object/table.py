@@ -128,7 +128,7 @@ class Table:
         self.__id_joueurs.append(id_joueur)
 
     @log
-    def retirer_joueur(self, indice: int) -> int:
+    def retirer_joueur(self, id_joueur: int) -> int:
         """
         Retire un joueur de la liste des joueurs selon son indice
 
@@ -143,20 +143,9 @@ class Table:
             L'id du joueur quittant la table
         """
 
-        if not isinstance(indice, int):
-            raise TypeError("L'indice doit être un entier")
-
-        if indice >= len(self.id_joueurs):
-            raise IndexError(
-                f"Indice plus grand que le nombre de joueurs : {len(self.__id_joueurs)}"
-            )
-
-        if indice < 0:
-            raise IndexError("Indice négatif impossible")
-
-        id_joueur = self.__id_joueurs.pop(indice)
-
-        logger.info(f"Le joueur {self.__id_joueurs} est retiré de la table")
+        if id_joueur not in self.__id_joueurs:
+            raise ValueError(f"Le joueur {id_joueur} n'est pas présent dans la table")
+        self.__id_joueurs.remove(id_joueur)
         return id_joueur
 
     @log

@@ -3,7 +3,6 @@ import os
 
 from InquirerPy import inquirer
 
-from view.menu_manche import MenuManche
 from view.vue_abstraite import VueAbstraite
 
 logger = logging.getLogger(__name__)
@@ -94,17 +93,21 @@ class InfoTableMenu(VueAbstraite):
                 return MenuJoueurVue()
 
             case "Lancer manche":
-                joueur = JoueurService().trouver_par_id(Session().id)
-                logger.debug(f"{joueur.table}")
-                # numero_table = joueur.table
-                numero_table = joueur.table.numero_table
-                # numero_table = 1
-                req = requests.get(f"{host}{END_POINT}lancer/{numero_table}")
+                from service.joueur_service import JoueurService
 
-                # return MenuManche("")
+                joueur = JoueurService().trouver_par_id(Session().id)
+                numero_table = joueur.numero_table
+                if numero_table is None:
+                    from view.menu_joueur_vue import MenuJoueurVue
+
+                    return MenuJoueurVue(Session().afficher())
+
+                req = requests.get(f"{host}{END_POINT}lancer/{numero_table}")
 
                 if req.status_code == 200:
                     print("Manche lancée !")
+                    from view.menu_manche_vue import MenuManche
+
                     return MenuManche("")
                 else:
                     print("Erreur lors du lancement de la manche")
@@ -112,10 +115,6 @@ class InfoTableMenu(VueAbstraite):
 
                     return MenuJoueurVue(Session().afficher())
 
-                """
-                TableService().lancer_manche(table.numero_table)
-                return GameMenu("")
-                """
             case "Quitter table":
                 from view.menu_joueur_vue import MenuJoueurVue
                 from view.session import Session
