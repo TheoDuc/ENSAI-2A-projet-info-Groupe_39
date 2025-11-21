@@ -114,17 +114,23 @@ class InfoTableMenu(VueAbstraite):
                 TableService().lancer_manche(table.numero_table)
                 return GameMenu("")
                 """
+            case "Quitter table":
+                import requests
 
-            case "Quitter table":  # fonctionne pas
-                id_joueur = Session().id
-                url = f"{host}{END_POINT}retirer/{id_joueur}"
-                req = requests.put(url)
+                from view.menu_creation_table import MenuCreationTable
+                from view.session import Session
 
-                if req.status_code == 200:
-                    message = "vous avez quitté la table"
-                else:
-                    message = "vous n'avez pas pu quitter la table"
+                session = Session()
+                id_joueur = session.id
+                url = f"{host}/table/retirer/{id_joueur}"
 
-                from view.menu_joueur_vue import MenuJoueurVue
+                try:
+                    req = requests.put(url)
+                    if req.status_code == 200:
+                        message = req.json().get("message", "Vous avez quitté la table")
+                    else:
+                        message = req.json().get("error", "Impossible de quitter la table")
+                except Exception as e:
+                    message = f"Erreur lors de la requête : {e}"
 
-                return MenuJoueurVue(message)
+                return MenuCreationTable(message)
