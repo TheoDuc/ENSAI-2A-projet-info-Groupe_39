@@ -1,7 +1,6 @@
 """Implémentation de la classe TableService"""
 
 from business_object.table import Table
-from dao.joueur_dao import JoueurDao
 from service.credit_service import CreditService
 from service.joueur_service import JoueurService
 from service.manche_joueur_service import MancheJoueurService
@@ -132,7 +131,7 @@ class TableService:
         None
         """
 
-        joueur = JoueurDao().trouver_par_id(id_joueur)
+        joueur = JoueurService().trouver_par_id(id_joueur)
         if not joueur:
             raise ValueError(f"Le joueur avec l'identifiant {id_joueur} n'existe pas")
         table = self.table_par_numero(numero_table)
@@ -142,12 +141,14 @@ class TableService:
         try:
             table.ajouter_joueur(id_joueur)
             joueur_dans_table = True
-            joueur.rejoindre_table(id_joueur)
+            joueur.rejoindre_table(numero_table)
         except Exception as e:
             if joueur_dans_table:
                 table.retirer_joueur(id_joueur)
 
             raise Exception(f"Échec, {joueur.pseudo} n'a pas rejoint la table {numero_table} : {e}")
+
+        JoueurService().maj_joueur(joueur)
 
     @log
     def retirer_joueur(self, id_joueur: int) -> None:
@@ -187,6 +188,11 @@ class TableService:
 
         table = self.table_par_numero(numero_table)
 
+        for id in range(len(table)):
+            joueur = JoueurService().trouver_par_id(table.id_joueurs[id])
+            if joueur.credit < table.grosse_blind:
+                self.retirer_joueur(joueur.id_joueur)
+
         table.nouvelle_manche()
 
     def affichage_general(self, numero_table: int) -> str:
@@ -208,7 +214,16 @@ class TableService:
 
         table = self.table_par_numero(numero_table)
 
-        return table.manche.affichage_complet()
+        res = table.manche.affichage_complet()
+
+        if res[1] is None:
+            instructions = "La manche est terminée !"
+        else:
+            id_joueur = res[1]
+            joueur = JoueurService().trouver_par_id(id_joueur)
+            instructions = f"C'est à {joueur.pseudo} de jouer !"
+
+        return res[0] + instructions
 
     def regarder_main(self, numero_table: int, id_joueur: int) -> str:
         """
