@@ -49,6 +49,7 @@ class InfoTableMenu(VueAbstraite):
 
                 # Récupérer toutes les tables
                 res_tables = requests.get(f"{host}/table/")
+                print(res_tables.json())
                 if res_tables.status_code != 200:
                     print("Impossible de récupérer la liste des tables")
                     return MenuJoueurVue()
