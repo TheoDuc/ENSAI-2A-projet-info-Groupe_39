@@ -17,12 +17,14 @@ class InfoTableMenu(VueAbstraite):
 
     def choisir_menu(self):
         session = Session()
-        session.refresh()
+        session.refresh()  # Rafraîchit les infos du joueur et des tables
+
+        # On récupère le joueur connecté
         joueur = next((j for j in Session.joueurs_connectes if j.id_joueur == session.id), None)
         if not joueur:
+            print("Erreur : joueur non trouvé dans la session")
             from view.menu_joueur_vue import MenuJoueurVue
 
-            print("Erreur : joueur non trouvé dans la session")
             return MenuJoueurVue()
 
         print("\nMenu de jeu Joueur")
@@ -57,47 +59,56 @@ class InfoTableMenu(VueAbstraite):
             print(f"{j.pseudo} : {j.credit} crédits")
 
     def lancer_manche(self, joueur):
-        if not joueur.numero_table:
-            print("Vous n'êtes connecté à aucune table")
-            from view.menu_joueur_vue import MenuJoueurVue
-
-            return MenuJoueurVue()
         table = Session.tables_globales.get(joueur.numero_table)
-        if len(table.joueurs) < 2:
-            print("Impossible de lancer la manche : au moins 2 joueurs nécessaires")
-            from view.menu_joueur_vue import MenuJoueurVue
+        match True:
+            case _ if not joueur.numero_table:
+                print("Vous n'êtes connecté à aucune table")
+                from view.menu_joueur_vue import MenuJoueurVue
 
-            return MenuJoueurVue()
+                return MenuJoueurVue()
+
+            case _ if len(table.joueurs) < 2:
+                print("Impossible de lancer la manche : au moins 2 joueurs nécessaires")
+                from view.menu_joueur_vue import MenuJoueurVue
+
+                return MenuJoueurVue()
 
         try:
             req = requests.get(f"{host}{END_POINT}lancer/{joueur.numero_table}")
-            if req.status_code == 200:
-                print("Manche lancée !")
-                from view.menu_manche_vue import MenuManche
+            match req.status_code:
+                case 200:
+                    print("Manche lancée !")
+                    from view.menu_manche_vue import MenuManche
 
-                return MenuManche()
+                    return MenuManche()
+                case _:
+                    print("Erreur lors du lancement de la manche")
         except requests.RequestException:
             print("Erreur serveur")
+
         from view.menu_joueur_vue import MenuJoueurVue
 
         return MenuJoueurVue()
 
     def quitter_table(self, joueur):
-        if not joueur.table:
-            print("Vous n'êtes actuellement à aucune table")
-            from view.menu_joueur_vue import MenuJoueurVue
+        table = getattr(joueur, "table", None)
+        match True:
+            case _ if not table:
+                print("Vous n'êtes actuellement à aucune table")
+                from view.menu_joueur_vue import MenuJoueurVue
 
-            return MenuJoueurVue()
+                return MenuJoueurVue()
 
-        table = joueur.table
         try:
             index = table.joueurs.index(joueur)
             table.retirer_joueur(index)
             logger.info(f"Vous avez quitté la table {table.numero_table}")
         except ValueError:
             logger.info("Erreur : impossible de vous retirer de la table")
+
         Session.tables_globales[table.numero_table] = table
         joueur.numero_table = None
+
         from view.menu_joueur_vue import MenuJoueurVue
 
         return MenuJoueurVue()
