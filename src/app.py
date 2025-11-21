@@ -202,6 +202,18 @@ async def liste_tables():
     return table_service.affichages_tables()
 
 
+@app.get("/table/session/{numero_table}", tags=["Table"])
+async def infos_session(numero_table: int):
+    """Renvoie les joueurs présents sur une table"""
+    table = table_service.table_par_numero(numero_table)
+
+    resultat = [
+        {"id_joueur": j.id_joueur, "pseudo": j.pseudo, "credit": j.credit, "pays": j.pays}
+        for j in table.joueurs
+    ]
+    return {"numero_table": table.numero_table, "joueurs": resultat}
+
+
 # fonctionne pas
 @app.get("/table/par_affichage/{affichage}", tags=["Table"])
 async def table_par_affichage(affichage: str):
