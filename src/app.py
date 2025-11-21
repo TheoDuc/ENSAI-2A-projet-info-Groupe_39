@@ -201,6 +201,14 @@ def supprimer_table(numero_table: int):
     return f"Table {numero_table} supprimé"
 
 
+@app.get("table/{numero_table}", tages=["table"])
+def joueur_id(numero_table: int):
+    a = table_service.table_par_numero(numero_table)
+
+    return a.id_joueurs
+
+
+@app.get()
 # fonctionne
 @app.get("/table/", tags=["Table"])
 async def liste_tables():
