@@ -47,35 +47,32 @@ class InfoTableMenu(VueAbstraite):
                 session = Session()
                 host = os.environ["HOST_WEBSERVICE"]
 
-                # Récupérer toutes les tables
-                res_tables = requests.get(f"{host}/table/")
-                print(res_tables.json())
-                if res_tables.status_code != 200:
-                    print("Impossible de récupérer la liste des tables")
+                # Vérifier si le joueur est connecté
+                if not session.id:
+                    print("Aucun joueur connecté")
                     return MenuJoueurVue()
 
-                tables = res_tables.json()
-
-                # Trouver la table où le joueur connecté est présent
-                table_info = None
-                for t in tables:
-                    for j in t.get("joueurs", []):
-                        if j.get("id_joueur") == session.id:
-                            table_info = t
-                            break
-                    if table_info:
-                        break
-
-                if not table_info:
+                # Vérifier si le joueur est dans une table
+                numero_table = getattr(session, "table_numero", None)
+                if not numero_table:
                     print("Vous n'êtes connecté à aucune table")
                     return MenuJoueurVue()
 
+                # Récupérer les infos de la table spécifique via l'API
+                res_table = requests.get(f"{host}/table/{numero_table}")
+                if res_table.status_code != 200:
+                    print("Impossible de récupérer la table")
+                    return MenuJoueurVue()
+
+                table_info = res_table.json()
+
                 # Affichage des infos de la table
-                numero_table = table_info.get("numero_table", "?")
                 nb_joueurs = len(table_info.get("joueurs", []))
                 nb_max = table_info.get("joueur_max", 0)
 
-                print(f"\nTable n°{numero_table} : {nb_joueurs}/{nb_max} joueurs présents")
+                print(
+                    f"\nTable n°{table_info.get('numero_table', '?')} : {nb_joueurs}/{nb_max} joueurs présents"
+                )
                 print("-" * 40)
                 for j in table_info.get("joueurs", []):
                     pseudo = j.get("pseudo", "Inconnu")
