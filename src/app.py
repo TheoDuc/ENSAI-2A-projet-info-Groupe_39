@@ -163,7 +163,7 @@ async def creer_table(t: TableModel):
     table = table_service.creer_table(t.joueurs_max, t.grosse_blind)
     return TableModel(
         numero_table=table.numero_table,
-        joueurs_max=table.joueur_max,
+        joueurs_max=table.joueurs_max,
         grosse_blind=table.grosse_blind,
         mode_jeu=table.mode_jeu,
         joueurs=[],
