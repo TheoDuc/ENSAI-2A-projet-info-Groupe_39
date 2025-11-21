@@ -17,17 +17,18 @@ class InfoTableMenu(VueAbstraite):
 
     def choisir_menu(self):
         session = Session()
-        session.refresh()  # Rafraîchit les infos du joueur et des tables
+        session.refresh()
+        logger.info("Session rafraîchie")
 
         # On récupère le joueur connecté
         joueur = next((j for j in Session.joueurs_connectes if j.id_joueur == session.id), None)
         if not joueur:
-            print("Erreur : joueur non trouvé dans la session")
+            logger.error("Erreur : joueur non trouvé dans la session")
             from view.menu_joueur_vue import MenuJoueurVue
 
             return MenuJoueurVue()
 
-        print("\nMenu de jeu Joueur")
+        logger.info(f"Menu de jeu pour le joueur {joueur.pseudo} (id={joueur.id_joueur})")
         choix = inquirer.select(
             message="Faites votre choix : ",
             choices=["Info de session", "Lancer manche", "Quitter table"],
@@ -50,41 +51,42 @@ class InfoTableMenu(VueAbstraite):
         """Affiche les infos de la table"""
         table = Session.tables_globales.get(joueur.numero_table)
         if not table:
-            print("Vous n'êtes connecté à aucune table")
+            logger.warning("Vous n'êtes connecté à aucune table")
             return
-        print(
+        logger.info(
             f"Table n°{table.numero_table} ({len(table.joueurs)}/{table.joueur_max}) joueurs présents"
         )
         for j in table.joueurs:
-            print(f"{j.pseudo} : {j.credit} crédits")
+            logger.info(f"{j.pseudo} : {j.credit} crédits")
 
     def lancer_manche(self, joueur):
         table = Session.tables_globales.get(joueur.numero_table)
-        match True:
-            case _ if not joueur.numero_table:
-                print("Vous n'êtes connecté à aucune table")
-                from view.menu_joueur_vue import MenuJoueurVue
+        if not joueur.numero_table:
+            logger.warning("Vous n'êtes connecté à aucune table")
+            from view.menu_joueur_vue import MenuJoueurVue
 
-                return MenuJoueurVue()
+            return MenuJoueurVue()
 
-            case _ if len(table.joueurs) < 2:
-                print("Impossible de lancer la manche : au moins 2 joueurs nécessaires")
-                from view.menu_joueur_vue import MenuJoueurVue
+        if len(table.joueurs) < 2:
+            logger.warning(
+                f"Impossible de lancer la manche : {len(table.joueurs)} joueur(s) présent(s), minimum 2 requis"
+            )
+            from view.menu_joueur_vue import MenuJoueurVue
 
-                return MenuJoueurVue()
+            return MenuJoueurVue()
 
         try:
             req = requests.get(f"{host}{END_POINT}lancer/{joueur.numero_table}")
-            match req.status_code:
-                case 200:
-                    print("Manche lancée !")
-                    from view.menu_manche_vue import MenuManche
+            logger.info(f"Appel API /table/lancer/{joueur.numero_table} status={req.status_code}")
+            if req.status_code == 200:
+                logger.info("Manche lancée avec succès !")
+                from view.menu_manche_vue import MenuManche
 
-                    return MenuManche()
-                case _:
-                    print("Erreur lors du lancement de la manche")
-        except requests.RequestException:
-            print("Erreur serveur")
+                return MenuManche()
+            else:
+                logger.error(f"Erreur lors du lancement de la manche : {req.text}")
+        except requests.RequestException as e:
+            logger.error(f"Erreur serveur lors du lancement de la manche : {e}")
 
         from view.menu_joueur_vue import MenuJoueurVue
 
@@ -92,19 +94,18 @@ class InfoTableMenu(VueAbstraite):
 
     def quitter_table(self, joueur):
         table = getattr(joueur, "table", None)
-        match True:
-            case _ if not table:
-                print("Vous n'êtes actuellement à aucune table")
-                from view.menu_joueur_vue import MenuJoueurVue
+        if not table:
+            logger.warning("Vous n'êtes actuellement à aucune table")
+            from view.menu_joueur_vue import MenuJoueurVue
 
-                return MenuJoueurVue()
+            return MenuJoueurVue()
 
         try:
             index = table.joueurs.index(joueur)
             table.retirer_joueur(index)
             logger.info(f"Vous avez quitté la table {table.numero_table}")
         except ValueError:
-            logger.info("Erreur : impossible de vous retirer de la table")
+            logger.error("Erreur : impossible de vous retirer de la table")
 
         Session.tables_globales[table.numero_table] = table
         joueur.numero_table = None
