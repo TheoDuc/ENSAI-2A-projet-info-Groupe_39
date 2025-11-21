@@ -1,12 +1,12 @@
+import os
 from datetime import datetime
 
-import os
-import requests
 import pytz
+import requests
 
-from utils.singleton import Singleton
-from service.joueur_service import JoueurService
 from business_object.joueur import Joueur
+from service.joueur_service import JoueurService
+from utils.singleton import Singleton
 
 
 class Session(metaclass=Singleton):
@@ -36,10 +36,12 @@ class Session(metaclass=Singleton):
         if joueur not in Session.joueurs_connectes:
             Session.joueurs_connectes.append(joueur)
 
-        if joueur.table:
-            for j in joueur.table.joueurs:
-                if j not in Session.joueurs_connectes:
-                    Session.joueurs_connectes.append(j)
+        if joueur.numero_table is not None:
+            table = Session.tables_globales.get(joueur.numero_table)
+            for id_j in table.id_joueurs:
+                js = JoueurService().trouver_par_id(id_j)
+                if js not in Session.joueurs_connectes:
+                    Session.joueurs_connectes.append(js)
 
     def deconnexion(self):
         """Suppression des données de la session"""
@@ -47,53 +49,46 @@ class Session(metaclass=Singleton):
         self.debut_connexion = None
 
     def afficher(self) -> str:
-        res = "Actuellement en session :\n"
-        res += "-------------------------\n"
+        res = "Actuellement en session :\n" + "-" * 25 + "\n"
 
-        host = os.environ["HOST_WEBSERVICE"]
-        END_POINT = "/joueur/id"
+        if self.id is None:
+            return res + "Aucun joueur connecté.\n"
 
-        url = f"{host}{END_POINT}/{self.id}"
-        req = requests.get(url)
-        
-        reponse = req.json()
+        host = os.environ.get("HOST_WEBSERVICE")
+        url = f"{host}/joueur/id/{self.id}"
+
+        try:
+            reponse = requests.get(url).json()
+        except Exception:
+            return res + "Erreur : impossible de récupérer le joueur.\n"
+
+        if not reponse or "_Joueur__id_joueur" not in reponse:
+            return res + "Aucun joueur connecté.\n"
+
+        # Instanciation du joueur depuis la réponse JSON
         joueur = Joueur(
             id_joueur=reponse["_Joueur__id_joueur"],
             pseudo=reponse["_Joueur__pseudo"],
             credit=reponse["_Joueur__credit"],
             pays=reponse["_Joueur__pays"],
+            numero_table=reponse.get("_Joueur__numero_table"),
         )
 
-        if not joueur:
-            return res + "Aucun joueur connecté.\n"
+        # Ajout du joueur à la liste globale si absent
+        if joueur not in Session.joueurs_connectes:
+            Session.joueurs_connectes.append(joueur)
 
         res += f"Joueur connecté : {joueur.pseudo} : {joueur.credit} crédits\n"
         if getattr(joueur, "debut_connexion", None):
             res += f"Début connexion : {joueur.debut_connexion}\n"
-        res += "\n"
 
-        print(
-            f"[DEBUG] Joueur {joueur.pseudo} est sur la table : {getattr(joueur.table, 'numero_table', 'Aucune')}"
-        )
-
-        # Tous les joueurs à la même table
+        # Affichage des joueurs à la même table
         if joueur.table:
-            numero_table = joueur.table.numero_table
-            res += f"Joueurs à la table {numero_table} :\n"
-            res += "-" * 40 + "\n"
-
-            # Récupération des joueurs depuis la table globale
-            table = Session.tables_globales.get(numero_table)
-            print(table)
-            if table:
-                for j in table.joueurs:
-                    # On cherche le joueur dans la liste globale des connectés
-                    if j in Session.joueurs_connectes:
-                        debut = getattr(j, "debut_connexion", "Connexion inconnue")
-                    else:
-                        debut = "Non connecté"
-                    res += f"{j.pseudo} : {j.credit} crédits (connexion : {debut})\n"
-            else:
-                res += "Impossible de récupérer les joueurs de la table.\n"
+            numero_table = joueur.numero_table
+            res += f"\nJoueurs à la table {numero_table} :\n" + "-" * 40 + "\n"
+            for id_j in joueur.table.id_joueurs:
+                j = JoueurService().trouver_par_id(id_j)
+                debut = getattr(j, "debut_connexion", "Non connecté")
+                res += f"{j.pseudo} : {j.credit} crédits (connexion : {debut})\n"
 
         return res
