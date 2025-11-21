@@ -155,8 +155,10 @@ class Table:
         if indice < 0:
             raise IndexError("Indice négatif impossible")
 
+        joueur = self.__joueurs.pop(indice)
+        joueur.table = None
         logger.info(f"Le joueur {self.joueurs[indice].pseudo} est retiré de la table")
-        return self.__joueurs.pop(indice)
+        return joueur
 
     @log
     def mettre_grosse_blind(self, montant: int) -> None:
