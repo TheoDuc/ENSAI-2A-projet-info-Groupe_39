@@ -135,7 +135,9 @@ class TableService:
         table = self.table_par_numero(numero_table)
 
         joueur.rejoindre_table(table.numero_table)
-        table.joueurs.append(joueur)
+        if joueur not in table.joueurs:
+            table.joueurs.append(joueur)
+
         JoueurService().modifier(joueur)
 
     @log
