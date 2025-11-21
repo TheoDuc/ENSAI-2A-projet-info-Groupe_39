@@ -172,11 +172,11 @@ async def creer_table(t: TableModel):
 
 # fonctionne
 @app.put("/table/ajouter/{numero_table}/{id_joueur}", tags=["Table"])
-async def ajouter_joueur(numero_table: int, id_joueur: int):
+async def ajouter_joueur(numero_table: int, id_joueurs: int):
     """ajoute un joueur a la table"""
     logging.info("ajoute un joueur a la table")
-    joueur = joueur_service.trouver_par_id(id_joueur)
-    table_service.ajouter_joueur(numero_table, id_joueur)
+    joueur = joueur_service.trouver_par_id(id_joueurs)
+    table_service.ajouter_joueur(numero_table, id_joueurs)
     return f"le joueur {joueur.pseudo} a été ajouté à la table {numero_table}"
 
 
