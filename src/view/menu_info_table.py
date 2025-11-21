@@ -39,8 +39,10 @@ class InfoTableMenu(VueAbstraite):
         ).execute()
 
         match choix:
-            case "Joueurs à la table":
-                return GameMenu(Session().afficher(), temps_attente=3)
+            case "Info de session":
+                from view.menu_joueur_vue import MenuJoueurVue
+
+                return MenuJoueurVue(Session().afficher(), temps_attente=3)
 
             case "Lancer manche":
                 joueur = JoueurService().trouver_par_id(Session().id)
@@ -57,9 +59,9 @@ class InfoTableMenu(VueAbstraite):
                     return MenuManche("")
                 else:
                     print("Erreur lors du lancement de la manche")
-                    from view.game_menu_view import GameMenu
+                    from view.menu_joueur_vue import MenuJoueurVue
 
-                    return GameMenu(Session().afficher())
+                    return MenuJoueurVue(Session().afficher())
 
                 """
                 TableService().lancer_manche(table.numero_table)
