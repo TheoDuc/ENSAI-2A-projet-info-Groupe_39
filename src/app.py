@@ -1,5 +1,4 @@
 import logging
-from typing import List
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import RedirectResponse
@@ -147,27 +146,6 @@ class TableModel(BaseModel):
     joueur_max: int
     grosse_blind: int
     mode_jeu: int | None = None  # Champ optionnel
-    joueurs: List[JoueurModel] = []
-
-
-@app.get("/table/", response_model=List[TableModel], tags=["Table"])
-async def liste_tables():
-    """Retourne toutes les tables avec leurs joueurs"""
-    result = []
-    for table in table_service.liste_tables():
-        result.append(
-            TableModel(
-                numero_table=table.numero_table,
-                joueur_max=table.joueur_max,
-                grosse_blind=table.grosse_blind,
-                mode_jeu=table.mode_jeu,
-                joueurs=[
-                    JoueurModel(id_joueur=j.id_joueur, pseudo=j.pseudo, credit=j.credit)
-                    for j in table.joueurs
-                ],
-            )
-        )
-    return result
 
 
 # fonctionne
