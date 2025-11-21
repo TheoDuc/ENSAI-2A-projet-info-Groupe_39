@@ -47,19 +47,21 @@ class InfoTableMenu(VueAbstraite):
                     print("Aucun joueur connecté")
                     return MenuJoueurVue()
 
-                # Récupérer les infos du joueur connecté via l'API
+                # Récupérer le joueur via l'API
                 joueur_req = requests.get(f"{host}/joueur/id/{session.id}")
                 if joueur_req.status_code != 200:
                     print("Impossible de récupérer les infos du joueur")
                     return MenuJoueurVue()
 
                 joueur_info = joueur_req.json()
-                table_numero = joueur_info.get("table")
+                table_numero = joueur_info.get(
+                    "table"
+                )  # Ici on récupère directement la table via l'API
                 if not table_numero:
                     print("Vous n'êtes connecté à aucune table")
                     return MenuJoueurVue()
 
-                # Récupérer la table et tous les joueurs via l'API
+                # Récupérer les infos de la table directement via l'API
                 table_req = requests.get(f"{host}/table/{table_numero}")
                 if table_req.status_code != 200:
                     print("Impossible de récupérer les joueurs de la table")
@@ -74,10 +76,7 @@ class InfoTableMenu(VueAbstraite):
 
                 print(f"\nTable n°{table_numero} : {nb_joueurs}/{nb_max} joueurs présents")
                 print("-" * 40)
-                if pseudos:
-                    print("\n".join(pseudos))
-                else:
-                    print("Aucun joueur présent pour le moment")
+                print("\n".join(pseudos) if pseudos else "Aucun joueur présent pour le moment")
 
                 return MenuJoueurVue()
 
