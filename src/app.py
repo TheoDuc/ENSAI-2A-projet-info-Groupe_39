@@ -1,9 +1,8 @@
 import logging
-from typing import List
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import RedirectResponse
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from service.action_service import ActionService
 from service.credit_service import CreditService
@@ -151,7 +150,6 @@ class TableModel(BaseModel):
     joueurs_max: int
     grosse_blind: int
     mode_jeu: int | None = None  # Champ optionnel
-    joueurs: List[JoueurModel] = Field(default_factory=list)
 
 
 # fonctionne
@@ -166,7 +164,6 @@ async def creer_table(t: TableModel):
         joueurs_max=table.joueurs_max,
         grosse_blind=table.grosse_blind,
         mode_jeu=table.mode_jeu,
-        joueurs=[],
     )
 
 
