@@ -40,21 +40,24 @@ class InfoTableMenu(VueAbstraite):
         match choix:
             case "Info de session":
                 from service.joueur_service import JoueurService
-                from view.menu_info_table import InfoTableMenu
                 from view.menu_joueur_vue import MenuJoueurVue
 
+                # Récupère le joueur courant
                 joueur = JoueurService().trouver_par_id(Session().id)
+
+                # Récupère la table du joueur
                 table = joueur.table
                 if table:
                     nb_joueurs = len(table.joueurs)
                     nb_max = table.joueur_max
                     pseudos = [j.pseudo for j in table.joueurs]
+
                     print(f"Table n°{table.numero_table}: {nb_joueurs}/{nb_max} joueurs présents")
                     print("Joueurs présents : " + ", ".join(pseudos))
                 else:
                     print("Vous n'êtes connecté à aucune table.")
 
-                return InfoTableMenu(Session().afficher(), temps_attente=3)
+                return MenuJoueurVue(Session().afficher(), temps_attente=3)
 
             case "Lancer manche":
                 joueur = JoueurService().trouver_par_id(Session().id)
