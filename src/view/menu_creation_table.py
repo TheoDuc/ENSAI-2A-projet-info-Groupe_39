@@ -29,9 +29,10 @@ class MenuCreationTable(VueAbstraite):
 
         table = {
             "numero_table": 0,
-            "joueur_max": joueur_max,
+            "joueurs_max": joueur_max,
             "grosse_blind": grosse_blind,
             "mode_jeu": 0,
+            "joueurs": [],
         }
         req = requests.post(f"{host}{END_POINT}", json=table)
 
