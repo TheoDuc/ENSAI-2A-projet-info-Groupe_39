@@ -115,12 +115,11 @@ class Manche:
         info = self.info.affichage_tout_joueur() + "\n\n\n"
         board = "Board :" + self.board.affichage_board() + "\n\n"
         if self.fin:
-            indication = "La manche est terminée !"
+            indice = None
         else:
-            pseudo = self.info.joueurs[self.indice_joueur_actuel].pseudo
-            indication = f"C'est à {pseudo} de jouer !"
+            indice = self.info.joueurs[self.indice_joueur_actuel]
 
-        return tour + info + board + indication
+        return [(tour + info + board), indice]
 
     def indice_joueur(self, id_joueur: int) -> int:
         """
@@ -251,10 +250,6 @@ class Manche:
         """Distribution des cartes initiales et mise des blinds"""
         self.reserve.melanger()
         self.info.assignation_mains(self.reserve.distribuer(len(self.info.joueurs)))
-        self.suivre(self.indice_joueur_actuel, self.grosse_blind // 2)
-        self.joueur_suivant()
-        self.suivre(self.indice_joueur_actuel, self.grosse_blind - (self.grosse_blind // 2))
-        self.joueur_suivant()
 
     @log
     def flop(self) -> str:
@@ -569,6 +564,10 @@ class Manche:
             si le board n'est pas complet
         """
 
+        if len(self.joueurs_en_lice) == 1:
+            gains = {self.info.joueurs[self.joueurs_en_lice[0]]: self.valeur_pot()}
+            return gains
+
         if len(self.board.cartes) != 5:
             raise ValueError("Le board n'est pas complet, impossible de calculer les gains.")
 
@@ -597,7 +596,7 @@ class Manche:
             meilleurs = [i for i in participants if classement[i] == min_rang]
 
             # Partage équitable du pot
-            part = pot / len(meilleurs)
+            part = pot // len(meilleurs)
             for i in meilleurs:
                 gains[self.info.joueurs[i]] += part
 
@@ -651,7 +650,7 @@ class Manche:
             raise ValueError(f"L'action {action} n'existe pas, actions possibles {actions}")
 
         if self.fin_de_manche():
-            self.fin = True
+            self.__fin = True
             return montant
 
         if self.fin_du_tour():

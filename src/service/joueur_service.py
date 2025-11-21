@@ -50,6 +50,10 @@ class JoueurService:
 
         del self._joueurs_connectes[id_joueur]
 
+    def joueurs_connectes(self):
+        """Renvoie les id des joueurs connectés"""
+        return [id for id in self._joueurs_connectes.keys()]
+
     @log
     def pseudo_deja_utilise(self, pseudo: str) -> bool:
         """
@@ -112,3 +116,10 @@ class JoueurService:
     def supprimer(self, joueur: Joueur) -> bool:
         """Supprime un joueur via DAO"""
         return self.dao.supprimer(joueur)
+
+    def maj_joueur(self, joueur: Joueur) -> None:
+        """Met à jour le joueur dans le service"""
+        if joueur.id_joueur not in self._joueurs_connectes:
+            raise Exception(f"Le joueur {joueur.pseudo} n'est pas connecté")
+
+        self._joueurs_connectes[joueur.id_joueur] = joueur

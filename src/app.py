@@ -3,7 +3,7 @@ from typing import List
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import RedirectResponse
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from service.action_service import ActionService
 from service.credit_service import CreditService
@@ -38,7 +38,6 @@ class JoueurModel(BaseModel):
     credit: int | None = None  # Champ optionnel
 
 
-# fonctionne pas oublier de demander si admin dans les view
 @app.put("/admin/crediter/{pseudo}/{montant}", tags=["Admin"])
 def crediter(pseudo: str, montant: int, est_admin: bool = False):
     joueur = joueur_service.trouver_par_pseudo(pseudo)
@@ -50,7 +49,6 @@ def crediter(pseudo: str, montant: int, est_admin: bool = False):
     return {"message": f"L'admin a bien crédité {montant} à {joueur.pseudo}"}
 
 
-# fonctionne
 @app.put("/admin/debiter/{pseudo}/{montant}", tags=["Admin"])
 def debiter(pseudo, montant: int):
     joueur = joueur_service.trouver_par_pseudo(pseudo)
@@ -58,22 +56,20 @@ def debiter(pseudo, montant: int):
     return f"l'admin a bien debiter {montant} à {joueur}"
 
 
-# fonctionne
-@app.get("/joueur/connection/{pseudo}", tags=["Joueurs"])
-async def joueur_connection(pseudo: str):
+@app.get("/joueur/connexion/{pseudo}", tags=["Joueurs"])
+async def joueur_connexion(pseudo: str):
     """Connecte le joueur"""
     logging.info("Connecte le joueur")
     return joueur_service.se_connecter(pseudo)
 
 
-@app.get("/joueur/deconnection/{id_joueur}", tags=["Joueurs"])
-async def joueur_deconnection(id_joueur: int):
+@app.get("/joueur/deconnexion/{id_joueur}", tags=["Joueurs"])
+async def joueur_deconnexion(id_joueur: int):
     """Deconnecte le joueur"""
     logging.info("Deconnecte le joueur")
     return joueur_service.deconnexion(id_joueur)
 
 
-# fonctionne
 @app.get("/joueur/liste/", tags=["Joueurs"])
 async def joueur_lister():
     """Liste tous les joueurs"""
@@ -81,7 +77,13 @@ async def joueur_lister():
     return joueur_service.lister_tous()
 
 
-# fonctionne
+@app.get("/joueur/connectes/", tags=["Joueurs"])
+async def joueur_connectes():
+    """Liste tous les joueurs"""
+    logging.info("Liste tous les joueurs connéctés")
+    return joueur_service.joueurs_connectes()
+
+
 @app.get("/joueur/id/{id_joueur}", tags=["Joueurs"])
 async def joueur_par_id(id_joueur: int):
     """Trouver un joueur à partir de son id"""
@@ -89,7 +91,6 @@ async def joueur_par_id(id_joueur: int):
     return joueur_service.trouver_par_id(id_joueur)
 
 
-# fonctionne
 @app.get("/joueur/{pseudo}", tags=["Joueurs"])
 async def joueur_par_pseudo(pseudo: str):
     """Trouver un joueur à partir de son pseudo"""
@@ -97,7 +98,6 @@ async def joueur_par_pseudo(pseudo: str):
     return joueur_service.trouver_par_pseudo(pseudo)
 
 
-# fonctionne
 @app.post("/joueur/", tags=["Joueurs"])
 async def creer_joueur(j: JoueurModel):
     """Créer un joueur"""
@@ -112,7 +112,6 @@ async def creer_joueur(j: JoueurModel):
     return joueur
 
 
-# fonctionne
 @app.put("/joueur/{id_joueur}/{pseudo}/{pays}", tags=["Joueurs"])
 def modifier_joueur(id_joueur: int, pseudo: str, pays: str):
     """Modifier un joueur"""
@@ -131,7 +130,6 @@ def modifier_joueur(id_joueur: int, pseudo: str, pays: str):
     return f"Joueur {pseudo} modifié"
 
 
-# fonctionne
 @app.delete("/joueur/{pseudo}", tags=["Joueurs"])
 def supprimer_joueur(pseudo: str):
     """Supprimer un joueur"""
@@ -151,10 +149,9 @@ class TableModel(BaseModel):
     joueurs_max: int
     grosse_blind: int
     mode_jeu: int | None = None  # Champ optionnel
-    joueurs: List[JoueurModel] = Field(default_factory=list)
+    joueurs: List[int] = []
 
 
-# fonctionne
 @app.post("/table/", tags=["Table"])
 async def creer_table(t: TableModel):
     """Créer une table"""
@@ -170,29 +167,6 @@ async def creer_table(t: TableModel):
     )
 
 
-# fonctionne
-@app.put("/table/ajouter/{numero_table}/{id_joueur}", tags=["Table"])
-async def ajouter_joueur(numero_table: int, id_joueur: int):
-    """ajoute un joueur a la table"""
-    logging.info("ajoute un joueur a la table")
-    joueur = joueur_service.trouver_par_id(id_joueur)
-    table_service.ajouter_joueur(numero_table, id_joueur)
-    return f"le joueur {joueur.pseudo} a été ajouté à la table {numero_table}"
-
-
-# fonctionne pas, le joueur ne garde pas en mémoire la table dans laquel il est
-@app.put("/table/retirer/{id_joueur}", tags=["Table"])
-async def retirer_un_joueur(id_joueur: str):
-    """retire un joueur a la table"""
-    logging.info("retire un joueur a la table")
-    joueur = joueur_service.trouver_par_id(id_joueur)
-    print(joueur.table)
-    # pourquoi c'est None ??
-    table_service.retirer_joueur(joueur)
-    return f"le joueur {joueur.pseudo} a été retiré de la table"
-
-
-# fonctionne
 @app.delete("/table/{numero_table}", tags=["Table"])
 def supprimer_table(numero_table: int):
     """Supprimer une table"""
@@ -201,7 +175,30 @@ def supprimer_table(numero_table: int):
     return f"Table {numero_table} supprimé"
 
 
-# fonctionne
+@app.put("/table/ajouter/{numero_table}/{id_joueur}", tags=["Table"])
+async def ajouter_joueur(numero_table: int, id_joueur: int):
+    """ajoute un joueur a la table"""
+    logging.info(f"ajoute le joueur {id_joueur} a la table {numero_table}")
+    joueur = joueur_service.trouver_par_id(id_joueur)
+    table_service.ajouter_joueur(numero_table, id_joueur)
+    return f"le joueur {joueur.pseudo} a été ajouté à la table {numero_table}"
+
+
+@app.put("/table/retirer/{id_joueur}", tags=["Table"])
+async def retirer_un_joueur(id_joueur: int):
+    """retire un joueur a la table"""
+    logging.info(f"retire le joueur {id_joueur} de la table")
+    table_service.retirer_joueur(id_joueur)
+    return f"le joueur {id_joueur} a été retiré de la table"
+
+
+@app.get("/table/{numero_table}", tags=["Table"])
+def joueurs_dans_table(numero_table: int):
+    table = table_service.table_par_numero(numero_table)
+
+    return table.id_joueurs
+
+
 @app.get("/table/", tags=["Table"])
 async def liste_tables():
     """liste les tables"""
@@ -209,36 +206,14 @@ async def liste_tables():
     return table_service.affichages_tables()
 
 
-@app.get("/table/session/{numero_table}", tags=["Table"])
-async def infos_session(numero_table: int):
-    """Renvoie les joueurs présents sur une table"""
-    table = table_service.table_par_numero(numero_table)
-
-    resultat = [
-        {"id_joueur": j.id_joueur, "pseudo": j.pseudo, "credit": j.credit, "pays": j.pays}
-        for j in table.joueurs
-    ]
-    return {"numero_table": table.numero_table, "joueurs": resultat}
-
-
-# fonctionne pas
-@app.get("/table/par_affichage/{affichage}", tags=["Table"])
-async def table_par_affichage(affichage: str):
-    """trouve une table par affichage"""
-    logging.info("trouve une table par affichage")
-    return table_service.table_par_affichage(affichage)
-
-
-# fonctionne
 @app.get("/table/lancer/{numero_table}", tags=["Table"])
 async def lancer_manche(numero_table: int):
     """lance une manche"""
     logging.info("lance une manche")
-    table_service.lancer_manche(numero_table=numero_table)
+    table_service.lancer_manche(numero_table)
     return f"la manche est lancé sur la table {numero_table}"
 
 
-# fonctionne
 @app.get("/table/terminer/{numero_table}", tags=["Table"])
 async def terminer_manche(numero_table: int):
     """termine une manche"""
@@ -247,53 +222,53 @@ async def terminer_manche(numero_table: int):
     return f"la manche est terminé sur la table {numero_table}"
 
 
-@app.get("/table/affichage/{numero_table}", tags=["Table"])
+@app.get("/table/affichage/{numero_table}", tags=["Manche"])
 async def affichage_general(numero_table: int):
     """affichage general"""
     logging.info("affichage general")
     return table_service.affichage_general(numero_table=numero_table)
 
 
-@app.get("/table/main/{numero_table}/{id_joueur}", tags=["Table"])
-async def regarder_main(numero_table: int, id_joueur: int):
+@app.get("/table/main/{numero_table}/{id_joueur}", tags=["Manche"])
+async def regarder_main(id_joueur: int):
     """regarder sa main"""
     logging.info("regarder sa main")
-    return table_service.regarder_main(numero_table=numero_table, id_joueur=id_joueur)
+    return table_service.regarder_main(id_joueur)
 
 
-@app.get("/action/{id}", tags=["Action"])
-async def manche_joueur(id: int):
+@app.get("/action/{id_joueur}", tags=["Action"])
+async def manche_joueur(id_joueur: int):
     """Trouver la manche auquel joue le joueur"""
     logging.info("Trouver la manche auquel joue le joueur")
-    return action_service.manche_joueur(id)
+    return action_service.manche_joueur(id_joueur)
 
 
-@app.put("/action/all_in/{id}", tags=["Action"])
-async def all_in(id: int):
+@app.put("/action/all_in/{id_joueur}", tags=["Action"])
+async def all_in(id_joueur: int):
     """Joue all_in pour le joueur"""
     logging.info("Joue all_in pour le joueur")
-    return action_service.all_in(id)
+    return action_service.all_in(id_joueur)
 
 
-@app.put("/action/checker/{id}", tags=["Action"])
-async def checker(id: int):
+@app.put("/action/checker/{id_joueur}", tags=["Action"])
+async def checker(id_joueur: int):
     """Joue checker pour le joueur"""
     logging.info("Joue checker pour le joueur")
-    return action_service.checker(id)
+    return action_service.checker(id_joueur)
 
 
-@app.put("/action/se_coucher/{id}", tags=["Action"])
-async def se_coucher(id: int):
+@app.put("/action/se_coucher/{id_joueur}", tags=["Action"])
+async def se_coucher(id_joueur: int):
     """Joue se_coucher pour le joueur"""
     logging.info("Joue se_coucher pour le joueur")
-    return action_service.se_coucher(id)
+    return action_service.se_coucher(id_joueur)
 
 
-@app.put("/action/suivre/{id}", tags=["Action"])
-async def suivre(id: int):
+@app.put("/action/suivre/{id_joueur}/{relance}", tags=["Action"])
+async def suivre(id_joueur: int, relance: 0 = int):
     """Joue suivre pour le joueur"""
     logging.info("Joue suivre pour le joueur")
-    return action_service.suivre(id)
+    return action_service.suivre(id_joueur, relance)
 
 
 # Run the FastAPI application
