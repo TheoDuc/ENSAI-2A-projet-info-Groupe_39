@@ -20,8 +20,12 @@ class MenuTable(VueAbstraite):
 
     def choisir_menu(self):
         action_table = ["Retour au Menu Joueur", "Créer une Table"]
-        reponse = requests.get(f"{host}{END_POINT}")
-        boutons_tables = reponse.json()
+        try:
+            reponse = requests.get(f"{host}{END_POINT}")
+            boutons_tables = reponse.json()
+        except ValueError:
+            boutons_tables = []
+
         action_table += boutons_tables
 
         choix = inquirer.select(
@@ -41,18 +45,20 @@ class MenuTable(VueAbstraite):
 
         if choix in boutons_tables:
             numero_table = int(choix.split()[1].replace(",", ""))
-
-            # L'identifiant provient de Session(), donc c'est TOUJOURS un ID numérique
             id_joueur = Session().id
 
-            # On appelle ta route actuelle
             req = requests.put(f"{host}{END_POINT}ajouter/{numero_table}/{id_joueur}")
 
             if req.status_code == 200:
-                Session().table_numero = numero_table
-                print(f"Vous êtes connecté sur la table {numero_table}")
+                # Met à jour la session globale
+                joueur = next(
+                    (j for j in Session.joueurs_connectes if j.id_joueur == id_joueur), None
+                )
+                if joueur:
+                    joueur.numero_table = numero_table
                 from view.menu_info_table import InfoTableMenu
 
+                print(f"Vous êtes connecté sur la table {numero_table}")
                 return InfoTableMenu()
             else:
                 print("Erreur lors de la connexion à la table")
