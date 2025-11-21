@@ -3,7 +3,6 @@ import os
 import requests
 from InquirerPy import inquirer
 
-from business_object.table import Table
 from view.vue_abstraite import VueAbstraite
 
 host = os.environ["HOST_WEBSERVICE"]
@@ -11,7 +10,7 @@ END_POINT = "/table/"
 
 
 class MenuCreationTable(VueAbstraite):
-    """Vue de Creation de table"""
+    """Vue de création d'une table"""
 
     def choisir_menu(self):
         # Demande à l'utilisateur de saisir les paramètres de la table
@@ -21,26 +20,29 @@ class MenuCreationTable(VueAbstraite):
             max_allowed=10,
             default=5,
         ).execute()
-        joueur_max = int(joueur_max)
         grosse_blind = inquirer.number(
             message="Saisissez la valeur de la grosse blind", min_allowed=2, default=40
         ).execute()
-        grosse_blind = int(grosse_blind)
 
-        table = {
-            "numero_table": 0,
-            "joueurs_max": joueur_max,
-            "grosse_blind": grosse_blind,
+        # Préparation du payload pour l'API
+        table_payload = {
+            "joueurs_max": int(joueur_max),
+            "grosse_blind": int(grosse_blind),
             "mode_jeu": 0,
             "joueurs": [],
         }
-        req = requests.post(f"{host}{END_POINT}", json=table)
 
-        # Si le joueur a été créé
+        # Appel API pour créer la table
+        req = requests.post(f"{host}{END_POINT}", json=table_payload)
+
         if req.status_code == 200:
-            message = "Votre table a été créé. Vous pouvez maintenant la rejoindre"
+            table_creee = req.json()
+            numero_table = table_creee.get("numero_table", "N/A")
+            message = (
+                f"Votre table a été créée (n°{numero_table}). Vous pouvez maintenant la rejoindre."
+            )
         else:
-            message = "Erreur de création de la table (les paramètres de la table sont incorrects)"
+            message = "Erreur de création de la table : paramètres incorrects"
 
         from view.menu_table import MenuTable
 
@@ -55,19 +57,28 @@ class InfosTable(VueAbstraite):
     - Liste des joueurs présents
     """
 
-    def infos_table(self, table: Table) -> None:
+    def afficher_infos_table(self, numero_table: int):
         """
-        Affiche le statut complet de la table :
-        - Numéro de la table
-        - Nombre de joueurs présents / nombre max
-        - Liste des joueurs présents
-        """
-        nb_joueurs_present = len(table.joueurs)
-        nb_max = table.joueur_max
-        pseudos = [joueur.pseudo for joueur in table.joueurs]
+        Affiche le statut complet de la table via l'API
 
-        print(f"Table n°{table.numero_table} : {nb_joueurs_present}/{nb_max} joueurs présents")
+        Paramètres
+        ----------
+        numero_table : int
+            Le numéro de la table à consulter
+        """
+        req = requests.get(f"{host}{END_POINT}id/{numero_table}")
+        if req.status_code != 200:
+            print("Erreur : impossible de récupérer les informations de la table.")
+            return
+
+        table_data = req.json()
+
+        nb_joueurs_present = len(table_data.get("joueurs", []))
+        nb_max = table_data.get("joueurs_max", "N/A")
+        pseudos = [j["pseudo"] for j in table_data.get("joueurs", [])]
+
+        print(f"\nTable n°{numero_table} : {nb_joueurs_present}/{nb_max} joueurs présents")
         if pseudos:
             print("Joueurs présents : " + ", ".join(pseudos))
         else:
-            print("Aucun joueur présent pour le moment.")
+            print("Aucun joueur présent pour le moment.\n")

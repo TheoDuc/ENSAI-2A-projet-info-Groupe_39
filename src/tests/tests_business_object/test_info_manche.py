@@ -42,9 +42,7 @@ class TestInfoManche:
         mauvais_joueurs = ["Alice", "Bob"]
 
         # WHEN / THEN
-        with pytest.raises(
-            TypeError, match="Tous les éléments de 'joueurs' doivent être des instances de Joueur"
-        ):
+        with pytest.raises(TypeError, match="Tous les éléments de 'joueurs' doivent être des int"):
             InfoManche(mauvais_joueurs)
 
     def test_infomanche_init_ValueError_pas_assez_de_joueurs(self):
