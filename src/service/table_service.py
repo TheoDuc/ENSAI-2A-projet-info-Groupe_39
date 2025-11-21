@@ -84,7 +84,7 @@ class TableService:
 
         table = Table(
             numero_table=numero,
-            joueur_max=joueur_max,
+            joueur_max=joueurs_max,
             grosse_blind=grosse_blind,
             mode_jeu=mode_jeu,
         )
