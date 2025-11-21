@@ -1,7 +1,6 @@
 """Implémentation de la classe TableService"""
 
 from business_object.table import Table
-from dao.joueur_dao import JoueurDao
 from service.joueur_service import JoueurService
 from service.manche_joueur_service import MancheJoueurService
 from service.manche_service import MancheService
@@ -131,14 +130,20 @@ class TableService:
         None
         """
 
-        joueur = JoueurDao().trouver_par_id(id_joueur)
+        joueur = JoueurService().trouver_par_id(id_joueur)
         table = self.table_par_numero(numero_table)
 
-        joueur.rejoindre_table(table.numero_table)
-        if joueur not in table.joueurs:
-            table.joueurs.append(joueur)
+        joueur_dans_table = False
 
-        JoueurService().modifier(joueur)
+        try:
+            table.ajouter_joueur(id_joueur)
+            joueur_dans_table = True
+            joueur.rejoindre_table(id_joueur)
+        except Exception as e:
+            if joueur_dans_table:
+                table.retirer_joueur(id_joueur)
+
+            raise Exception(f"Échec, {joueur.pseudo} n'a pas rejoint la table {numero_table} : {e}")
 
     @log
     def retirer_joueur(self, id_joueur: int) -> None:
@@ -156,8 +161,10 @@ class TableService:
         """
 
         joueur = JoueurService().trouver_par_id(id_joueur)
+        table = TableService().table_par_numero(joueur.numero_table)
 
         joueur.quitter_table()
+        table.retirer_joueur(table.id_joueurs.index(id_joueur))
 
     @log
     def lancer_manche(self, numero_table: int) -> None:
