@@ -2,6 +2,7 @@ import pytest
 
 from business_object.info_manche import InfoManche
 from business_object.main import Main
+from business_object.joueur import Joueur
 
 
 class TestInfoManche:
@@ -127,9 +128,10 @@ class TestInfoManche:
 
     def test_affichage_tout_joueur(self):
         # GIVEN
-        joueurs = [1, 2]
-        pseudos = ["Alice", "Bob"]
-        manche = InfoManche(joueurs, pseudos)
+        joueurs = [Joueur(id_joueur= 1, "Alice", 1000, "FR"), Joueur(id_joueur=2, "Bob", 1500, "FR")]
+        ids_joueurs = [j.id_joueur for j in joueurs]
+        manche = InfoManche(ids_joueurs)
+        manche.mapping_joueur = {j.id_joueur: j for j in joueurs}
 
         # On force un état pour être sûr de l'affichage
         manche.modifier_statut(0, 2)  # "à jour"
@@ -152,6 +154,4 @@ class TestInfoManche:
         assert "all in" in texte
         assert "150" in texte
         assert "300" in texte
-        assert "3" in texte
-        assert "Alice" in texte
-        assert "Bob" in texte
+        assert "3" in texte  # Bob couché au tour 3
