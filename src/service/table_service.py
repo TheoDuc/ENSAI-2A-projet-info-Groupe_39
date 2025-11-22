@@ -194,6 +194,17 @@ class TableService:
                 self.retirer_joueur(joueur.id_joueur)
 
         table.nouvelle_manche()
+        table.manche.preflop()
+        p_blind = table.manche.info.joueurs[0]
+        g_blind = table.manche.info.joueurs[1]
+
+        grosse_blind = table.manche.grosse_blind
+
+        from service.action_service import ActionService
+
+        ActionService().suivre(p_blind, grosse_blind // 2)
+        ActionService().suivre(g_blind, grosse_blind - grosse_blind // 2)
+        table.manche.info.modifier_statut(1, 0)
 
     def affichage_general(self, numero_table: int) -> str:
         """
@@ -225,7 +236,7 @@ class TableService:
 
         return res[0] + instructions
 
-    def regarder_main(self, numero_table: int, id_joueur: int) -> str:
+    def regarder_main(self, id_joueur: int) -> str:
         """
         Affiche la main d'un joueur
 
@@ -243,11 +254,10 @@ class TableService:
         """
 
         joueur = JoueurService().trouver_par_id(id_joueur)
+        numero_table = joueur.numero_table
         table = self.table_par_numero(numero_table)
 
-        table.manche.preflop()
-
-        return table.manche.regarder_cartes(joueur)
+        return table.manche.regarder_cartes(id_joueur)
 
     @log
     def terminer_manche(self, numero_table: int) -> None:
@@ -268,7 +278,7 @@ class TableService:
 
         gains = table.manche.terminer_manche()
 
-        for id_joueur, montant in gains:
+        for id_joueur, montant in gains.items():
             joueur = JoueurService().trouver_par_id(id_joueur)
             CreditService().crediter(joueur, montant)
 

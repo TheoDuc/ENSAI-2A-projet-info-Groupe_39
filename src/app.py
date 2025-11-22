@@ -230,45 +230,45 @@ async def affichage_general(numero_table: int):
 
 
 @app.get("/table/main/{numero_table}/{id_joueur}", tags=["Manche"])
-async def regarder_main(numero_table: int, id_joueur: int):
+async def regarder_main(id_joueur: int):
     """regarder sa main"""
     logging.info("regarder sa main")
-    return table_service.regarder_main(numero_table=numero_table, id_joueur=id_joueur)
+    return table_service.regarder_main(id_joueur)
 
 
-@app.get("/action/{id}", tags=["Action"])
-async def manche_joueur(id: int):
+@app.get("/action/{id_joueur}", tags=["Action"])
+async def manche_joueur(id_joueur: int):
     """Trouver la manche auquel joue le joueur"""
     logging.info("Trouver la manche auquel joue le joueur")
-    return action_service.manche_joueur(id)
+    return action_service.manche_joueur(id_joueur)
 
 
-@app.put("/action/all_in/{id}", tags=["Action"])
-async def all_in(id: int):
+@app.put("/action/all_in/{id_joueur}", tags=["Action"])
+async def all_in(id_joueur: int):
     """Joue all_in pour le joueur"""
     logging.info("Joue all_in pour le joueur")
-    return action_service.all_in(id)
+    return action_service.all_in(id_joueur)
 
 
-@app.put("/action/checker/{id}", tags=["Action"])
-async def checker(id: int):
+@app.put("/action/checker/{id_joueur}", tags=["Action"])
+async def checker(id_joueur: int):
     """Joue checker pour le joueur"""
     logging.info("Joue checker pour le joueur")
-    return action_service.checker(id)
+    return action_service.checker(id_joueur)
 
 
-@app.put("/action/se_coucher/{id}", tags=["Action"])
-async def se_coucher(id: int):
+@app.put("/action/se_coucher/{id_joueur}", tags=["Action"])
+async def se_coucher(id_joueur: int):
     """Joue se_coucher pour le joueur"""
     logging.info("Joue se_coucher pour le joueur")
-    return action_service.se_coucher(id)
+    return action_service.se_coucher(id_joueur)
 
 
-@app.put("/action/suivre/{id}", tags=["Action"])
-async def suivre(id: int):
+@app.put("/action/suivre/{id_joueur}/{relance}", tags=["Action"])
+async def suivre(id_joueur: int, relance: int):
     """Joue suivre pour le joueur"""
     logging.info("Joue suivre pour le joueur")
-    return action_service.suivre(id)
+    return action_service.suivre(id_joueur, relance)
 
 
 # Run the FastAPI application
