@@ -225,8 +225,8 @@ async def regarder_main(id_joueur: int):
 async def terminer_manche(numero_table: int):
     """termine une manche"""
     logging.info("termine une manche")
-    table_service.terminer_manche(numero_table=numero_table)
-    return f"la manche est terminé sur la table {numero_table}"
+    texte = table_service.terminer_manche(numero_table=numero_table)
+    return f"la manche est terminé sur la table {numero_table}\n\n" + texte
 
 
 @app.get("/action/{id_joueur}", tags=["Action"])

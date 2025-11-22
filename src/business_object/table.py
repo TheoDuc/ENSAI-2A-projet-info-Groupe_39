@@ -197,7 +197,7 @@ class Table:
         logger.info(f"Le joueur {dealer} devient dealer")
 
     @log
-    def nouvelle_manche(self) -> None:
+    def nouvelle_manche(self, pseudos: list[str] = None) -> None:
         """
         Lance une nouvelle manche sur la table.
 
@@ -220,4 +220,6 @@ class Table:
                 f"Trop peu de joeuurs sur la table pour lancer une manche : {len(self.__id_joueurs)}"
             )
 
-        self.__manche = Manche(info=InfoManche(self.__id_joueurs), grosse_blind=self.__grosse_blind)
+        self.__manche = Manche(
+            info=InfoManche(self.__id_joueurs, pseudos), grosse_blind=self.__grosse_blind
+        )
