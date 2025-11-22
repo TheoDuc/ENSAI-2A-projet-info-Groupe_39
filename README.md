@@ -259,7 +259,6 @@ La journalisation est initialisée dans le module `src/utils/log_init.py` :
 
 - Cette configuration est exécutée automatiquement au démarrage de l’application CLI ou du webservice.
 - Elle utilise le fichier `logging_config.yml` pour définir le format et le niveau des logs.
-  - Pour changer le niveau de log, modifiez la valeur de `level` dans ce fichier.
 
 Un **décorateur** est également disponible dans `src/utils/log_decorator.py` :
 
@@ -270,7 +269,6 @@ Un **décorateur** est également disponible dans `src/utils/log_decorator.py` :
 Tous les logs sont sauvegardés dans le dossier `logs/` pour consultation et analyse.
 
 ### Exemple de logs
-
 
 
 ```
