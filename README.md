@@ -78,7 +78,7 @@ Dans la plupart des cas, **vous n'avez pas besoin de modifier ces fichiers**, sa
 
 ### Fichiers de paramètres
 
-Ce projet inclut plusieurs fichiers de configuration utilisés pour configurer les outils, workflows et paramètres du projet.
+Ce projet inclut plusieurs fichiers de configuration utilisés pour configurer les outils et les paramètres du projet.
 
 Dans la plupart des cas, **vous n'avez pas besoin de modifier ces fichiers**, sauf :
 
