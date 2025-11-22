@@ -39,7 +39,7 @@ class Session(metaclass=Singleton):
         if self.id_joueur is None:
             return None
         try:
-            resp = requests.get(f"{self.host}/joueur/id/{self.id_joueur}")
+            resp = requests.get(f"{self.host}/joueur/connectes/id/{self.id_joueur}")
             if resp.status_code != 200:
                 return None
             return resp.json()

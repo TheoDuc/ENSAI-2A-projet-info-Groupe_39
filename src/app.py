@@ -39,21 +39,19 @@ class JoueurModel(BaseModel):
 
 
 @app.put("/admin/crediter/{pseudo}/{montant}", tags=["Admin"])
-async def crediter(pseudo: str, montant: int, est_admin: bool = False):
+async def crediter(pseudo: str, montant: int):
     joueur = joueur_service.trouver_par_pseudo(pseudo)
-
-    if not est_admin:
-        return {"error": "Vous n'êtes pas autorisé à créditer : accès admin requis."}
-
     credit_service.crediter(joueur, montant)
-    return {"message": f"L'admin a bien crédité {montant} à {joueur.pseudo}"}
+    message = f"L'admin a bien crédité {montant} à {joueur.pseudo}"
+    return message
 
 
 @app.put("/admin/debiter/{pseudo}/{montant}", tags=["Admin"])
 async def debiter(pseudo, montant: int):
     joueur = joueur_service.trouver_par_pseudo(pseudo)
-    credit_service.debiter(joueur, montant)
-    return f"l'admin a bien debiter {montant} à {joueur}"
+    credit_service.debiter(joueur.id_joueur, montant)
+    message = f"l'admin a bien débité {montant} à {joueur.pseudo}"
+    return message
 
 
 @app.get("/joueur/", tags=["Joueurs"])

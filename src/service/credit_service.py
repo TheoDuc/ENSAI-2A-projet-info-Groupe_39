@@ -34,9 +34,6 @@ class CreditService:
 
         """
 
-        if montant < 0:
-            raise ValueError("Le montant à créditer doit être positif.")
-
         ram_modif = False
 
         try:
@@ -50,8 +47,11 @@ class CreditService:
             logger.error(f"Échec du crédit pour {joueur.pseudo} : {e}")
             raise Exception(f"Échec du crédit pour {joueur.pseudo} : {e}")
 
+        if joueur.id_joueur in JoueurService()._joueurs_connectes.keys():
+            JoueurService().maj_joueur(joueur)
+
     @log
-    def debiter(self, id_joueur: int, montant: int) -> None:
+    def debiter(self, id_joueur: int, montant: int) -> str:
         """
         Crédite un joueur dans la RAM et dans la DAO
 
@@ -73,20 +73,29 @@ class CreditService:
         joueur = self.joueur_par_id(id_joueur)
         """
 
-        joueur = JoueurService().trouver_par_id(id_joueur)
+        if id_joueur in JoueurService()._joueurs_connectes.keys():
+            joueur = JoueurService().trouver_par_id(id_joueur)
 
-        if montant <= 0:
-            raise ValueError("Le montant à débiter doit être positif.")
+            ram_modif = False
 
-        ram_modif = False
+            try:
+                joueur.retirer_credits(montant)
+                ram_modif = True
+                JoueurDao().modifier(joueur)
+            except Exception as e:
+                if ram_modif:
+                    joueur.ajouter_credits(montant)
 
-        try:
+                logger.error(f"Échec du débit pour {joueur.pseudo} : {e}")
+                raise Exception(f"Échec du crédit pour {joueur.pseudo} : {e}")
+
+            message = f"Le joueur {joueur.pseudo} a été débité de {montant} avec succès"
+
+        else:
+            joueur = JoueurDao().trouver_par_id(id_joueur)
             joueur.retirer_credits(montant)
-            ram_modif = True
             JoueurDao().modifier(joueur)
-        except Exception as e:
-            if ram_modif:
-                joueur.ajouter_credits(montant)
 
-            logger.error(f"Échec du débit pour {joueur.pseudo} : {e}")
-            raise Exception(f"Échec du crédit pour {joueur.pseudo} : {e}")
+            message = f"Le joueur {joueur.pseudo} a été débité de {montant} avec succès"
+
+        return message
