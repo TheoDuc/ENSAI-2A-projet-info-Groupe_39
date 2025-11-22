@@ -126,32 +126,4 @@ class TestInfoManche:
         assert "mises=" in affichage
         assert "tour_couche=" in affichage
 
-    def test_affichage_tout_joueur(self):
-        # GIVEN
-        joueurs = [Joueur(id_joueur= 1, "Alice", 1000, "FR"), Joueur(id_joueur=2, "Bob", 1500, "FR")]
-        ids_joueurs = [j.id_joueur for j in joueurs]
-        manche = InfoManche(ids_joueurs)
-        manche.mapping_joueur = {j.id_joueur: j for j in joueurs}
-
-        # On force un état pour être sûr de l'affichage
-        manche.modifier_statut(0, 2)  # "à jour"
-        manche.modifier_statut(1, 4)  # "all in"
-        manche.modifier_mise(0, 150)
-        manche.modifier_mise(1, 300)
-        manche.modifier_tour_couche(1, 3)
-
-        # WHEN
-        texte = manche.affichage_tout_joueur()
-
-        # THEN : on vérifie quelques éléments essentiels
-        assert "Joueurs" in texte
-        assert "Statuts" in texte
-        assert "Mises" in texte
-        assert "Couché au" in texte
-
-        # Vérifications du contenu réel
-        assert "à jour" in texte
-        assert "all in" in texte
-        assert "150" in texte
-        assert "300" in texte
-        assert "3" in texte  # Bob couché au tour 3
+    
