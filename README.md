@@ -207,7 +207,7 @@ python src/main.py
 ```
 Cela démarrera l’application CLI, vous permettant d’interagir avec le serveur de poker.
 
-[ ] Pour autant de joeurs que vous le souhaitez, ouvrez un nouveau terminal et lancez l’application avec la même commande.
+- [ ] Pour autant de joeurs que vous le souhaitez, ouvrez un nouveau terminal et lancez l’application avec la même commande.
 
 ## :arrow_forward: Lancer le Webservice
 
