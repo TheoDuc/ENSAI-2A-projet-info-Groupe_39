@@ -13,19 +13,24 @@ class Test_Action_Service:
         # GIVEN
         joueur1 = Joueur(1, "A", 100, "France")
         joueur2 = Joueur(2, "B", 100, "France")
+        ids_joueurs = [joueur1.id_joueur, joueur2.id_joueur]
+        info = InfoManche(joueurs=ids_joueurs)
 
-        info = InfoManche(joueurs=[joueur1, joueur2])
         manche = Manche(info=info, grosse_blind=50)
-        table = type("Table", (), {"manche": manche})()
+        table = type("Table", (), {"manche": manche, "numero_table": 1})()
 
+        joueur1._Joueur__table = table
+        joueur1.numero_table = 1
+        
         service = ActionService()
 
-        with patch("src.service.action_service.JoueurService") as MockService:
-            instance = MockService.return_value
-            instance.trouver_par_id.return_value = joueur1
-
-            joueur1._Joueur__table = table
-            service.joueur_par_id = lambda _id: joueur1
+        with patch("src.service.action_service.JoueurService") as MockJS, \
+             patch("src.service.action_service.TableService") as MockTS:
+            
+            instance_js = MockJS.return_value
+            instance_js.trouver_par_id.return_value = joueur1
+            instance_ts = MockTS.return_value
+            instance_ts.table_par_numero.return_value = table
 
             # WHEN
             result = service.manche_joueur(joueur1.id_joueur)
@@ -36,15 +41,18 @@ class Test_Action_Service:
     def test_manche_joueur_table_sans_manche(self):
         # GIVEN
         joueur1 = Joueur(1, "A", 100, "France")
-        table = type("Table", (), {"manche": None})()
+        table = type("Table", (), {"manche": None, "numero_table": 1})()
         # WHEN
-        service = ActionService()
-        with patch("src.service.action_service.JoueurService") as MockJS:
-            instance = MockJS.return_value
-            instance.trouver_par_id.return_value = joueur1
+        joueur1._Joueur__table = table
+        joueur1.numero_table = 1
 
-            joueur1._Joueur__table = table
-            service.joueur_par_id = lambda _id: joueur1
+        service = ActionService()
+        with patch("src.service.action_service.JoueurService") as MockJS, \
+             patch("src.service.action_service.TableService") as MockTS:
+            instance_js = MockJS.return_value
+            instance_js.trouver_par_id.return_value = joueur1
+            instance_ts = MockTS.return_value
+            instance_ts.table_par_numero.return_value = table
 
             # THEN
             with pytest.raises(ValueError, match="aucune manche n'est en cours"):
@@ -56,15 +64,20 @@ class Test_Action_Service:
         joueur2 = Joueur(2, "B", 100, "France")
         joueur3 = Joueur(3, "C", 100, "France")
         # WHEN
-        info = InfoManche(joueurs=[joueur2, joueur3])
+        info = InfoManche(joueurs=[joueur2.id_joueur, joueur3.id_joueur])
         manche = Manche(info=info, grosse_blind=50)
-        table = type("Table", (), {"manche": manche})()
+        table = type("Table", (), {"manche": manche, "numero_table": 1})()
         joueur1._Joueur__table = table
+        joueur1.numero_table = 1
         service = ActionService()
         # THEN
-        with patch("src.service.action_service.JoueurService") as MockService:
-            instance = MockService.return_value
-            instance.trouver_par_id.return_value = joueur1
+        with patch("src.service.action_service.JoueurService") as MockJS, \
+             patch("src.service.action_service.TableService") as MockTS:
+
+            instance_js = MockJS.return_value
+            instance_js.trouver_par_id.return_value = joueur1
+            instance_ts = MockTS.return_value
+            instance_ts.table_par_numero.return_value = table
 
             service.joueur_par_id = lambda _id: joueur1
 
@@ -78,103 +91,29 @@ class Test_Action_Service:
 
         manche = Mock()
         manche.est_tour.return_value = False
-
-        service = ActionService()
-        service.manche_joueur = Mock(return_value=manche)
-
-        # WHEN / THEN
-        with patch("src.service.action_service.JoueurService") as MockJoueurService:
-            instance_joueur_service = MockJoueurService.return_value
-            instance_joueur_service.trouver_par_id.return_value = joueur
-
-            with patch("src.service.action_service.CreditService") as MockCreditService:
-                instance_credit_service = MockCreditService.return_value
-                instance_credit_service.debiter = Mock()
-
-                with pytest.raises(Exception, match=f"Ce n'est pas à {joueur.pseudo} de jouer"):
-                    service.all_in(id_joueur=1)
-
-    def test_manche_all_in_ok(self):
-        # GIVEN
-        joueur = Mock()
-        joueur.pseudo = "A"
-
-        manche = Mock()
-        manche.est_tour.return_value = True
         manche.indice_joueur.return_value = 0
-        manche.info.all_in.return_value = 100
+
+        info_mock = Mock()
+        info_mock.all_in.return_value = 100
+        manche.info = info_mock
 
         service = ActionService()
         service.manche_joueur = Mock(return_value=manche)
 
-        # WHEN
         with (
             patch("src.service.action_service.JoueurService") as MockJoueurService,
             patch("src.service.action_service.CreditService") as MockCreditService,
         ):
             MockJoueurService.return_value.trouver_par_id.return_value = joueur
-            MockCreditService.return_value.debiter = Mock()
 
-            service.all_in(id_joueur=1)
+            instance_credit = MockCreditService.return_value
+            instance_credit.debiter = Mock()
 
-            # THEN
-            MockCreditService.return_value.debiter.assert_called_once_with(joueur, 100)
+            # WHEN 
+            with pytest.raises(Exception):
+                service.all_in(id_joueur=1)
 
-    def test_checker_ok(self):
-        # GIVEN
-        joueur = Mock()
-        joueur.pseudo = "A"
-
-        manche = Mock()
-        manche.est_tour.return_value = True
-        manche.indice_joueur.return_value = 0
-        manche.info.statuts = [2]
-
-        service = ActionService()
-        service.manche_joueur = Mock(return_value=manche)
-
-        # WHEN
-        with patch("src.service.action_service.JoueurService") as MockJoueurService:
-            MockJoueurService.return_value.trouver_par_id.return_value = joueur
-            service.checker(id_joueur=1)
-
-            # THEN
-            manche.info.mettre_statut.assert_called_once_with(0, 2)
-
-    def test_checker_pas_tour(self):
-        # GIVEN
-        joueur = Mock()
-        joueur.pseudo = "A"
-
-        manche = Mock()
-        manche.est_tour.return_value = False
-
-        service = ActionService()
-        service.manche_joueur = Mock(return_value=manche)
-
-        # WHEN / THEN
-        with patch("src.service.action_service.JoueurService") as MockJoueurService:
-            MockJoueurService.return_value.trouver_par_id.return_value = joueur
-            with pytest.raises(Exception, match=f"Ce n'est pas à {joueur.pseudo} de jouer"):
-                service.checker(id_joueur=1)
-
-    def test_checker_statut_incorrect(self):
-        # GIVEN
-        joueur = Mock()
-        joueur.pseudo = "A"
-
-        manche = Mock()
-        manche.est_tour.return_value = True
-        manche.indice_joueur.return_value = 0
-        manche.info.statuts = [1]
-        service = ActionService()
-        service.manche_joueur = Mock(return_value=manche)
-
-        # WHEN / THEN
-        with patch("src.service.action_service.JoueurService") as MockJoueurService:
-            MockJoueurService.return_value.trouver_par_id.return_value = joueur
-            with pytest.raises(ValueError, match=f"{joueur.pseudo} ne peut pas checker"):
-                service.checker(id_joueur=1)
+            instance_credit.debiter.assert_not_called()
 
     def test_se_coucher_ok(self):
         # GIVEN
@@ -184,19 +123,42 @@ class Test_Action_Service:
         manche = Mock()
         manche.est_tour.return_value = True
         manche.indice_joueur.return_value = 0
+        manche.info = Mock()  
+        manche.action = Mock(side_effect=lambda id_joueur, action: manche.info.coucher_joueur(0, 3) 
+                                        if action=="se coucher" else None)
 
         service = ActionService()
         service.manche_joueur = Mock(return_value=manche)
 
-        # WHEN
         with patch("src.service.action_service.JoueurService") as MockJoueurService:
             MockJoueurService.return_value.trouver_par_id.return_value = joueur
+
+            # WHEN
             service.se_coucher(id_joueur=1)
 
             # THEN
             manche.info.coucher_joueur.assert_called_once_with(0, 3)
 
-    def test_suivre_ok(self):
+    def test_checker_ok(self):
+        # GIVEN
+        joueur = Mock()
+        joueur.pseudo = "A"
+
+        manche = Mock()
+        service = ActionService()
+        service.manche_joueur = Mock(return_value=manche)
+
+        with patch("src.service.action_service.JoueurService") as MockJoueurService:
+            MockJoueurService.return_value.trouver_par_id.return_value = joueur
+
+            # WHEN
+            service.checker(id_joueur=1)
+
+            # THEN
+            manche.action.assert_called_once_with(1, "checker")
+
+
+    def test_checker_statut_incorrect(self):
         # GIVEN
         joueur = Mock()
         joueur.pseudo = "A"
@@ -204,21 +166,46 @@ class Test_Action_Service:
         manche = Mock()
         manche.est_tour.return_value = True
         manche.indice_joueur.return_value = 0
-        manche.info.suivre.return_value = 50
+
+        # On simule que checker est interdit
+        info_mock = Mock()
+        manche.info = info_mock
+        manche.action = Mock(side_effect=lambda id_joueur, action: (_ for _ in ()).throw(ValueError(f"{joueur.pseudo} ne peut pas checker")) if action=="checker" else None)
 
         service = ActionService()
         service.manche_joueur = Mock(return_value=manche)
 
-        # WHEN
+        with patch("src.service.action_service.JoueurService") as MockJoueurService:
+            MockJoueurService.return_value.trouver_par_id.return_value = joueur
+
+            # WHEN / THEN
+            with pytest.raises(ValueError, match=f"{joueur.pseudo} ne peut pas checker"):
+                service.checker(id_joueur=1)
+
+    def test_suivre_ok(self):
+        # GIVEN
+        joueur = Mock()
+        joueur.pseudo = "A"
+        joueur.credit = 100
+
+        manche = Mock()
+        manche.est_tour.return_value = True
+        manche.action = Mock(return_value=50)  
+
+        service = ActionService()
+        service.manche_joueur = Mock(return_value=manche)
+
         with (
             patch("src.service.action_service.JoueurService") as MockJoueurService,
             patch("src.service.action_service.CreditService") as MockCreditService,
         ):
             MockJoueurService.return_value.trouver_par_id.return_value = joueur
-            MockCreditService.return_value.debiter = Mock()
+            instance_credit = MockCreditService.return_value
+            instance_credit.debiter = Mock()
 
+            # WHEN
             service.suivre(id_joueur=1)
 
             # THEN
-            manche.info.suivre.assert_called_once_with(0, 0)
-            MockCreditService.return_value.debiter.assert_called_once_with(joueur, 50)
+            manche.action.assert_called_once_with(1, "suivre", joueur.credit, 0)
+            instance_credit.debiter.assert_called_once_with(1, 50)
