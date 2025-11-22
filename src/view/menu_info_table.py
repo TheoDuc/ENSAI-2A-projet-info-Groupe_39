@@ -1,7 +1,11 @@
 import logging
 import os
+
 import requests
 from InquirerPy import inquirer
+
+from business_object.joueur import Joueur
+from view.session import Session
 from view.vue_abstraite import VueAbstraite
 
 logger = logging.getLogger(__name__)
@@ -12,33 +16,52 @@ END_POINT = "/table/"
 class InfoTableMenu(VueAbstraite):
     """Menu de gestion d'une table ."""
 
-    def choisir_menu(self, numero_table: int):
+    def __init__(self, numero_table: int, message="", temps_attente=0, input_attente=False):
+        self.numero_table = numero_table
+        super().__init__(message, temps_attente, input_attente)
+
+    def choisir_menu(self):
         """Boucle principale du menu de la table."""
-        while True:
-            print(f"\nBienvenue sur la table {numero_table}\n")
-            choix = inquirer.select(
-                message="Faites votre choix :",
-                choices=["Voir joueurs", "Lancer manche", "Quitter table"],
-            ).execute()
+        print("\n" + "-" * 50 + f"\nTable {self.numero_table}\n" + "-" * 50 + "\n")
+        choix = inquirer.select(
+            message="Faites votre choix :",
+            choices=["Voir joueurs", "Lancer manche", "Quitter table"],
+        ).execute()
 
-            if choix == "Voir joueurs":
-                self.afficher_infos_table(numero_table)
+        if choix == "Voir joueurs":
+            texte = self.afficher_infos_table(self.numero_table)
+            return InfoTableMenu(self.numero_table, texte, input_attente=True)
 
-            elif choix == "Lancer manche":
-                menu_manche = self.lancer_manche(numero_table)
-                if menu_manche:
-                    return menu_manche  
+        elif choix == "Lancer manche":
+            menu_manche = self.lancer_manche(self.numero_table)
+            if menu_manche:
+                return menu_manche
 
-            elif choix == "Quitter table":
-                return self.quitter_table(numero_table)
+        elif choix == "Quitter table":
+            id_joueur = Session().id_joueur
+            return self.quitter_table(id_joueur)
 
-    def afficher_infos_table(self, numero_table: int):
+    def afficher_infos_table(self, numero_table: int) -> str:
         joueurs_ids = self.get_joueurs_table(numero_table)
 
-        print(f"\nTable n°{numero_table} ({len(joueurs_ids)} joueurs présents)")
+        texte = f"\nTable n°{numero_table} ({len(joueurs_ids)} joueurs présents)\n"
+        i = 0
         for jid in joueurs_ids:
-            print(f" - Joueur ID : {jid}")
-        print()
+            i += 1
+
+            req = requests.get(f"{host}/joueur/connectes/id/{jid}")
+
+            data = req.json()
+            joueur = Joueur(
+                id_joueur=data["_Joueur__id_joueur"],
+                pseudo=data["_Joueur__pseudo"],
+                credit=data["_Joueur__credit"],
+                pays=data["_Joueur__pays"],
+            )
+
+            texte += f" - Joueur {i} : {joueur.pseudo}\n"
+
+        return texte
 
     def get_joueurs_table(self, numero_table: int):
         try:
@@ -56,36 +79,38 @@ class InfoTableMenu(VueAbstraite):
     def lancer_manche(self, numero_table: int):
         joueurs_ids = self.get_joueurs_table(numero_table)
         if not joueurs_ids:
-            print("Impossible de lancer la manche : aucun joueur présent")
-            return None
+            message = "Impossible de lancer la manche : aucun joueur présent"
+            return message
 
         try:
             resp = requests.put(f"{host}/manche/lancer/{numero_table}")
             if resp.status_code == 200:
-                print("Manche lancée !")
+                message = "Manche lancée !"
                 id_joueur = joueurs_ids[0]
                 pseudo = f"Joueur{id_joueur}"
 
                 from view.menu_manche import MenuManche
+
                 return MenuManche().choisir_menu(numero_table, id_joueur, pseudo)
             else:
-                print("Erreur lors du lancement de la manche")
-                return None
+                message = "Erreur lors du lancement de la manche"
+                return message
         except requests.RequestException as e:
             logger.error(f"Erreur serveur lors du lancement de la manche : {e}")
-            print("Erreur serveur lors du lancement de la manche")
-            return None
+            message = "Erreur serveur lors du lancement de la manche"
+            return message
 
-    def quitter_table(self, numero_table: int):
+    def quitter_table(self, id_joueur: int):
         try:
-            resp = requests.delete(f"{host}{END_POINT}{numero_table}")
-            if resp.status_code == 200:
-                print(f"Vous avez quitté la table {numero_table}")
+            req = requests.put(f"{host}/table/retirer/{id_joueur}")
+            if req.status_code == 200:
+                message = req.text
             else:
-                print("Erreur lors de la déconnexion de la table")
+                message = req.text
         except requests.RequestException as e:
             logger.error(f"Erreur serveur lors de la déconnexion de la table : {e}")
-            print("Erreur serveur lors de la déconnexion de la table")
+            message = "Erreur serveur lors de la déconnexion de la table"
 
         from view.menu_joueur_vue import MenuJoueurVue
-        return MenuJoueurVue()
+
+        return MenuJoueurVue(message, temps_attente=2)

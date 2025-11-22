@@ -19,14 +19,12 @@ class ConnexionVue(VueAbstraite):
         pseudo = inquirer.text(message="Entrez votre pseudo : ").execute()
         url = f"{host}{END_POINT}/{pseudo}"
 
-        try:
-            req = requests.get(url)
-            req.raise_for_status()
-        except requests.RequestException:
-            print("Erreur serveur ou pseudo inexistant")
+        req = requests.get(url)
+        if req.status_code != 200:
+            message = req.json().get("detail", "Erreur inconnue")
             from view.accueil.accueil_vue import AccueilVue
 
-            return AccueilVue("Erreur serveur ou pseudo inexistant", temps_attente=2)
+            return AccueilVue(message, temps_attente=2)
 
         data = req.json()
         joueur = Joueur(

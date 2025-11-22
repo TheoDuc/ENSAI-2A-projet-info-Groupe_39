@@ -23,7 +23,6 @@ class MenuJoueurVue(VueAbstraite):
             message="Faites votre choix : ",
             choices=[
                 "Tables",
-                "Se créditer",
                 "Infos de session",
                 "Changer ses informations",
                 "Lire les règles",
@@ -56,9 +55,6 @@ class MenuJoueurVue(VueAbstraite):
                 from view.menu_table import MenuTable
 
                 return MenuTable()
-
-            case "Se créditer":
-                return self.se_crediter()
 
             case "Lire les règles":
                 texte = self._texte_regles()

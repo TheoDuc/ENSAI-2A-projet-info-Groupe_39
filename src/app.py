@@ -65,7 +65,17 @@ async def joueur_lister():
 async def joueur_connexion(pseudo: str):
     """Connecte le joueur"""
     logging.info("Connecte le joueur")
-    return joueur_service.se_connecter(pseudo)
+
+    try:
+        return joueur_service.se_connecter(pseudo)
+
+    except ValueError as e:
+        # pseudo n'existe pas
+        raise HTTPException(status_code=404, detail=str(e))
+
+    except Exception as e:
+        # ex : joueur déjà connecté
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @app.get("/joueur/deconnexion/{id_joueur}", tags=["Joueurs"])
@@ -186,7 +196,8 @@ async def retirer_un_joueur(id_joueur: int):
     """retire un joueur a la table"""
     logging.info(f"retire le joueur {id_joueur} de la table")
     table_service.retirer_joueur(id_joueur)
-    return f"le joueur {id_joueur} a été retiré de la table"
+    joueur = joueur_service.trouver_par_id(id_joueur)
+    return f"le joueur {joueur.pseudo} a quitté sa table"
 
 
 @app.delete("/table/{numero_table}", tags=["Table"])

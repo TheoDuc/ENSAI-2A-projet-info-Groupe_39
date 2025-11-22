@@ -2,8 +2,10 @@
 
 import logging
 import os
+
 import requests
 from InquirerPy import inquirer
+
 from view.session import Session
 from view.vue_abstraite import VueAbstraite
 
@@ -18,6 +20,8 @@ class MenuTable(VueAbstraite):
 
     def choisir_menu(self):
         action_table = ["Retour au Menu Joueur", "Créer une Table"]
+
+        print("\n" + "-" * 50 + "\nMenu Tables\n" + "-" * 50 + "\n")
 
         # Récupération des tables existantes
         try:
@@ -38,10 +42,12 @@ class MenuTable(VueAbstraite):
         # --- CAS FIXES ---
         if choix == "Retour au Menu Joueur":
             from view.menu_joueur_vue import MenuJoueurVue
+
             return MenuJoueurVue()
 
         if choix == "Créer une Table":
             from view.menu_creation_table import MenuCreationTable
+
             return MenuCreationTable()
 
         # --- CAS DES TABLES DYNAMIQUES ---
@@ -58,21 +64,27 @@ class MenuTable(VueAbstraite):
                 if req.status_code == 200:
                     # Mise à jour locale
                     session.numero_table = numero_table
-                    print(f"Vous êtes connecté sur la table {numero_table}")
+                    message = f"Vous êtes connecté sur la table {numero_table}"
 
                     # Redirection vers le menu infos table
                     from view.menu_info_table import InfoTableMenu
-                    return InfoTableMenu().choisir_menu(numero_table)
+
+                    return InfoTableMenu(numero_table, message, temps_attente=2)
+
                 else:
-                    print("Erreur lors de la connexion à la table")
+                    message = "Erreur lors de la connexion à la table"
                     from view.menu_table import MenuTable
-                    return MenuTable()
+
+                    return MenuTable(message, temps_attente=2)
+
             except requests.RequestException as e:
                 logger.error(f"Erreur serveur : {e}")
-                print("Impossible de rejoindre la table")
+                message = "Impossible de rejoindre la table"
                 from view.menu_table import MenuTable
-                return MenuTable()
+
+                return MenuTable(message, temps_attente=2)
 
         # Sécurité : retour menu joueur si choix invalide
         from view.menu_joueur_vue import MenuJoueurVue
+
         return MenuJoueurVue()
