@@ -125,9 +125,11 @@ class TestInfoManche:
         assert "mises=" in affichage
         assert "tour_couche=" in affichage
 
-    def test_affichage_tout_joueur(self, joueurs):
+    def test_affichage_tout_joueur(self):
         # GIVEN
-        manche = InfoManche(joueurs)
+        joueurs = [1, 2]
+        pseudos = ["Alice", "Bob"]
+        manche = InfoManche(joueurs, pseudos)
 
         # On force un état pour être sûr de l'affichage
         manche.modifier_statut(0, 2)  # "à jour"
@@ -150,4 +152,6 @@ class TestInfoManche:
         assert "all in" in texte
         assert "150" in texte
         assert "300" in texte
-        assert "3" in texte  # Bob couché au tour 3
+        assert "3" in texte
+        assert "Alice" in texte
+        assert "Bob" in texte
