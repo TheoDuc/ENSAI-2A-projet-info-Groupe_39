@@ -28,7 +28,6 @@ class MenuManche(VueAbstraite):
         super().__init__(message, temps_attente, input_attente)
 
     def choisir_menu(self):
-        """Boucle principale du menu pendant la manche."""
         print("\n" + "-" * 50)
         print(f"Menu Manche - Table {self.numero_table} - Joueur {self.pseudo}")
         print("-" * 50 + "\n")
@@ -42,15 +41,17 @@ class MenuManche(VueAbstraite):
                 "Suivre",
                 "All in",
                 "Se coucher",
-                "Quitter manche",
+                "Terminer manche",
             ],
         ).execute()
 
         if choix == "Voir infos manche":
-            self.voir_infos_manche(self.numero_table)
+            message = self.voir_infos_manche(self.numero_table)
+            return MenuManche(self.numero_table, self.pseudo, message=message, input_attente=True)
 
         elif choix == "Voir main":
-            self.voir_main(self.numero_table, Session.id_joueur)
+            message = self.voir_main(self.numero_table, Session().id_joueur)
+            return MenuManche(self.numero_table, self.pseudo, message=message, input_attente=True)
 
         elif choix in ["Checker", "Suivre", "All in", "Se coucher"]:
             mapping = {
@@ -59,38 +60,40 @@ class MenuManche(VueAbstraite):
                 "All in": "all_in",
                 "Se coucher": "se_coucher",
             }
-            self.effectuer_action(mapping[choix], Session.id_joueur)
+            message = self.effectuer_action(mapping[choix], Session().id_joueur)
+            return MenuManche(self.numero_table, self.pseudo, message, temps_attente=2)
 
-        elif choix == "Quitter manche":
-            self.quitter_manche(self.numero_table)
-            from view.menu_joueur_vue import MenuJoueurVue
+        elif choix == "Terminer manche":
+            message = self.terminer_manche(self.numero_table)
+            from view.menu_info_table import InfoTableMenu
 
-            return MenuJoueurVue()
+            return InfoTableMenu(self.numero_table, message, input_attente=True)
 
     # -------------------------
     # Actions et affichages
     # -------------------------
     def voir_infos_manche(self, numero_table: int):
         try:
-            resp = requests.get(f"{host}/manche/affichage/{numero_table}")
-            if resp.status_code == 200:
-                print(resp.text)
+            req = requests.get(f"{host}/manche/affichage/{numero_table}")
+            if req.status_code == 200:
+                return "Infos :\n\n" + str(req.text).replace("\\n", "\n")
             else:
-                print("Impossible de récupérer les infos de la manche")
+                return "Impossible de récupérer les infos de la manche"
+
         except requests.RequestException as e:
             logger.error(f"Erreur serveur lors de l'affichage de la manche : {e}")
-            print("Erreur serveur lors de l'affichage de la manche")
+            return "Erreur serveur lors de l'affichage de la manche"
 
     def voir_main(self, numero_table: int, id_joueur: int):
         try:
             resp = requests.get(f"{host}/manche/main/{numero_table}/{id_joueur}")
             if resp.status_code == 200:
-                print(resp.text)
+                return resp.text
             else:
-                print("Impossible de récupérer votre main")
+                return "Impossible de récupérer votre main"
         except requests.RequestException as e:
             logger.error(f"Erreur serveur lors de l'affichage de la main : {e}")
-            print("Erreur serveur lors de l'affichage de la main")
+            return "Erreur serveur lors de l'affichage de la main"
 
     def effectuer_action(self, action: str, id_joueur: int):
         try:
@@ -103,7 +106,7 @@ class MenuManche(VueAbstraite):
             logger.error(f"Erreur serveur lors de l'action '{action}' : {e}")
             print(f"Erreur serveur lors de l'action '{action}'")
 
-    def quitter_manche(self, numero_table: int):
+    def terminer_manche(self, numero_table: int):
         try:
             resp = requests.get(f"{host}/manche/terminer/{numero_table}")
             if resp.status_code == 200:

@@ -191,28 +191,28 @@ class TableService:
         """
 
         table = self.table_par_numero(numero_table)
+        if table.manche is None or table.manche.fin:
+            pseudos = []
 
-        pseudos = []
+            for id in range(len(table)):
+                joueur = JoueurService().trouver_par_id(table.id_joueurs[id])
+                if joueur.credit < table.grosse_blind:
+                    self.retirer_joueur(joueur.id_joueur)
+                else:
+                    pseudos.append(joueur.pseudo)
 
-        for id in range(len(table)):
-            joueur = JoueurService().trouver_par_id(table.id_joueurs[id])
-            if joueur.credit < table.grosse_blind:
-                self.retirer_joueur(joueur.id_joueur)
-            else:
-                pseudos.append(joueur.pseudo)
+            table.nouvelle_manche(pseudos)
+            table.manche.preflop()
+            p_blind = table.manche.info.joueurs[0]
+            g_blind = table.manche.info.joueurs[1]
 
-        table.nouvelle_manche(pseudos)
-        table.manche.preflop()
-        p_blind = table.manche.info.joueurs[0]
-        g_blind = table.manche.info.joueurs[1]
+            grosse_blind = table.manche.grosse_blind
 
-        grosse_blind = table.manche.grosse_blind
+            from service.action_service import ActionService
 
-        from service.action_service import ActionService
-
-        ActionService().suivre(p_blind, grosse_blind // 2)
-        ActionService().suivre(g_blind, grosse_blind - grosse_blind // 2)
-        table.manche.info.modifier_statut(1, 0)
+            ActionService().suivre(p_blind, grosse_blind // 2)
+            ActionService().suivre(g_blind, grosse_blind - grosse_blind // 2)
+            table.manche.info.modifier_statut(1, 0)
 
     def affichage_general(self, numero_table: int) -> str:
         """

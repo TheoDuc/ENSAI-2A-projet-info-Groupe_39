@@ -34,8 +34,7 @@ class InfoTableMenu(VueAbstraite):
 
         elif choix == "Lancer manche":
             menu_manche = self.lancer_manche(self.numero_table)
-            if menu_manche:
-                return menu_manche
+            return menu_manche
 
         elif choix == "Quitter table":
             id_joueur = Session().id_joueur
@@ -87,9 +86,21 @@ class InfoTableMenu(VueAbstraite):
             if req.status_code == 200:
                 message = "Manche lancée !"
 
+                reqj = requests.get(f"{host}/joueur/connectes/id/{Session().id_joueur}")
+
+                data = reqj.json()
+                joueur = Joueur(
+                    id_joueur=data["_Joueur__id_joueur"],
+                    pseudo=data["_Joueur__pseudo"],
+                    credit=data["_Joueur__credit"],
+                    pays=data["_Joueur__pays"],
+                )
+
                 from view.menu_manche import MenuManche
 
-                return MenuManche(self.numero_table, message, temps_attente=1)
+                return MenuManche(
+                    self.numero_table, pseudo=joueur.pseudo, message=message, temps_attente=1
+                )
             else:
                 message = (
                     f"Erreur lors du lancement : {req.json().get('detail', 'Erreur inconnue')}"
