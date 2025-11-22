@@ -192,14 +192,22 @@ L’application en ligne de commande (CLI) offre une interface **interactive sim
 
 ### Étapes
 
-1. Ouvrez votre terminal (Git Bash, PowerShell, ou autre) et lancez l’application :
+1. Lancer d'abord sur un premier terminal
+
+```bash
+python src/app.py
+```
+- Cela exécutera le script `src/utils/reset_database.py`.
+- Le script initialise la base de données en exécutant les fichiers SQL présents dans le dossier `data/`
+
+2. Ensuite ouvrez un autre terminal et lancez l’application avec la commande suivante :
 
 ```bash
 python src/main.py
 ```
-- [ ] Lors du premier lancement, sélectionnez **Reset database** :
-  - Cela exécutera le script `src/utils/reset_database.py`.
-  - Le script initialise la base de données en exécutant les fichiers SQL présents dans le dossier `data/`.
+Cela démarrera l’application CLI, vous permettant d’interagir avec le serveur de poker.
+
+[ ] Pour autant de joeurs que vous le souhaitez, ouvrez un nouveau terminal et lancez l’application avec la même commande.
 
 ## :arrow_forward: Lancer le Webservice
 
