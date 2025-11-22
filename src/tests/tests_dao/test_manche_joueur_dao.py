@@ -14,8 +14,8 @@ class TestMancheJoueurDAO:
     def setup_data(self):
         dao = MancheJoueurDAO()
 
-        j1 = Joueur(id_joueur=1, pseudo="Alice", credit=1000, pays="France")
-        j2 = Joueur(id_joueur=2, pseudo="Bob", credit=800, pays="Belgique")
+        j1 = 1
+        j2 = 2
 
         info = InfoManche([j1, j2])
         info.modifier_mise(0, 100)
@@ -23,7 +23,6 @@ class TestMancheJoueurDAO:
 
         return dao, info
 
-        return dao, info
 
     @patch("dao.manche_joueur_dao.DBConnection")
     def test_creer_manche_joueur_succes(self, mock_db, setup_data):

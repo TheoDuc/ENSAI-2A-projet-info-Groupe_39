@@ -10,8 +10,8 @@ from utils.reset_database import ResetDatabase
 class TestMancheDao:
     def creer_manche(self):
         # Crée une instance de Manche prête à être utilisée
-        joueur1 = Joueur(1, "paul", 100, "fr")
-        joueur2 = Joueur(2, "luc", 200, "us")
+        joueur1 = 1
+        joueur2 = 2
         info = InfoManche([joueur1, joueur2])
         manche = Manche(info, 10)
         manche.preflop()
@@ -36,8 +36,8 @@ class TestMancheDao:
         if ResetDatabase().lancer(True):
             # GIVEN
             mancheDao = MancheDao()
-            joueur1 = Joueur(1, "paul", 100, "fr")
-            joueur2 = Joueur(2, "luc", 200, "us")
+            joueur1 = 1
+            joueur2 = 2
             info = InfoManche([joueur1, joueur2])
             manche = Manche(info, 10)
             manche.preflop()
