@@ -115,11 +115,11 @@ class Manche:
         info = self.info.affichage_tout_joueur() + "\n\n\n"
         board = "Board :" + self.board.affichage_board() + "\n\n"
         if self.fin:
-            indice = None
+            instruction = "La manche est terminée !"
         else:
-            indice = self.info.joueurs[self.indice_joueur_actuel]
+            instruction = f"C'est à {self.info.pseudos[self.indice_joueur_actuel]} de jouer !"
 
-        return [(tour + info + board), indice]
+        return tour + info + board + instruction
 
     def indice_joueur(self, id_joueur: int) -> int:
         """
@@ -337,6 +337,11 @@ class Manche:
             raise TypeError("indice_joueur doit être un entier")
         if not isinstance(relance, int) or relance < 0:
             raise ValueError("Le montant doit être un entier positif")
+
+        if relance == 0 and self.info.statuts[indice_joueur] == 0:
+            raise ValueError(
+                "Vous ne pouvez pas suivre alors que vous êtes déjà à jour, il faut checker."
+            )
 
         pour_suivre = max(self.info.mises) - self.info.mises[indice_joueur]
 
@@ -665,7 +670,7 @@ class Manche:
         self.joueur_suivant()
         return montant
 
-    def terminer_manche(self):
+    def terminer_manche(self) -> dict:
         """Termine la manche et retourne les gains de chaque joueurs"""
         if self.__enregistree:
             return
@@ -676,3 +681,34 @@ class Manche:
             gains = self.gains()
             self.__enregistree = True
             return gains
+
+    def resultats(self) -> str:
+        """Affiche le détail complet de fin de partie"""
+
+        texte = "Combinaisons :\n"
+
+        if len(self.joueurs_en_lice) > 1:
+            for j in range(len(self.info.joueurs)):
+                if j in self.joueurs_en_lice:
+                    combinaison = EvaluateurCombinaison().eval(
+                        self.board.cartes + self.info.mains[j].cartes
+                    )
+                    texte += f"{self.info.pseudos[j]} : {combinaison}\n"
+                else:
+                    texte += f"{self.info.pseudos[j]} : [?]\n"
+
+        else:
+            texte += "NA : seul un joueur ne s'est pas couché"
+
+        texte += "\nGains :\n"
+
+        if len(self.joueurs_en_lice) > 1:
+            for j in range(len(self.info.joueurs)):
+                id_joueur = self.info.joueurs[j]
+                gain = self.gains()[id_joueur]
+                texte += f"{self.info.pseudos[j]} : {gain}\n"
+        else:
+            gain = self.valeur_pot()
+            texte += f"{self.info.pseudos[self.joueurs_en_lice[0]]} : {gain}"
+
+        return texte

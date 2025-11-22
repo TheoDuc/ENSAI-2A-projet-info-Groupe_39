@@ -39,7 +39,7 @@ class JoueurModel(BaseModel):
 
 
 @app.put("/admin/crediter/{pseudo}/{montant}", tags=["Admin"])
-def crediter(pseudo: str, montant: int, est_admin: bool = False):
+async def crediter(pseudo: str, montant: int, est_admin: bool = False):
     joueur = joueur_service.trouver_par_pseudo(pseudo)
 
     if not est_admin:
@@ -50,10 +50,17 @@ def crediter(pseudo: str, montant: int, est_admin: bool = False):
 
 
 @app.put("/admin/debiter/{pseudo}/{montant}", tags=["Admin"])
-def debiter(pseudo, montant: int):
+async def debiter(pseudo, montant: int):
     joueur = joueur_service.trouver_par_pseudo(pseudo)
     credit_service.debiter(joueur, montant)
     return f"l'admin a bien debiter {montant} à {joueur}"
+
+
+@app.get("/joueur/", tags=["Joueurs"])
+async def joueur_lister():
+    """Liste tous les joueurs"""
+    logging.info("Liste tous les joueurs")
+    return joueur_service.lister_tous()
 
 
 @app.get("/joueur/connexion/{pseudo}", tags=["Joueurs"])
@@ -70,13 +77,6 @@ async def joueur_deconnexion(id_joueur: int):
     return joueur_service.deconnexion(id_joueur)
 
 
-@app.get("/joueur/liste/", tags=["Joueurs"])
-async def joueur_lister():
-    """Liste tous les joueurs"""
-    logging.info("Liste tous les joueurs")
-    return joueur_service.lister_tous()
-
-
 @app.get("/joueur/connectes/", tags=["Joueurs"])
 async def joueur_connectes():
     """Liste tous les joueurs"""
@@ -84,18 +84,11 @@ async def joueur_connectes():
     return joueur_service.joueurs_connectes()
 
 
-@app.get("/joueur/id/{id_joueur}", tags=["Joueurs"])
+@app.get("/joueur/connectes/id/{id_joueur}", tags=["Joueurs"])
 async def joueur_par_id(id_joueur: int):
     """Trouver un joueur à partir de son id"""
     logging.info("Trouver un joueur à partir de son id")
     return joueur_service.trouver_par_id(id_joueur)
-
-
-@app.get("/joueur/{pseudo}", tags=["Joueurs"])
-async def joueur_par_pseudo(pseudo: str):
-    """Trouver un joueur à partir de son pseudo"""
-    logging.info("Trouver un joueur à partir de son pseudo")
-    return joueur_service.trouver_par_pseudo(pseudo)
 
 
 @app.post("/joueur/", tags=["Joueurs"])
@@ -113,7 +106,7 @@ async def creer_joueur(j: JoueurModel):
 
 
 @app.put("/joueur/{id_joueur}/{pseudo}/{pays}", tags=["Joueurs"])
-def modifier_joueur(id_joueur: int, pseudo: str, pays: str):
+async def modifier_joueur(id_joueur: int, pseudo: str, pays: str):
     """Modifier un joueur"""
     logging.info("Modifier un joueur")
     joueur = joueur_service.trouver_par_id(id_joueur)
@@ -131,7 +124,7 @@ def modifier_joueur(id_joueur: int, pseudo: str, pays: str):
 
 
 @app.delete("/joueur/{pseudo}", tags=["Joueurs"])
-def supprimer_joueur(pseudo: str):
+async def supprimer_joueur(pseudo: str):
     """Supprimer un joueur"""
     logging.info("Supprimer un joueur")
     joueur = joueur_service.trouver_par_pseudo(pseudo)
@@ -152,6 +145,13 @@ class TableModel(BaseModel):
     joueurs: List[int] = []
 
 
+@app.get("/table/", tags=["Table"])
+async def liste_tables():
+    """liste les tables"""
+    logging.info("liste les tables")
+    return table_service.affichages_tables()
+
+
 @app.post("/table/", tags=["Table"])
 async def creer_table(t: TableModel):
     """Créer une table"""
@@ -167,12 +167,11 @@ async def creer_table(t: TableModel):
     )
 
 
-@app.delete("/table/{numero_table}", tags=["Table"])
-def supprimer_table(numero_table: int):
-    """Supprimer une table"""
-    logging.info("Supprimer une table")
-    table_service.supprimer_table(numero_table)
-    return f"Table {numero_table} supprimé"
+@app.get("/table/joueurs/{numero_table}", tags=["Table"])
+async def joueurs_dans_table(numero_table: int):
+    table = table_service.table_par_numero(numero_table)
+
+    return table.id_joueurs
 
 
 @app.put("/table/ajouter/{numero_table}/{id_joueur}", tags=["Table"])
@@ -192,21 +191,15 @@ async def retirer_un_joueur(id_joueur: int):
     return f"le joueur {id_joueur} a été retiré de la table"
 
 
-@app.get("/table/{numero_table}", tags=["Table"])
-def joueurs_dans_table(numero_table: int):
-    table = table_service.table_par_numero(numero_table)
-
-    return table.id_joueurs
-
-
-@app.get("/table/", tags=["Table"])
-async def liste_tables():
-    """liste les tables"""
-    logging.info("liste les tables")
-    return table_service.affichages_tables()
+@app.delete("/table/{numero_table}", tags=["Table"])
+async def supprimer_table(numero_table: int):
+    """Supprimer une table"""
+    logging.info("Supprimer une table")
+    table_service.supprimer_table(numero_table)
+    return f"Table {numero_table} supprimé"
 
 
-@app.get("/table/lancer/{numero_table}", tags=["Table"])
+@app.put("/manche/lancer/{numero_table}", tags=["Manche"])
 async def lancer_manche(numero_table: int):
     """lance une manche"""
     logging.info("lance une manche")
@@ -214,26 +207,26 @@ async def lancer_manche(numero_table: int):
     return f"la manche est lancé sur la table {numero_table}"
 
 
-@app.get("/table/terminer/{numero_table}", tags=["Table"])
-async def terminer_manche(numero_table: int):
-    """termine une manche"""
-    logging.info("termine une manche")
-    table_service.terminer_manche(numero_table=numero_table)
-    return f"la manche est terminé sur la table {numero_table}"
-
-
-@app.get("/table/affichage/{numero_table}", tags=["Manche"])
+@app.get("/manche/affichage/{numero_table}", tags=["Manche"])
 async def affichage_general(numero_table: int):
     """affichage general"""
     logging.info("affichage general")
     return table_service.affichage_general(numero_table=numero_table)
 
 
-@app.get("/table/main/{numero_table}/{id_joueur}", tags=["Manche"])
+@app.get("/manche/main/{numero_table}/{id_joueur}", tags=["Manche"])
 async def regarder_main(id_joueur: int):
     """regarder sa main"""
     logging.info("regarder sa main")
     return table_service.regarder_main(id_joueur)
+
+
+@app.put("/manche/terminer/{numero_table}", tags=["Manche"])
+async def terminer_manche(numero_table: int):
+    """termine une manche"""
+    logging.info("termine une manche")
+    texte = table_service.terminer_manche(numero_table=numero_table)
+    return f"la manche est terminé sur la table {numero_table}\n\n" + texte
 
 
 @app.get("/action/{id_joueur}", tags=["Action"])
