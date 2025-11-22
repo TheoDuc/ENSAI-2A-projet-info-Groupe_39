@@ -52,48 +52,43 @@ class TestTable:
 
     def test_table_retirer_joueur_succes(self):
         # GIVEN
-        id_joueur = 1
+        index = 0
         table = Table(10, 10, id_joueurs=[1])
-        table_attendu = Table(10, 10, 1, [])
-        indice = 0
-
-        # WHEN
-        id_joueur_supprime = table.retirer_joueur(indice)
-
+        table_attendu = Table(10, 10, id_joueurs=[])
         # THEN
+        id_joueur_supprime = table.retirer_joueur(index)
+        # WHEN
         assert len(table) == len(table_attendu)
         assert table.id_joueurs == table_attendu.id_joueurs
-        assert id_joueur_supprime == id_joueur
+        assert id_joueur_supprime == 1
 
     def test_table_retirer_joueur_valeur_incorrecte(self):
         # GIVEN
-        table = Table(1, 10, 1, [])
-        message_attendu = "Indice négatif impossible"
-        indice = -6
+        table = Table(1, 10, 1, id_joueurs=[1])
+        # WHEN
+        with pytest.raises(IndexError, match="Indice plus grand que le nombre de joueurs"):
+            table.retirer_joueur(5)
 
-        # WHEN / THEN
-        with pytest.raises(IndexError, match=message_attendu):
-            table.retirer_joueur(indice)
+        with pytest.raises(IndexError, match="Indice négatif impossible"):
+            table.retirer_joueur(-1)
 
     def test_table_retirer_joueur_valeur_incorrecte2(self):
         # GIVEN
-        table = Table(1, 10, 1, [])
-        message_attendu = f"Indice plus grand que le nombre de joueurs : {len(table.id_joueurs)}"
-        indice = 2
-
-        # WHEN / THEN
-        with pytest.raises(IndexError, match=message_attendu):
-            table.retirer_joueur(indice)
+        table = Table(1, 10, 1, id_joueurs=[1])
+        index = 5
+        # WHEN/THEN
+        with pytest.raises(IndexError, match="Indice plus grand que le nombre de joueurs"):
+            table.retirer_joueur(index)
 
     def test_table_retirer_joueur_valeur_incorrecte3(self):
         # GIVEN
-        table = Table(1, 10, 1, [])
+        table = Table(1, 10, 1, id_joueurs=[1])
         message_attendu = "L'indice doit être un entier"
-        indice = "a"
+        id_joueurs = "a"
 
         # WHEN / THEN
         with pytest.raises(TypeError, match=message_attendu):
-            table.retirer_joueur(indice)
+            table.retirer_joueur(id_joueurs)
 
     def test_table_mettre_grosse_blind_succes(self):
         # GIVEN
