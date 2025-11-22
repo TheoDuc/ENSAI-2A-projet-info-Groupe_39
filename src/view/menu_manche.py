@@ -1,7 +1,10 @@
 import logging
 import os
+
 import requests
 from InquirerPy import inquirer
+
+from view.session import Session
 from view.vue_abstraite import VueAbstraite
 
 logger = logging.getLogger(__name__)
@@ -12,45 +15,57 @@ END_POINT = "/action/"
 class MenuManche(VueAbstraite):
     """Menu du joueur pendant une manche"""
 
-    def choisir_menu(self, numero_table: int, id_joueur: int, pseudo: str):
+    def __init__(
+        self,
+        numero_table: int,
+        pseudo: str = "?",
+        message="",
+        temps_attente=0,
+        input_attente=False,
+    ):
+        self.numero_table = numero_table
+        self.pseudo = pseudo
+        super().__init__(message, temps_attente, input_attente)
+
+    def choisir_menu(self):
         """Boucle principale du menu pendant la manche."""
-        while True:
-            print("\n" + "-" * 50)
-            print(f"Menu Manche - Table {numero_table} - Joueur {pseudo}")
-            print("-" * 50 + "\n")
+        print("\n" + "-" * 50)
+        print(f"Menu Manche - Table {self.numero_table} - Joueur {self.pseudo}")
+        print("-" * 50 + "\n")
 
-            choix = inquirer.select(
-                message="Faites votre choix :",
-                choices=[
-                    "Voir infos manche",
-                    "Voir main",
-                    "Checker",
-                    "Suivre",
-                    "All in",
-                    "Se coucher",
-                    "Quitter manche",
-                ],
-            ).execute()
+        choix = inquirer.select(
+            message="Faites votre choix :",
+            choices=[
+                "Voir infos manche",
+                "Voir main",
+                "Checker",
+                "Suivre",
+                "All in",
+                "Se coucher",
+                "Quitter manche",
+            ],
+        ).execute()
 
-            if choix == "Voir infos manche":
-                self.voir_infos_manche(numero_table)
+        if choix == "Voir infos manche":
+            self.voir_infos_manche(self.numero_table)
 
-            elif choix == "Voir main":
-                self.voir_main(numero_table, id_joueur)
+        elif choix == "Voir main":
+            self.voir_main(self.numero_table, Session.id_joueur)
 
-            elif choix in ["Checker", "Suivre", "All in", "Se coucher"]:
-                mapping = {
-                    "Checker": "checker",
-                    "Suivre": "suivre",
-                    "All in": "all_in",
-                    "Se coucher": "se_coucher"
-                }
-                self.effectuer_action(mapping[choix], id_joueur)
+        elif choix in ["Checker", "Suivre", "All in", "Se coucher"]:
+            mapping = {
+                "Checker": "checker",
+                "Suivre": "suivre",
+                "All in": "all_in",
+                "Se coucher": "se_coucher",
+            }
+            self.effectuer_action(mapping[choix], Session.id_joueur)
 
-            elif choix == "Quitter manche":
-                self.quitter_manche(numero_table)
-                from view.menu_joueur_vue import MenuJoueurVue
-                return MenuJoueurVue()
+        elif choix == "Quitter manche":
+            self.quitter_manche(self.numero_table)
+            from view.menu_joueur_vue import MenuJoueurVue
+
+            return MenuJoueurVue()
 
     # -------------------------
     # Actions et affichages

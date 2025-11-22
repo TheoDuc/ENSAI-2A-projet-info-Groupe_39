@@ -196,8 +196,7 @@ async def retirer_un_joueur(id_joueur: int):
     """retire un joueur a la table"""
     logging.info(f"retire le joueur {id_joueur} de la table")
     table_service.retirer_joueur(id_joueur)
-    joueur = joueur_service.trouver_par_id(id_joueur)
-    return f"le joueur {joueur.pseudo} a quitté sa table"
+    return "Vous avez quitté la table"
 
 
 @app.delete("/table/{numero_table}", tags=["Table"])
@@ -210,10 +209,15 @@ async def supprimer_table(numero_table: int):
 
 @app.put("/manche/lancer/{numero_table}", tags=["Manche"])
 async def lancer_manche(numero_table: int):
-    """lance une manche"""
     logging.info("lance une manche")
-    table_service.lancer_manche(numero_table)
-    return f"la manche est lancé sur la table {numero_table}"
+
+    try:
+        table_service.lancer_manche(numero_table)
+        return {"message": f"Manche lancée sur la table {numero_table}"}
+
+    except Exception as e:
+        logging.error(f"Erreur lors du lancement de la manche : {e}")
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @app.get("/manche/affichage/{numero_table}", tags=["Manche"])
