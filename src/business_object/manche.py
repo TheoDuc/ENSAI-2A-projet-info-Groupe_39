@@ -704,7 +704,8 @@ class Manche:
 
         if len(self.joueurs_en_lice) > 1:
             for j in range(len(self.info.joueurs)):
-                gain = self.gains().values[j]
+                id_joueur = self.info.joueurs[j]
+                gain = self.gains()[id_joueur]
                 texte += f"{self.info.pseudos[j]} : {gain}\n"
         else:
             gain = self.valeur_pot()
