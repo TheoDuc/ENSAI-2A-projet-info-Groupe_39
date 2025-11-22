@@ -1,8 +1,8 @@
 import logging
 from typing import List
 
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import RedirectResponse
+from fastapi import FastAPI, HTTPException, status
+from fastapi.responses import JSONResponse, RedirectResponse
 from pydantic import BaseModel
 
 from service.action_service import ActionService
@@ -253,14 +253,29 @@ async def manche_joueur(id_joueur: int):
 async def all_in(id_joueur: int):
     """Joue all_in pour le joueur"""
     logging.info("Joue all_in pour le joueur")
-    return action_service.all_in(id_joueur)
+    try:
+        action_service.all_in(id_joueur)
+        return {"success": True, "message": f"Joueur {id_joueur} a mis all-in"}
+    except Exception as e:
+        logging.error(f"Erreur action all_in pour le joueur {id_joueur} : {e}")
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"success": False, "message": str(e)},
+        )
 
 
 @app.put("/action/checker/{id_joueur}", tags=["Action"])
 async def checker(id_joueur: int):
     """Joue checker pour le joueur"""
     logging.info("Joue checker pour le joueur")
-    return action_service.checker(id_joueur)
+    try:
+        action_service.checker(id_joueur)
+        return {"success": True, "message": f"Joueur {id_joueur} a checké"}
+    except Exception as e:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"success": False, "message": str(e)},
+        )
 
 
 @app.put("/action/se_coucher/{id_joueur}", tags=["Action"])
@@ -274,7 +289,14 @@ async def se_coucher(id_joueur: int):
 async def suivre(id_joueur: int, relance: int):
     """Joue suivre pour le joueur"""
     logging.info("Joue suivre pour le joueur")
-    return action_service.suivre(id_joueur, relance)
+    try:
+        action_service.suivre(id_joueur, relance)
+        return {"success": True, "message": f"Joueur {id_joueur} a suivi {relance}"}
+    except Exception as e:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"success": False, "message": str(e)},
+        )
 
 
 # Run the FastAPI application

@@ -277,12 +277,13 @@ class TableService:
 
         gains = table.manche.terminer_manche()
 
-        for id_joueur, montant in gains.items():
-            joueur = JoueurService().trouver_par_id(id_joueur)
-            CreditService().crediter(joueur, montant)
+        if gains is not None:
+            for id_joueur, montant in gains.items():
+                joueur = JoueurService().trouver_par_id(id_joueur)
+                CreditService().crediter(joueur, montant)
 
-        id_manche = MancheService().sauvegarder_manche(table.manche)
-        MancheJoueurService().sauvegarder_manche_joueur(id_manche, table.manche.info)
-        table.rotation_dealer()
+            id_manche = MancheService().sauvegarder_manche(table.manche)
+            MancheJoueurService().sauvegarder_manche_joueur(id_manche, table.manche.info)
+            table.rotation_dealer()
 
         return table.manche.resultats()

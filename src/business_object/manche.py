@@ -280,9 +280,12 @@ class Manche:
     def fin_de_manche(self) -> bool:
         """Vérifie si la manche est terminée"""
         n = sum(1 for s in self.info.statuts if s != 3)
+        n_all = sum(1 for s in self.info.statuts if s == 4)
         if n == 0:
             raise ValueError("Les joueurs ne peuvent être tous couchés")
-        return n == 1 or (self.fin_du_tour() and self.tour == 3)
+        return (
+            n_all == len(self.joueurs_en_lice) or n == 1 or (self.fin_du_tour() and self.tour == 3)
+        )
 
     @log
     def checker(self, indice_joueur: int):
@@ -573,8 +576,16 @@ class Manche:
             gains = {self.info.joueurs[self.joueurs_en_lice[0]]: self.valeur_pot()}
             return gains
 
-        if len(self.board.cartes) != 5:
+        if len(self.board.cartes) != 5 and not self.fin:
             raise ValueError("Le board n'est pas complet, impossible de calculer les gains.")
+
+        if self.fin and len(self.board.cartes) < 5:
+            if self.tour == 0:
+                self.flop()
+            if self.tour == 1:
+                self.turn()
+            if self.tour == 2:
+                self.river()
 
         mises_restantes = self.info.mises[:]
         classement = self.classement()  # Rang 1 = meilleur

@@ -60,14 +60,14 @@ class MenuManche(VueAbstraite):
                 "All in": "all_in",
                 "Se coucher": "se_coucher",
             }
+
             message = self.effectuer_action(mapping[choix], Session().id_joueur)
             return MenuManche(self.numero_table, self.pseudo, message, temps_attente=2)
 
         elif choix == "Terminer manche":
-            message = self.terminer_manche(self.numero_table)
-            from view.menu_info_table import InfoTableMenu
+            menu = self.terminer_manche(self.numero_table)
 
-            return InfoTableMenu(self.numero_table, message, input_attente=True)
+            return menu
 
     # -------------------------
     # Actions et affichages
@@ -97,22 +97,45 @@ class MenuManche(VueAbstraite):
 
     def effectuer_action(self, action: str, id_joueur: int):
         try:
-            resp = requests.put(f"{host}{END_POINT}{action}/{id_joueur}")
-            if resp.status_code == 200:
-                print(f"Action '{action}' effectuée !")
+            if action == "suivre":
+                relance = inquirer.number(
+                    "Valeur de la relance (0 si pas de relance) : ", min_allowed=0
+                ).execute()
+                montant = f"/{relance}"
             else:
-                print(f"Impossible de faire '{action}'")
+                montant = ""
+
+            resp = requests.put(f"{host}{END_POINT}{action}/{id_joueur}{montant}")
+            if resp.status_code == 200:
+                return f"Action '{action}' effectuée !"
+            else:
+                # Tenter de récupérer le message d'erreur depuis le JSON
+                try:
+                    data = resp.json()
+                    return f"Erreur : {data.get('message', 'Impossible de faire cette action')}"
+                except Exception:
+                    return f"Impossible de faire '{action}'"
         except requests.RequestException as e:
             logger.error(f"Erreur serveur lors de l'action '{action}' : {e}")
-            print(f"Erreur serveur lors de l'action '{action}'")
+            return f"Erreur serveur lors de l'action '{action}'"
 
     def terminer_manche(self, numero_table: int):
         try:
-            resp = requests.get(f"{host}/manche/terminer/{numero_table}")
-            if resp.status_code == 200:
-                print("Vous avez quitté la manche")
-            else:
-                print("Impossible de quitter la manche")
+            resp = requests.put(f"{host}/manche/terminer/{numero_table}")
+            resp.raise_for_status()
+            message = str(resp.text).replace("\\n", "\n")
+
+            from view.menu_info_table import InfoTableMenu
+
+            return InfoTableMenu(numero_table, message, input_attente=True)
+        except requests.HTTPError:
+            try:
+                message = f"Erreur serveur : {resp.json().get('detail', resp.text)}"
+                return MenuManche(self.numero_table, self.pseudo, message=message, temps_attente=2)
+            except Exception:
+                message = f"Erreur serveur : {resp.text}"
+                return MenuManche(self.numero_table, self.pseudo, message=message, temps_attente=2)
         except requests.RequestException as e:
             logger.error(f"Erreur serveur lors de la fermeture de la manche : {e}")
-            print("Erreur serveur lors de la fermeture de la manche")
+            message = f"Erreur serveur lors de la fermeture de la manche : {e}"
+            return MenuManche(self.numero_table, self.pseudo, message=message, temps_attente=2)
