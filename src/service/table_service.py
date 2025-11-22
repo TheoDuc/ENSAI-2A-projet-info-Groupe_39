@@ -132,8 +132,12 @@ class TableService:
         """
 
         joueur = JoueurService().trouver_par_id(id_joueur)
+
         if not joueur:
             raise ValueError(f"Le joueur avec l'identifiant {id_joueur} n'existe pas")
+        if joueur.numero_table is not None:
+            raise ValueError("Le joueur est déjà à une table")
+
         table = self.table_par_numero(numero_table)
 
         joueur_dans_table = False
@@ -188,12 +192,16 @@ class TableService:
 
         table = self.table_par_numero(numero_table)
 
+        pseudos = []
+
         for id in range(len(table)):
             joueur = JoueurService().trouver_par_id(table.id_joueurs[id])
             if joueur.credit < table.grosse_blind:
                 self.retirer_joueur(joueur.id_joueur)
+            else:
+                pseudos.append(joueur.pseudo)
 
-        table.nouvelle_manche()
+        table.nouvelle_manche(pseudos)
         table.manche.preflop()
         p_blind = table.manche.info.joueurs[0]
         g_blind = table.manche.info.joueurs[1]
@@ -225,16 +233,7 @@ class TableService:
 
         table = self.table_par_numero(numero_table)
 
-        res = table.manche.affichage_complet()
-
-        if res[1] is None:
-            instructions = "La manche est terminée !"
-        else:
-            id_joueur = res[1]
-            joueur = JoueurService().trouver_par_id(id_joueur)
-            instructions = f"C'est à {joueur.pseudo} de jouer !"
-
-        return res[0] + instructions
+        return table.manche.affichage_complet()
 
     def regarder_main(self, id_joueur: int) -> str:
         """
@@ -260,7 +259,7 @@ class TableService:
         return table.manche.regarder_cartes(id_joueur)
 
     @log
-    def terminer_manche(self, numero_table: int) -> None:
+    def terminer_manche(self, numero_table: int) -> str:
         """
         Ajoute un joeuur à une table
 
@@ -285,3 +284,5 @@ class TableService:
         id_manche = MancheService().sauvegarder_manche(table.manche)
         MancheJoueurService().sauvegarder_manche_joueur(id_manche, table.manche.info)
         table.rotation_dealer()
+
+        return table.manche.resultats()

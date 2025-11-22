@@ -2,10 +2,8 @@
 
 import logging
 import os
-
 import requests
 from InquirerPy import inquirer
-
 from view.session import Session
 from view.vue_abstraite import VueAbstraite
 
@@ -24,11 +22,11 @@ class MenuTable(VueAbstraite):
         # Récupération des tables existantes
         try:
             reponse = requests.get(f"{host}{END_POINT}")
-            boutons_tables = reponse.json()  # Doit être une liste ["Table 1", "Table 2", ...]
+            boutons_tables = reponse.json()  # Liste de tables ["Table 1, ..."]
         except ValueError:
             boutons_tables = []
 
-        # Ajout des tables
+        # Ajout des tables à l'interface
         action_table += boutons_tables
 
         # Sélection du choix
@@ -38,50 +36,43 @@ class MenuTable(VueAbstraite):
         ).execute()
 
         # --- CAS FIXES ---
-
         if choix == "Retour au Menu Joueur":
             from view.menu_joueur_vue import MenuJoueurVue
-
             return MenuJoueurVue()
 
         if choix == "Créer une Table":
             from view.menu_creation_table import MenuCreationTable
-
             return MenuCreationTable()
 
         # --- CAS DES TABLES DYNAMIQUES ---
-
         if choix in boutons_tables:
             session = Session()
+            id_joueur = session.id_joueur  # ID du joueur connecté
 
             # Extraction du numéro de table
-            numero_table = int(choix.split()[1].replace(",", ""))
-            id_joueur = session.id
+            numero_table = int(choix.split()[1].rstrip(","))
 
             # Appel API pour rejoindre la table
-            req = requests.put(f"{host}{END_POINT}ajouter/{numero_table}/{id_joueur}")
+            try:
+                req = requests.put(f"{host}{END_POINT}ajouter/{numero_table}/{id_joueur}")
+                if req.status_code == 200:
+                    # Mise à jour locale
+                    session.numero_table = numero_table
+                    print(f"Vous êtes connecté sur la table {numero_table}")
 
-            if req.status_code == 200:
-                # Met à jour la session globale
-                joueur = next(
-                    (j for j in Session.joueurs_connectes if j.id_joueur == id_joueur),
-                    None,
-                )
-                if joueur:
-                    joueur.numero_table = numero_table
+                    # Redirection vers le menu infos table
+                    from view.menu_info_table import InfoTableMenu
+                    return InfoTableMenu().choisir_menu(numero_table)
+                else:
+                    print("Erreur lors de la connexion à la table")
+                    from view.menu_table import MenuTable
+                    return MenuTable()
+            except requests.RequestException as e:
+                logger.error(f"Erreur serveur : {e}")
+                print("Impossible de rejoindre la table")
+                from view.menu_table import MenuTable
+                return MenuTable()
 
-                print(f"Vous êtes connecté sur la table {numero_table}")
-                from view.menu_info_table import InfoTableMenu
-
-                return InfoTableMenu()
-
-            else:
-                print("Erreur lors de la connexion à la table")
-                from view.menu_joueur_vue import MenuJoueurVue
-
-                return MenuJoueurVue()
-
-        # Sécurité : retour menu joueur si choix invalide (rare)
+        # Sécurité : retour menu joueur si choix invalide
         from view.menu_joueur_vue import MenuJoueurVue
-
         return MenuJoueurVue()

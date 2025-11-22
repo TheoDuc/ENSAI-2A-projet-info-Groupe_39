@@ -1,6 +1,5 @@
 """Implémentation de la classe InfoManche"""
 
-from business_object.joueur import Joueur
 from business_object.main import Main
 
 
@@ -9,7 +8,7 @@ class InfoManche:
 
     __STATUTS = ("innactif", "en retard", "à jour", "couché", "all in")
 
-    def __init__(self, joueurs: list[Joueur]):
+    def __init__(self, joueurs: list[int], pseudos: list[str] = None):
         """
         Crée une nouvelle instance d'InfoManche pour suivre une manche.
 
@@ -40,6 +39,7 @@ class InfoManche:
             )
 
         self.__joueurs = joueurs
+        self.__pseudos = pseudos
         self.__statuts = [0 for _ in joueurs]
         self.__mains = [None for _ in joueurs]
         self.__mises = [0 for _ in joueurs]
@@ -57,6 +57,11 @@ class InfoManche:
         """
 
         return self.__joueurs
+
+    @property
+    def pseudos(self) -> list[str]:
+        """Renvoie le pseudo des joueurs"""
+        return self.__pseudos
 
     @property
     def statuts(self) -> list[int]:
@@ -135,14 +140,14 @@ class InfoManche:
         )
 
     def affichage_tout_joueur(self) -> str:
-        id_joueurs = [str(j) for j in self.__joueurs]
+        pseudos = [p for p in self.pseudos]
         statuts = [self.__STATUTS[s] for s in self.__statuts]
         mises = [str(m) for m in self.__mises]
         couches = [str(t) if t is not None else "-" for t in self.__tour_couche]
 
         col_widths = [
-            max(len(id_joueur), len(statut), len(mise), len(couche), 7)
-            for id_joueur, statut, mise, couche in zip(id_joueurs, statuts, mises, couches)
+            max(len(pseudo), len(statut), len(mise), len(couche), 7)
+            for pseudo, statut, mise, couche in zip(pseudos, statuts, mises, couches)
         ]
 
         def row(label, values):
@@ -154,7 +159,7 @@ class InfoManche:
         separator = "-" * (14 + sum(col_widths) + 3 * len(col_widths))
 
         lines.append(separator)
-        lines.append(row("Joueurs", id_joueurs))
+        lines.append(row("Joueurs", pseudos))
         lines.append(separator)
         lines.append(row("Statuts", statuts))
         lines.append(row("Mises", mises))

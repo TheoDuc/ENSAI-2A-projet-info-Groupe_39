@@ -1,9 +1,8 @@
 import os
-
 import requests
 from InquirerPy import inquirer
+import json
 
-from service.joueur_service import JoueurService
 from view.session import Session
 from view.vue_abstraite import VueAbstraite
 
@@ -11,12 +10,11 @@ host = os.environ.get("HOST_WEBSERVICE")
 
 
 class MenuJoueurVue(VueAbstraite):
-    """Menu du joueur avec rafraîchissement de la session multi-joueurs"""
+    """Menu du joueur avec session locale et récupération des infos via API"""
 
     def __init__(self, message="", temps_attente=0, input_attente=False):
         super().__init__(message, temps_attente, input_attente)
-        self.session = Session()
-        self.session.refresh()
+        self.session = Session()  
 
     def choisir_menu(self):
         print("\n" + "-" * 50 + "\nMenu Joueur\n" + "-" * 50 + "\n")
@@ -29,35 +27,33 @@ class MenuJoueurVue(VueAbstraite):
                 "Infos de session",
                 "Afficher les joueurs de la base de données",
                 "Changer ses informations",
-                "Lire les regles",
+                "Lire les règles",
                 "Se déconnecter",
             ],
         ).execute()
 
-        if not self.session.id:
+        if not self.session.id_joueur:
             print("Aucun joueur connecté")
             from view.accueil.accueil_vue import AccueilVue
-
             return AccueilVue()
 
         match choix:
             case "Se déconnecter":
-                requests.get(f"{host}/joueur/deconnection/{self.session.id}")
+                requests.get(f"{host}/joueur/deconnexion/{self.session.id_joueur}")
                 self.session.deconnexion()
                 from view.accueil.accueil_vue import AccueilVue
-
                 return AccueilVue()
 
             case "Infos de session":
                 print(self.session.afficher())
-                return MenuJoueurVue(temps_attente=3)
+                return MenuJoueurVue(temps_attente=2)
 
             case "Afficher les joueurs de la base de données":
                 try:
                     req = requests.get(f"{host}/joueur/liste/")
                     if req.status_code == 200:
                         reponse = req.json()
-                        print(reponse)
+                        print(json.dumps(reponse, indent=4, ensure_ascii=False))
                     else:
                         print("Impossible de récupérer la liste des joueurs")
                 except Exception:
@@ -69,27 +65,25 @@ class MenuJoueurVue(VueAbstraite):
 
             case "Tables":
                 from view.menu_table import MenuTable
-
                 return MenuTable()
 
             case "Se créditer":
                 return self.se_crediter()
 
-            case "Lire les regles":
+            case "Lire les règles":
                 texte = self._texte_regles()
                 return MenuJoueurVue(texte, input_attente=True)
 
     def changer_infos(self):
         """Permet de modifier le pseudo et le pays du joueur"""
-        id_joueur = self.session.id
-        req = requests.get(f"{host}/joueur/id/{id_joueur}")
-        if req.status_code != 200:
+        joueur_info = self.session.get_joueur()
+        if not joueur_info:
             print("Erreur lors de la récupération du joueur")
             return MenuJoueurVue()
 
-        reponse = req.json()
-        pseudo_actuel = reponse["_Joueur__pseudo"]
-        pays_actuel = reponse["_Joueur__pays"]
+        id_joueur = joueur_info["_Joueur__id_joueur"]
+        pseudo_actuel = joueur_info["_Joueur__pseudo"]
+        pays_actuel = joueur_info["_Joueur__pays"]
 
         nouveau_pseudo = inquirer.text(
             message=f"Entrez votre nouveau pseudo (actuel : {pseudo_actuel}) : "
@@ -101,21 +95,26 @@ class MenuJoueurVue(VueAbstraite):
         req = requests.put(f"{host}/joueur/{id_joueur}/{nouveau_pseudo}/{nouveau_pays}")
         if req.status_code == 200:
             print("Informations mises à jour avec succès")
-            return MenuJoueurVue()
         else:
             print("Erreur lors de la mise à jour")
-            return MenuJoueurVue()
+        return MenuJoueurVue()
 
     def se_crediter(self):
         """Permet à un administrateur d’ajouter du crédit à un joueur"""
-        joueur = JoueurService().trouver_par_id(self.session.id)
-        admin = inquirer.text(message="Etes vous un administrateur : (oui/non)").execute()
+        joueur_info = self.session.get_joueur()
+        if not joueur_info:
+            print("Impossible de récupérer le joueur")
+            return MenuJoueurVue()
+
+        pseudo = joueur_info["_Joueur__pseudo"]
+        admin = inquirer.text(message="Êtes-vous un administrateur : (oui/non)").execute()
         if admin.lower() != "oui":
             print("Vous n'êtes pas admin")
             return MenuJoueurVue()
+
         try:
-            credit = int(inquirer.text(message="Entrez votre montant à ajouter : ").execute())
-            req = requests.put(f"{host}/admin/crediter/{joueur.pseudo}/{credit}")
+            credit = int(inquirer.text(message="Entrez le montant à ajouter : ").execute())
+            req = requests.put(f"{host}/admin/crediter/{pseudo}/{credit}")
             if req.status_code == 200:
                 print("Crédit ajouté avec succès")
             else:
