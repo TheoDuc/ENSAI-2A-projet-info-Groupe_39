@@ -208,12 +208,38 @@ Vous pouvez tester les endpoints avec un client comme **Insomnia**, **Postman**,
 
 ### Exemples d’Endpoints
 
-- `/create` : créer une nouvelle partie et ajouter des joueurs
+Vous pouvez excecuter les requêtes suivantes sur insomnia ou postman une fois le webservice lancé :
+
+- `POST http://localhost/table/`: créer une nouvelle table
+```
+{
+  "numero_table": 2,
+  "joueurs_max": 7,
+  "grosse_blind": 100,
+  "mode_jeu": 1,
+  "joueurs": []
+}
+```
+- `POST http://localhost/joueur/connexion/{pseudo}`: Pour connecter un joueur deja existant avec son pseudo
+```
+{
+  "_Joueur__id_joueur": 3,
+  "_Joueur__pseudo": "nil",
+  "_Joueur__credit": 2000,
+  "_Joueur__pays": "fr",
+  "_Joueur__numero_table": null,
+  "_Joueur__est_admin": false
+}
+```
+- `GET http://localhost/table/joueurs/{numero_table}`: Pour ajouter un joueur à une table
+
+- `GET http://localhost/joueur/`: Pour récupérer la liste de tous les joueurs connectés
+
+- `GET http://localhost/action/suivre/{id_joueur}/{relance}`: Pour qu'un joueur suive une relance
 
 
-- `/start` : démarrer une partie
-- `/state` : récupérer l’état actuel de la partie
-- `/fold/{player_id}` : faire passer un joueur
+
+
 
 > 💡 Astuce : FastAPI fournit une documentation interactive à l’adresse `/docs` lorsque le serveur est lancé.
 
