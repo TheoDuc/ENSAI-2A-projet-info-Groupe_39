@@ -338,6 +338,11 @@ class Manche:
         if not isinstance(relance, int) or relance < 0:
             raise ValueError("Le montant doit être un entier positif")
 
+        if relance == 0 and self.info.statuts[indice_joueur] == 0:
+            raise ValueError(
+                "Vous ne pouvez pas suivre alors que vous êtes déjà à jour, il faut checker."
+            )
+
         pour_suivre = max(self.info.mises) - self.info.mises[indice_joueur]
 
         if pour_suivre >= credit_joueur:
