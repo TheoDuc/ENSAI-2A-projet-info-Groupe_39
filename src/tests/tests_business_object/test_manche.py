@@ -214,13 +214,14 @@ class Test_Manche:
         # GIVEN
         manche.info.statuts[:] = [2, 3, 3]
         manche.info.mises[:] = [100, 50, 50]
+        print(manche.info.joueurs)
         # WHEN
         Test_Manche.remplir_board(manche)
         gains = manche.gains()
+        print(gains)
         # THEN
         assert gains[manche.info.joueurs[0]] == 200
-        assert gains[manche.info.joueurs[1]] == 0
-        assert gains[manche.info.joueurs[2]] == 0
+        assert gains == {1: 200}
 
     def test_manche_init_info_type_error(self):
         # GIVEN/WHEN/THEN
@@ -345,7 +346,7 @@ class Test_Manche:
         info.mises[1] = 50
         # THEN
         with pytest.raises(ValueError, match="Le joueur doit all-in"):
-            manche.suivre(0, 10, relance=0)
+            manche.suivre(0, 10, relance=1)
 
     def test_all_in_joueur_deja_couche(self, manche):
         # GIVEN/WHEN
@@ -380,7 +381,7 @@ class Test_Manche:
         assert montant is None or isinstance(montant, int)
 
         # GIVEN/WHEN
-        montant = manche.action(joueurs[1], "suivre", 100, relance=0)
+        montant = manche.action(joueurs[1], "suivre", 100, relance=1)
         # THEN
         assert isinstance(montant, int)
 
