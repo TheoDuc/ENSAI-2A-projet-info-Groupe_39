@@ -80,25 +80,25 @@ class InfoTableMenu(VueAbstraite):
         joueurs_ids = self.get_joueurs_table(numero_table)
         if not joueurs_ids:
             message = "Impossible de lancer la manche : aucun joueur présent"
-            return message
+            return InfoTableMenu(self.numero_table, message, temps_attente=2)
 
         try:
-            resp = requests.put(f"{host}/manche/lancer/{numero_table}")
-            if resp.status_code == 200:
+            req = requests.put(f"{host}/manche/lancer/{numero_table}")
+            if req.status_code == 200:
                 message = "Manche lancée !"
-                id_joueur = joueurs_ids[0]
-                pseudo = f"Joueur{id_joueur}"
 
                 from view.menu_manche import MenuManche
 
-                return MenuManche().choisir_menu(numero_table, id_joueur, pseudo)
+                return MenuManche(self.numero_table, message, temps_attente=1)
             else:
-                message = "Erreur lors du lancement de la manche"
-                return message
+                message = (
+                    f"Erreur lors du lancement : {req.json().get('detail', 'Erreur inconnue')}"
+                )
+                return InfoTableMenu(self.numero_table, message, temps_attente=2)
+
         except requests.RequestException as e:
-            logger.error(f"Erreur serveur lors du lancement de la manche : {e}")
-            message = "Erreur serveur lors du lancement de la manche"
-            return message
+            message = f"Erreur serveur : {e}"
+            return InfoTableMenu(self.numero_table, message, temps_attente=2)
 
     def quitter_table(self, id_joueur: int):
         try:
