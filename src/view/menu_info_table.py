@@ -4,106 +4,87 @@ import requests
 from InquirerPy import inquirer
 from view.vue_abstraite import VueAbstraite
 
-# Logger
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
-
 host = os.environ.get("HOST_WEBSERVICE")
 END_POINT = "/table/"
 
+
 class InfoTableMenu(VueAbstraite):
-    """Menu de table multi-joueurs"""
+    """Menu de gestion d'une table ."""
 
     def choisir_menu(self, numero_table: int):
-        logger.info(f"Début InfoTableMenu pour la table {numero_table}")
+        """Boucle principale du menu de la table."""
+        while True:
+            print(f"\nBienvenue sur la table {numero_table}\n")
+            choix = inquirer.select(
+                message="Faites votre choix :",
+                choices=["Voir joueurs", "Lancer manche", "Quitter table"],
+            ).execute()
 
-        print(f"\nBienvenue sur la table {numero_table}\n")
-        choix = inquirer.select(
-            message="Faites votre choix : ",
-            choices=["Info de session", "Lancer manche", "Quitter table"],
-        ).execute()
-
-        match choix:
-            case "Info de session":
+            if choix == "Voir joueurs":
                 self.afficher_infos_table(numero_table)
-                return self  # On reste dans le menu infos table
 
-            case "Lancer manche":
-                return self.lancer_manche(numero_table)
+            elif choix == "Lancer manche":
+                menu_manche = self.lancer_manche(numero_table)
+                if menu_manche:
+                    return menu_manche  
 
-            case "Quitter table":
+            elif choix == "Quitter table":
                 return self.quitter_table(numero_table)
 
     def afficher_infos_table(self, numero_table: int):
-        # Récupération des joueurs dans la table
-        try:
-            resp_table = requests.get(f"{host}{END_POINT}{numero_table}")
-            table_joueurs_ids = resp_table.json() if resp_table.status_code == 200 else []
-        except requests.RequestException:
-            table_joueurs_ids = []
+        joueurs_ids = self.get_joueurs_table(numero_table)
 
-        # Récupération des joueurs connectés
-        try:
-            resp_connectes = requests.get(f"{host}/joueur/connectes/")
-            joueurs_connectes_ids = resp_connectes.json() if resp_connectes.status_code == 200 else []
-        except requests.RequestException:
-            joueurs_connectes_ids = []
-
-        # Filtrage : joueurs connectés sur cette table
-        joueurs_en_ligne = [jid for jid in table_joueurs_ids if jid in joueurs_connectes_ids]
-
-        print(f"Table n°{numero_table} ({len(joueurs_en_ligne)}/{len(table_joueurs_ids)}) joueurs connectés")
-        for jid in joueurs_en_ligne:
-            print(f"Joueur ID : {jid}")
+        print(f"\nTable n°{numero_table} ({len(joueurs_ids)} joueurs présents)")
+        for jid in joueurs_ids:
+            print(f" - Joueur ID : {jid}")
         print()
 
+    def get_joueurs_table(self, numero_table: int):
+        try:
+            resp = requests.get(f"{host}{END_POINT}joueurs/{numero_table}")
+            if resp.status_code == 200:
+                return resp.json()
+            else:
+                print("Impossible de récupérer les joueurs de la table")
+                return []
+        except requests.RequestException as e:
+            logger.error(f"Erreur serveur lors de la récupération des joueurs : {e}")
+            print("Erreur serveur lors de la récupération des joueurs de la table")
+            return []
+
     def lancer_manche(self, numero_table: int):
-        # Vérification qu'au moins 2 joueurs connectés
-        try:
-            resp_connectes = requests.get(f"{host}/joueur/connectes/")
-            joueurs_connectes_ids = resp_connectes.json() if resp_connectes.status_code == 200 else []
-        except requests.RequestException:
-            joueurs_connectes_ids = []
+        joueurs_ids = self.get_joueurs_table(numero_table)
+        if not joueurs_ids:
+            print("Impossible de lancer la manche : aucun joueur présent")
+            return None
 
         try:
-            resp_table = requests.get(f"{host}{END_POINT}{numero_table}")
-            table_joueurs_ids = resp_table.json() if resp_table.status_code == 200 else []
-        except requests.RequestException:
-            table_joueurs_ids = []
-
-        joueurs_table_connectes = [jid for jid in table_joueurs_ids if jid in joueurs_connectes_ids]
-
-        if len(joueurs_table_connectes) < 2:
-            print("Impossible de lancer la manche : au moins 2 joueurs connectés nécessaires")
-            from view.menu_joueur_vue import MenuJoueurVue
-            return MenuJoueurVue()
-
-        # Lancement de la manche via API
-        try:
-            req = requests.get(f"{host}{END_POINT}lancer/{numero_table}")
-            if req.status_code == 200:
+            resp = requests.put(f"{host}/manche/lancer/{numero_table}")
+            if resp.status_code == 200:
                 print("Manche lancée !")
-                from view.menu_manche_vue import MenuManche
-                return MenuManche()
+                id_joueur = joueurs_ids[0]
+                pseudo = f"Joueur{id_joueur}"
+
+                from view.menu_manche import MenuManche
+                return MenuManche().choisir_menu(numero_table, id_joueur, pseudo)
             else:
                 print("Erreur lors du lancement de la manche")
+                return None
         except requests.RequestException as e:
-            logger.error(f"Erreur serveur : {e}")
+            logger.error(f"Erreur serveur lors du lancement de la manche : {e}")
             print("Erreur serveur lors du lancement de la manche")
-
-        from view.menu_joueur_vue import MenuJoueurVue
-        return MenuJoueurVue()
+            return None
 
     def quitter_table(self, numero_table: int):
-        # On suppose que l'API gère le retrait du joueur de la table
         try:
-            req = requests.delete(f"{host}{END_POINT}{numero_table}")
-            if req.status_code == 200:
+            resp = requests.delete(f"{host}{END_POINT}{numero_table}")
+            if resp.status_code == 200:
                 print(f"Vous avez quitté la table {numero_table}")
             else:
                 print("Erreur lors de la déconnexion de la table")
         except requests.RequestException as e:
-            logger.error(f"Erreur serveur : {e}")
+            logger.error(f"Erreur serveur lors de la déconnexion de la table : {e}")
             print("Erreur serveur lors de la déconnexion de la table")
 
         from view.menu_joueur_vue import MenuJoueurVue
