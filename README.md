@@ -1,4 +1,4 @@
-# 🎲 ENSAI 2A — Projet Serveur de Poker (Groupe 39)
+# 🎲 ENSAI 2A — Projet: Serveur de Poker (Groupe 39)
 
 Ce projet a pour objectif de créer un **serveur de poker fonctionnel**, capable de gérer des tables et de faire jouer des parties de **Texas Hold’em**.  
 Les joueurs peuvent interagir avec le serveur via des requêtes **HTTP**, tandis que toutes les données importantes sont sauvegardées dans une base de données **PostgreSQL**.
