@@ -94,7 +94,7 @@ class Simple(AbstractCombinaison):
         str
             Chaîne lisible pour le joueur, exemple : "Simple".
         """
-        return "Simple"
+        return f"Simple {self.hauteur}"
 
     def __repr__(self) -> str:
         """

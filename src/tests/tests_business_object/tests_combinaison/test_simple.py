@@ -62,5 +62,5 @@ class Test_Simple:
         texte_repr = repr(simple)
 
         # THEN : vérifications
-        assert texte_str == "Simple"
+        assert texte_str == "Simple As"
         assert texte_repr == "Simple(hauteur='As', kicker=('Roi', 'Dame', 'Valet', '10'))"

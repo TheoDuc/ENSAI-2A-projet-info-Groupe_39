@@ -254,6 +254,7 @@ class Manche:
     @log
     def flop(self) -> str:
         """Révélation des 3 premières cartes communes"""
+        self.__reserve.bruler()
         for _ in range(3):
             self.__reserve.reveler(self.__board)
         self.nouveau_tour()
@@ -262,6 +263,7 @@ class Manche:
     @log
     def turn(self) -> str:
         """Révélation de la quatrième carte commune"""
+        self.__reserve.bruler()
         self.__reserve.reveler(self.__board)
         self.nouveau_tour()
         return "La phase de turn commence !"
@@ -269,6 +271,7 @@ class Manche:
     @log
     def river(self) -> str:
         """Révélation de la cinquième carte commune"""
+        self.__reserve.bruler()
         self.__reserve.reveler(self.__board)
         self.nouveau_tour()
         return "La phase de river commence !"
@@ -281,10 +284,14 @@ class Manche:
         """Vérifie si la manche est terminée"""
         n = sum(1 for s in self.info.statuts if s != 3)
         n_all = sum(1 for s in self.info.statuts if s == 4)
+        n_late = sum(1 for s in self.info.statuts if s == 1)
         if n == 0:
             raise ValueError("Les joueurs ne peuvent être tous couchés")
         return (
-            n_all == len(self.joueurs_en_lice) or n == 1 or (self.fin_du_tour() and self.tour == 3)
+            n_all == len(self.joueurs_en_lice)
+            or (n_all == len(self.joueurs_en_lice) - 1 and n_late == 0)
+            or n == 1
+            or (self.fin_du_tour() and self.tour == 3)
         )
 
     @log
@@ -579,41 +586,35 @@ class Manche:
         if len(self.board.cartes) != 5 and not self.fin:
             raise ValueError("Le board n'est pas complet, impossible de calculer les gains.")
 
-        if self.fin and len(self.board.cartes) < 5:
-            if self.tour == 0:
-                self.flop()
-            if self.tour == 1:
-                self.turn()
-            if self.tour == 2:
-                self.river()
-
         mises_restantes = self.info.mises[:]
         classement = self.classement()  # Rang 1 = meilleur
         gains = {j: 0 for j in self.info.joueurs}
 
         # Tant qu'il reste des mises à distribuer
         while any(m > 0 for m in mises_restantes):
-            # Joueurs actifs pour ce pot
-            participants = [i for i, m in enumerate(mises_restantes) if m > 0]
-            if not participants:
-                break
+            # Participants ayant encore misé ET toujours en lice
+            participants = [
+                i for i, m in enumerate(mises_restantes) if m > 0 and i in self.joueurs_en_lice
+            ]
 
-            # Montant minimum parmi les mises restantes
+            # S’il reste de l’argent mais plus aucun joueur actif → pot perdu ?
+            if not participants:
+                break  # évite la boucle infinie
+
             mise_min = min(mises_restantes[i] for i in participants)
-            # Montant du pot courant
             pot = sum(min(mises_restantes[i], mise_min) for i in participants)
 
-            # Déduire la mise_min de chaque participant
+            # On retire la mise du pot
             for i in participants:
                 mises_restantes[i] -= mise_min
 
-            # Identifier les meilleurs joueurs pour ce pot
+            # Trouver les gagnants du pot
             min_rang = min(classement[i] for i in participants)
-            meilleurs = [i for i in participants if classement[i] == min_rang]
+            winners = [i for i in participants if classement[i] == min_rang]
 
-            # Partage équitable du pot
-            part = pot // len(meilleurs)
-            for i in meilleurs:
+            part = pot // len(winners)
+
+            for i in winners:
                 gains[self.info.joueurs[i]] += part
 
         return gains
@@ -666,6 +667,18 @@ class Manche:
             raise ValueError(f"L'action {action} n'existe pas, actions possibles {actions}")
 
         if self.fin_de_manche():
+            # On passe les tours jusqu'au dernier en cas de fin de manche avant le dernier tour
+            if self.tour == 0:
+                for _ in range(3):
+                    self.__reserve.bruler()
+                    self.__reserve.reveler(self.__board)
+            if self.tour <= 1:
+                self.__reserve.bruler()
+                self.__reserve.reveler(self.__board)
+            if self.tour <= 2:
+                self.__reserve.bruler()
+                self.__reserve.reveler(self.__board)
+
             self.__fin = True
             return montant
 
