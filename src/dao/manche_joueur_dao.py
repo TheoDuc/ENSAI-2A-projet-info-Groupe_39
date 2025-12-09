@@ -45,11 +45,12 @@ class MancheJoueurDAO(metaclass=Singleton):
                         carte1 = None
                         carte2 = None
                         gain = gains[i]
-                        if hasattr(info_manche, "cartes_mains"):
-                            try:
-                                carte1, carte2 = info_manche.cartes_mains[i]
-                            except (IndexError, TypeError):
-                                pass  # reste None si non défini
+                        # if hasattr(info_manche, "cartes_mains"):
+                        try:
+                            carte1 = info_manche.mains[i].cartes[0]
+                            carte2 = info_manche.mains[i].cartes[1]
+                        except (IndexError, TypeError):
+                            pass  # reste None si non défini
 
                         # Insertion SQL
                         cursor.execute(
@@ -76,8 +77,8 @@ class MancheJoueurDAO(metaclass=Singleton):
                             {
                                 "id_manche": id_manche,
                                 "id_joueur": joueur,
-                                "carte_main_1": carte1,
-                                "carte_main_2": carte2,
+                                "carte_main_1": str(carte1),
+                                "carte_main_2": str(carte2),
                                 "gain": gain,
                                 "mise": info_manche.mises[i],
                                 "tour_couche": info_manche.tour_couche[i],
