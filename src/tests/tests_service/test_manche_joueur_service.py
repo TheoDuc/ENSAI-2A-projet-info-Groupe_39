@@ -17,7 +17,7 @@ class Test_MancheJoueurService:
 
         # THEN
         assert result is True
-        mock_dao.creer_manche_joueur.assert_called_once_with(1, "info_manche_mock")
+        mock_dao.creer_manche_joueur.assert_called_once_with(1, "info_manche_mock",{})
 
     @patch("src.service.manche_joueur_service.MancheJoueurDAO")
     def test_trouver_par_ids_ok(self, MockDAO):

@@ -15,7 +15,7 @@ class MancheJoueurDAO(metaclass=Singleton):
 
     # ---------------------------------------------------------------------
     @log
-    def creer_manche_joueur(self, id_manche: int, info_manche: InfoManche) -> bool:
+    def creer_manche_joueur(self, id_manche: int, info_manche: InfoManche, gains : dict = {}) -> bool:
         """
         Création des entrées de la table manche_joueur pour une manche donnée.
 
@@ -34,17 +34,13 @@ class MancheJoueurDAO(metaclass=Singleton):
         try:
             with DBConnection().connection as connection:
                 with connection.cursor() as cursor:
-                    # Récupération des gains depuis InfoManche si possible, sinon 0
-                    try:
-                        gains = info_manche.gains()
-                    except AttributeError:
-                        gains = [0] * len(info_manche.joueurs)
-
                     for i, joueur in enumerate(info_manche.joueurs):
                         # Cartes du joueur si elles existent
                         carte1 = None
                         carte2 = None
-                        gain = gains[i]
+                        gain = 0 
+                        if joueur in gains :
+                            gain = gains[joueur]
                         # if hasattr(info_manche, "cartes_mains"):
                         try:
                             carte1 = info_manche.mains[i].cartes[0]

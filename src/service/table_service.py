@@ -283,7 +283,7 @@ class TableService:
                 CreditService().crediter(joueur, montant)
 
             id_manche = MancheService().sauvegarder_manche(table.manche)
-            MancheJoueurService().sauvegarder_manche_joueur(id_manche, table.manche.info)
+            MancheJoueurService().sauvegarder_manche_joueur(id_manche, table.manche.info, gains)
             table.rotation_dealer()
 
         return table.manche.resultats()

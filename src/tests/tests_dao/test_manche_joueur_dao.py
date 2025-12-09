@@ -5,6 +5,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from business_object.info_manche import InfoManche
+from business_object.main import Main
 from business_object.joueur import Joueur
 from dao.manche_joueur_dao import MancheJoueurDAO
 
@@ -17,8 +18,9 @@ class TestMancheJoueurDAO:
         j1 = 1
         j2 = 2
 
-        info = InfoManche([j1, j2])
+        info = InfoManche([j1, j2],)
         info.modifier_mise(0, 100)
+        info.assignation_mains([Main([pytest.trois_carreau, pytest.quatre_carreau]), Main([pytest.as_carreau, pytest.roi_carreau])])
         info.modifier_tour_couche(1, 2)
 
         return dao, info
@@ -34,7 +36,7 @@ class TestMancheJoueurDAO:
         mock_db.return_value.connection.__enter__.return_value = mock_conn
         mock_conn.cursor.return_value.__enter__.return_value = mock_cursor
 
-        result = dao.creer_manche_joueur(1, info_manche)
+        result = dao.creer_manche_joueur(1, info_manche,{})
 
         assert result is True
         assert mock_cursor.execute.call_count == 2

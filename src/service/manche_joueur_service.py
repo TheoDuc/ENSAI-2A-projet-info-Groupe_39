@@ -11,9 +11,9 @@ class MancheJoueurService:
     dao = MancheJoueurDAO()
 
     @log
-    def sauvegarder_manche_joueur(self, id_manche: int, info_manche) -> bool:
+    def sauvegarder_manche_joueur(self, id_manche: int, info_manche, gains = {}) -> bool:
         """Crée les participations des joueurs à une manche."""
-        return MancheJoueurDAO().creer_manche_joueur(id_manche, info_manche)
+        return MancheJoueurDAO().creer_manche_joueur(id_manche, info_manche, gains)
 
     def trouver_par_ids(self, id_manche: int, id_joueur: int) -> list[dict]:
         """Récupère les participations d’un joueur spécifique à une manche."""
