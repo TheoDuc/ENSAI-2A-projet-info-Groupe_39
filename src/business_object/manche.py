@@ -650,7 +650,7 @@ class Manche:
         indice_joueur = self.indice_joueur(id_joueur)
 
         if indice_joueur != self.indice_joueur_actuel:
-            raise Exception(f"Ce n'est pas au joueur {id_joueur} de jouer")
+            raise Exception(f"Ce n'est pas à vous de jouer !")
         if self.fin:
             raise Exception("La manche est déjà terminée, aucune action ne peut être effectuée")
 

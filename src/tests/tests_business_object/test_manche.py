@@ -316,7 +316,7 @@ class Test_Manche:
 
     def test_action_exceptions(self, manche, joueurs):
         # GIVEN/WHEN/THEN
-        with pytest.raises(Exception, match="Ce n'est pas au joueur 2 de jouer"):
+        with pytest.raises(Exception, match="Ce n'est pas à vous de jouer !"):
             manche.action(joueurs[1], "checker")
 
         # GIVEN/WHEN
