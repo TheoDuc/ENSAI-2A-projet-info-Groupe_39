@@ -217,7 +217,7 @@ class Table:
 
         if len(self.__id_joueurs) < 2:
             raise Exception(
-                f"Trop peu de joeuurs sur la table pour lancer une manche : {len(self.__id_joueurs)}"
+                f"Trop peu de joueurs sur la table pour lancer une manche : {len(self.__id_joueurs)}"
             )
 
         self.__manche = Manche(
