@@ -586,36 +586,57 @@ class Manche:
         if len(self.board.cartes) != 5 and not self.fin:
             raise ValueError("Le board n'est pas complet, impossible de calculer les gains.")
 
-        mises_restantes = self.info.mises[:]
-        classement = self.classement()  # Rang 1 = meilleur
-        gains = {j: 0 for j in self.info.joueurs}
+        # copies / structures locales
+        mises_restantes = self.info.mises[:]  # liste modifiable
+        classement = self.classement()        # liste des rangs (1 = meilleur, 0 = hors course)
+        joueurs = self.info.joueurs           # liste d'objets Joueur
+        n = len(joueurs)
 
-        # Tant qu'il reste des mises à distribuer
+        # init gains à 0 (clé : Joueur)
+        gains = {j: 0 for j in joueurs}
+
+        # tant qu'il reste de l'argent à distribuer
         while any(m > 0 for m in mises_restantes):
-            # Participants ayant encore misé ET toujours en lice
-            participants = [
-                i for i, m in enumerate(mises_restantes) if m > 0 and i in self.joueurs_en_lice
-            ]
+            # participants qui ont contribué à ce round (TOUS ceux avec mise > 0)
+            participants_all = [i for i, m in enumerate(mises_restantes) if m > 0]
+            if not participants_all:
+                break  # sécurité
 
-            # S’il reste de l’argent mais plus aucun joueur actif → pot perdu ?
-            if not participants:
-                break  # évite la boucle infinie
+            # niveau minimal parmi ces participants
+            mise_min = min(mises_restantes[i] for i in participants_all)
 
-            mise_min = min(mises_restantes[i] for i in participants)
-            pot = sum(min(mises_restantes[i], mise_min) for i in participants)
+            # valeur du pot courant (prend mise_min de chaque participant_all)
+            pot = sum(min(mises_restantes[i], mise_min) for i in participants_all)
 
-            # On retire la mise du pot
-            for i in participants:
-                mises_restantes[i] -= mise_min
+            # retirer la part correspondant à ce niveau
+            for i in participants_all:
+                prises = min(mises_restantes[i], mise_min)
+                mises_restantes[i] -= prises
 
-            # Trouver les gagnants du pot
-            min_rang = min(classement[i] for i in participants)
-            winners = [i for i in participants if classement[i] == min_rang]
+            # candidats au pot = participants_all
+            # mais seuls les joueurs encore en lice peuvent gagner (statut "en lice")
+            candidats = [i for i in participants_all if i in self.joueurs_en_lice]
 
-            part = pot // len(winners)
+            # s'il n'y a pas de candidat (rare/impossible normalement), on répartit aux contributeurs
+            if not candidats:
+                candidats = participants_all
+
+            # trouver le meilleur rang parmi les candidats (1 = top)
+            meilleurs_rang = min(classement[i] for i in candidats)
+            winners = [i for i in candidats if classement[i] == meilleurs_rang]
+
+            # partage équitable
+            part_entiere = pot // len(winners)
+            reste = pot - part_entiere * len(winners)
 
             for i in winners:
-                gains[self.info.joueurs[i]] += part
+                gains[joueurs[i]] += part_entiere
+
+            # distribuer le reste suivant une règle déterministe :
+            # par ex. au winner ayant l'indice minimal dans la table (ou selon dealer).
+            # Ici on donne le reste aux winners dans l'ordre d'apparition.
+            for k in range(reste):
+                gains[joueurs[winners[k % len(winners)]]] += 1
 
         return gains
 
