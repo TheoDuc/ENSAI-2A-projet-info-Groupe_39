@@ -6,7 +6,7 @@ INSERT INTO manche(carte1, carte2, carte3, carte4, carte5) VALUES
 INSERT INTO joueur(pseudo, credit, pays) VALUES
 ('admin',       0,         'fr'),
 ('théo',        1000,      'fr'),
-('nil',         2000,      'fr'),
+('nil',         500,      'fr'),
 ('cheick',      2500,      'fr'),
 ('guillaume',   2300,      'us'),
 ('marine',      2100,      'uk');

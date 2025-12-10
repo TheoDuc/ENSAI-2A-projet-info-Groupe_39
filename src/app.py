@@ -12,7 +12,7 @@ from service.table_service import TableService
 from utils.log_init import initialiser_logs
 from utils.reset_database import ResetDatabase
 
-app = FastAPI(title="Mon webservice")
+app = FastAPI(title="ENS'ALL IN")
 
 
 initialiser_logs("Webservice")
